@@ -18,7 +18,7 @@
 
     return KBWidget({
         name: "kbasePhenotypeSet",
-        parent : kbaseWidget,
+        
         version: "1.0.0",
         options: {
             color: "black",

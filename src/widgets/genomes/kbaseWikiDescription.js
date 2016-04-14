@@ -35,7 +35,7 @@
  
     return KBWidget({
         name: "KBaseWikiDescription",
-        parent : kbaseWidget,
+        
         version: "1.0.0",
 
         /**

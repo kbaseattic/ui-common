@@ -19,7 +19,7 @@
 
     return KBWidget({
         name: "KBaseGeneOperon",
-        parent : kbaseWidget,
+        
         version: "1.0.0",
 
         options: {

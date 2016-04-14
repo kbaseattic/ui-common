@@ -13,7 +13,7 @@ define (
  
     return KBWidget({ 
         name: "KBaseMAKResultCard", 
-        parent : kbaseWidget, 
+         
         version: "1.0.0",
 
         options: {

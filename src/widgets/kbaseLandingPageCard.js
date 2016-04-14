@@ -21,7 +21,7 @@
 
     return KBWidget({
         name: "LandingPageCard", 
-        parent : kbaseWidget,
+        
         version: "1.0.0",
         options: { 
             resizable: true,

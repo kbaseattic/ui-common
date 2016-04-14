@@ -49,7 +49,7 @@
 
     return KBWidget({
         name: "KBaseMultiContigBrowser",
-        parent : kbaseWidget,
+        
         version: "1.0.0",
         options: {
             genomeID: null,

@@ -13,7 +13,7 @@ define (
  
     return KBWidget({ 
         name: "KBaseBambiRawOutputCard", 
-        parent : kbaseWidget, 
+         
         version: "1.0.0",
 
         options: {

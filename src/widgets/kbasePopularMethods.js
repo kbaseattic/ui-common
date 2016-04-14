@@ -17,7 +17,7 @@ define (
 
     return KBWidget({
         name: "kbasePopularMethods",
-        parent : kbaseWidget,
+        
         version: "1.0.0",
 
         _accessors : ['stats'],

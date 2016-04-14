@@ -23,7 +23,7 @@
 
     return KBWidget({
         name: "KBaseGeneStructureMatches",
-        parent : kbaseWidget,
+        
         version: "1.0.0",
 
         options: {

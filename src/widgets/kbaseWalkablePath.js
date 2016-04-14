@@ -20,7 +20,7 @@
 
     return KBWidget({
         name: "kbaseWalkablePath",
-        parent : kbaseWidget,
+        
         version: "1.0.0",
         options: {
             narrativeMethodStoreURL : "https://kbase.us/services/narrative_method_store/rpc",
