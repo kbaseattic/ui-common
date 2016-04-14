@@ -50,7 +50,7 @@ sub rewrite {
   unshift(@def, 'kbwidget', 'bootstrap');
 
   my %seen = ();
-  @def = grep { ! $seen{$_} } @def;
+  @def = grep { ! $seen{$_}++ } @def;
 
   return "define (\n\t[\n" . join(",\n", map{"\t\t'$_'"} @def) . "\n\t], function(\n"
     . join(",\n", map {stupidRewriteRule($_)} @def) . "\n\t)";
