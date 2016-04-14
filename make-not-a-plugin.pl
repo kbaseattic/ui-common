@@ -33,6 +33,7 @@ foreach my $file (@files) {
   $widget =~ s/^((?:[^=\n]+=)?)([^\S\n]*)(.+)\.(kbase\w+)\s*\(\s*\)/$1$2 new $4($3)/gm;
 
   $widget =~ s/parent\s*:\s*(['"])(\w+)\1/parent : $2/g;
+  $widget =~ s/parent : kbaseWidget\s*,//g;
 
   open my $wfh, '>', $file;
   print $wfh $widget;
@@ -78,6 +79,6 @@ sub stupidRewriteRule {
   elsif (@$funcs) {
     $module = shift @$funcs;
   }
-  $module =~ s!/!_!g;
+  $module =~ s![/-]+!_!g;
   return "\t\t" . $module;
 }
