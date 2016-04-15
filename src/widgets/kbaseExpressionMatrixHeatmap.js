@@ -5,14 +5,12 @@ define (
 		'kbwidget',
 		'bootstrap',
 		'jquery',
-		'kbwidget',
 		'kbaseAuthenticatedWidget',
 		'kbaseHeatmap'
 	], function(
 		KBWidget,
 		bootstrap,
 		$,
-		KBWidget,
 		kbaseAuthenticatedWidget,
 		kbaseHeatmap
 	) {

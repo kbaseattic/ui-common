@@ -38,7 +38,6 @@ define (
 		'd3',
 		'kbasePiechart',
 		'kbaseTable',
-		'kbwidget',
 		'kbaseAuthenticatedWidget',
 		'kbaseTabs'
 	], function(
@@ -49,7 +48,6 @@ define (
 		d3,
 		kbasePiechart,
 		kbaseTable,
-		KBWidget,
 		kbaseAuthenticatedWidget,
 		kbaseTabs
 	) {

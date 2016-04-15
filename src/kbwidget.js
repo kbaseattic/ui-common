@@ -164,6 +164,7 @@ define (
     }
 
     var defaultBindingAccessors = function(elem) {
+
         var tagName = $(elem).prop('tagName').toLowerCase();
 
         if (tagName.match(/^(input|select|textarea)$/)) {
@@ -463,13 +464,23 @@ define (
         def = (def || {});
 
         var Widget = function ($elem) {
+
+          var self = this;
+
+          //XXX THIS IS FOR BACKWARDS COMPATIBILITY WITH JQUERY PLUGIN SYNTAX __ONLY__
+          if (! (this instanceof Widget)) {
+            var args = $elem;
+            self = new Widget(this, args);
+            $elem = this;
+            if (window.console) {console.warn("deprecated plugin style construction of", def.name, this, args, self, self.prototype);}
+          }
+          //XXX END BACKWARDS HACK
+
             if ($elem.get(0) != undefined && $elem.get(0).kb_obj != undefined) {
               return $elem.get(0).kb_obj;
             }
 
-            var self = this;
-
-            this.$elem = $elem;
+            self.$elem = $elem;
             if ($elem.get(0) != undefined) {
               $elem.get(0).kb_obj = self;
             }
@@ -477,7 +488,7 @@ define (
             var args = Array.prototype.slice.call(arguments, 1);
 
             $elem[def.name] = function(method) {
-
+            if (window.console) {console.warn("deprecated plugin style method call of", def.name, method);}
               return self.prototype[method].apply(
                   $self[method](
                     args
@@ -485,12 +496,12 @@ define (
               );
             }
 
-            this.init.apply(this, args);
+            self.init.apply(this, args);
 
-            this._init = true;
-            this.trigger('initialized');
+            self._init = true;
+            self.trigger('initialized');
 
-            return this;
+            return self;
         }
 
         Widget.options = $.extend(true, {}, def.options);
@@ -607,6 +618,10 @@ define (
         if (parent) {
             Widget.prototype.options = $.extend(true, {}, parent.prototype.options, Widget.prototype.options);
         }
+
+        //XXX THIS IS FOR BACKWARDS COMPATIBILITY WITH JQUERY PLUGIN SYNTAX __ONLY__
+        $.fn[def.name] = Widget;
+        //XXX END BACKWARDS HACK
 
         return Widget;
 
@@ -825,12 +840,14 @@ define (
             },
 
             sortCaseInsensitively : function sortCaseInsensitively (a,b) {
+
                      if (a.toLowerCase() < b.toLowerCase()) { return -1 }
                 else if (a.toLowerCase() > b.toLowerCase()) { return 1  }
                 else                            { return 0  }
             },
 
             sortByKey : function sortByKey (key, insensitively) {
+
                 if (insensitively) {
                     return function (a,b) {
                              if (a[key].toLowerCase() < b[key].toLowerCase()) { return -1 }

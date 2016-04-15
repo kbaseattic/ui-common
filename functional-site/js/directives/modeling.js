@@ -14,7 +14,7 @@ angular.module('modeling-directives')
 
             var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped">');
-            var tabs = container.kbTabs({tabs: [
+            var tabs = container.kbaseTabTableTabs({tabs: [
                                             {name: 'Selection', content: selectionTable, active: true} 
                                         ]});
 

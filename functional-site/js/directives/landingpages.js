@@ -605,7 +605,7 @@ kbaseSimulationSet(            $(p.body()), {ws: scope.ws, name: scope.id})
         link: function(scope, ele, attrs) {
             var ids = scope.ids;
 
-            var tabs = $(ele).kbTabs()
+            var tabs = $(ele).kbaseTabTableTabs()
             for (var i = 0; i < ids.length; i++) {
                 var id = ids[i];
 
@@ -625,7 +625,7 @@ kbaseRxn(                content, {id: id});
         link: function(scope, ele, attrs) {
             var ids = scope.ids;
 
-            var tabs = $(ele).kbTabs()
+            var tabs = $(ele).kbaseTabTableTabs()
             for (var i = 0; i < ids.length; i++) {
                 var id = ids[i];
 

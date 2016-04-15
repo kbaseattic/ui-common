@@ -50,7 +50,7 @@
 
 
     return KBWidget({
-        name: "kbTabs",
+        name: "kbaseTabTableTabs",
         version: "1.0.0",
         init: function(options) {
             this._super(options);

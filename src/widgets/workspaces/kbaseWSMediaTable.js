@@ -3,13 +3,11 @@ define (
 		'kbwidget',
 		'bootstrap',
 		'jquery',
-		'kbwidget',
 		'kbasePanel'
 	], function(
 		KBWidget,
 		bootstrap,
 		$,
-		KBWidget,
 		kbasePanel
 	) {
 

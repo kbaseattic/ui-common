@@ -3,13 +3,11 @@ define (
 		'kbwidget',
 		'bootstrap',
 		'jquery',
-		'kbwidget',
 		'kbasePrompt'
 	], function(
 		KBWidget,
 		bootstrap,
 		$,
-		KBWidget,
 		kbasePrompt
 	) {
 

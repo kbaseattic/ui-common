@@ -5,13 +5,11 @@
 		'kbwidget',
 		'bootstrap',
 		'jquery',
-		'kbwidget',
 		'kbaseAuthenticatedWidget'
 	], function(
 		KBWidget,
 		bootstrap,
 		$,
-		KBWidget,
 		kbaseAuthenticatedWidget
 	) {
 

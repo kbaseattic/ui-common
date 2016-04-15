@@ -6,14 +6,12 @@ define (
 		'bootstrap',
 		'jquery',
 		'kbaseTable',
-		'kbwidget',
 		'kbaseAuthenticatedWidget'
 	], function(
 		KBWidget,
 		bootstrap,
 		$,
 		kbaseTable,
-		KBWidget,
 		kbaseAuthenticatedWidget
 	) {
 

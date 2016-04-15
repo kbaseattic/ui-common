@@ -63,7 +63,7 @@ return KBWidget({
         }
 
         uiTabs[0].active = true;
-        tabs = self.$elem.kbTabs({tabs: uiTabs});
+        tabs = self.$elem.kbaseTabTableTabs({tabs: uiTabs});
 
         //
         // 3) get meta data, add any metadata tables
