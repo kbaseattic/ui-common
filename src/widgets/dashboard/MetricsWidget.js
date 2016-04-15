@@ -1,4 +1,17 @@
-define(['kb.widget.dashboard.base', 'postal', 'kb.config'], function (DashboardWidget, Postal, Config) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.widget.dashboard.base',
+		'postal',
+		'kb.config'
+	], function(
+		KBWidget,
+		bootstrap,
+		DashboardWidget,
+		Postal,
+		Config
+	) {
    return Object.create(DashboardWidget, {
       init: {
          value: function (cfg) {

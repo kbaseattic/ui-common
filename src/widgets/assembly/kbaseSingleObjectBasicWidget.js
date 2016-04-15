@@ -9,9 +9,9 @@
 
 
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseSingleObjectBasicWidget',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '1.0.1',
         options: {
             objId: null,

@@ -1,7 +1,7 @@
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseMemeMotifCard",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             title: "MEME Motif",

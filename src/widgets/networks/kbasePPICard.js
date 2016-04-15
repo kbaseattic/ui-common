@@ -2,9 +2,9 @@
    Create a card with a table showing a PPI dataset
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBasePPICard",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.2",
         options: {
 	    id: null,

@@ -1,6 +1,7 @@
-(function( $, undefined ) {
 
-$.KBWidget({
+define(['kbwidget', 'jquery', 'bootstrap', 'kbaseTabTableTabs'],
+function(KBWidget, $, bootstrap, kbaseTabTableTabs) {
+return KBWidget({
     name: "kbasePathways",
     version: "1.0.0",
     init: function(options) {
@@ -18,7 +19,7 @@ $.KBWidget({
         // add tabs
         var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
             class="table table-bordered table-striped">');
-        var tabs = container.kbTabs({tabs: [
+        var tabs = container.kbaseTabTableTabs({tabs: [
                                         {name: 'Selection', content: selectionTable, active: true}
                                     ]});
 
@@ -124,7 +125,7 @@ $.KBWidget({
     }  //end init
 
 })
-}( jQuery ) );
+});
 
 
 

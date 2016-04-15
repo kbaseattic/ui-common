@@ -2,9 +2,9 @@
  * @author Roman Sutormin <rsutormin@lbl.gov>
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseKidlWebEditor',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             type: null,

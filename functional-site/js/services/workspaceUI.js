@@ -35,7 +35,7 @@ app.service('modals', function() {
                       '</div>')
 
 
-        var createModal = $('<div>').kbasePrompt({
+        var createModal =  new kbasePrompt($('<div>'), {
                 title : 'Create Workspace',
                 body : body,
                 modalClass : '', 
@@ -102,7 +102,7 @@ app.service('modals', function() {
     }
 
     /*
-    var modal = $('<div>').kbaseModal({title: 'Create Workspace',
+    var modal =  new kbaseModal($('<div>'), {title: 'Create Workspace',
                                        body: body,
                                        buttons: [{text: 'Cancel'},
                                                  {text: 'Create', kind: 'primary'}]
@@ -135,7 +135,7 @@ app.service('modals', function() {
                      '</div>');
         
 
-        var copyWSModal = $('<div>').kbasePrompt({
+        var copyWSModal =  new kbasePrompt($('<div>'), {
                 title : 'Copy Workspace <i>'+ws_name+'</i>',
                 body : body,
                 modalClass : '', 
@@ -210,7 +210,7 @@ app.service('modals', function() {
         var body = $('<div style="text-align: center;">Are you sure you want to delete this workspace?<h3>'
                         +ws_name+'</h3>This action is irreversible.</div>');
 
-        var deleteModal = $('<div>').kbasePrompt({
+        var deleteModal =  new kbasePrompt($('<div>'), {
                 title : 'Delete Workspace',
                 body : body,
                 modalClass : '', 
@@ -264,7 +264,7 @@ app.service('modals', function() {
         var content = $('<div>');
 
         var permData;
-        var manage_modal = $('<div>').kbasePrompt({
+        var manage_modal =  new kbasePrompt($('<div>'), {
                 title : 'Manage Workspace '+
                     (USER_ID ? '<a class="btn btn-primary btn-xs btn-edit">Edit <span class="glyphicon glyphicon-pencil"></span></a>' : ''),
                 body : content,

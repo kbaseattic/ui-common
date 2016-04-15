@@ -1,11 +1,40 @@
 // This is main.js
-define('jquery', [], function () {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		']',
+		'function () {
    return jQuery;
 });
-//NB underscore, as of 1.6, inclues AMD compatible loading. However, other parts of the kbase
-// codebase may rely on underscore being loaded globally, so se just use the global version, which 
+//NB underscore',
+		'as of 1.6',
+		'inclues AMD compatible loading. However',
+		'other parts of the kbase
+// codebase may rely on underscore being loaded globally',
+		'so se just use the global version',
+		'which 
 // must already be loaded.
-define('underscore', [], function () {
+define(underscore',
+		'['
+	], function(
+		KBWidget,
+		bootstrap,
+		],
+		function () {
+   return jQuery;
+});
+_NB underscore,
+		as of 1.6,
+		inclues AMD compatible loading. However,
+		other parts of the kbase
+_ codebase may rely on underscore being loaded globally,
+		so se just use the global version,
+		which 
+_ must already be loaded.
+define(underscore,
+		[
+	) {
    return _;
 });
 var kbClients = [

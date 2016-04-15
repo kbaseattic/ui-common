@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbasePathway",     
     version: "1.0.0",
     options: {

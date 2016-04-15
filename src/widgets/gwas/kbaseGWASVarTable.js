@@ -1,7 +1,7 @@
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGWASVarTable",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
             width: 500,

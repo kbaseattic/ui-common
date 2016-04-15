@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseMediaEditor",
     version: "1.0.0",
     options: {
@@ -127,7 +127,7 @@ $.KBWidget({
                 	minflux.push(minfluxes[i].value);
                 	maxflux.push(maxfluxes[i].value);
                 }
-                //var test = $('#save-to-ws').kbaseSimpleWSSelect({defaultWS:ws, auth: token});
+                //var test =  new kbaseSimpleWSSelect($('#save-to-ws'), {defaultWS:ws, auth: token});
                 //test.show();
 				var newmedia = {
                     wsid: media,

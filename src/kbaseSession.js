@@ -1,7 +1,23 @@
 /*global define: true */
 /*jslint browser:true  vars: true */
-define(['jquery', 'q', 'kb.cookie', 'kb.config', 'kb.logger'],
-    function ($, Q, Cookie, Config, Logger) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'q',
+		'kb.cookie',
+		'kb.config',
+		'kb.logger'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		Q,
+		Cookie,
+		Config,
+		Logger
+	) {
         'use strict';
         var Session = Object.create({}, {
             // Property Constants

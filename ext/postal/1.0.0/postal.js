@@ -8,7 +8,16 @@
 (function (root, factory) { /* istanbul ignore if  */
     if (typeof define === "function" && define.amd) {
         // AMD. Register as an anonymous module.
-        define(["lodash"], function (_) {
+        define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'lodash'
+	], function(
+		KBWidget,
+		bootstrap,
+		_
+	) {
             return factory(_, root);
         }); /* istanbul ignore else */
     } else if (typeof module === "object" && module.exports) {

@@ -7,9 +7,9 @@
 
 
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseReferenceAssembly',
-        parent: 'kbaseSingleObjectBasicWidget',
+        parent : kbaseSingleObjectBasicWidget,
         version: '1.0.1',
 
         getDataModel: function(objData){

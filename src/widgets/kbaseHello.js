@@ -3,9 +3,9 @@
  * in a user-defined color (must be a css color - 'red' or 'yellow' or '#FF0000')
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "HelloWidget",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             color: "black",

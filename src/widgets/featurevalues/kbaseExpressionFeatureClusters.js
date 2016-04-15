@@ -4,9 +4,9 @@
  * @public
  */
 
-$.KBWidget({
+return KBWidget({
 		name: 'kbaseExpressionFeatureClusters',
-		parent: 'kbaseAuthenticatedWidget',
+		parent : kbaseAuthenticatedWidget,
 		version: '1.0.0',
 		options: {
 			clusterSetID: null,
@@ -128,7 +128,7 @@ $.KBWidget({
 			var tabPane = $('<div id="'+pref+'tab-content">');
 			container.append(tabPane);
 
-			tabPane.kbaseTabs({canDelete : true, tabs : []});                    
+			 new kbaseTabs(tabPane, {canDelete : true, tabs : []});                    
 			///////////////////////////////////// Overview table ////////////////////////////////////////////           
 			var tabOverview = $("<div/>");
 			tabPane.kbaseTabs('addTab', {tab: 'Overview', content: tabOverview, canDelete : false, show: true});

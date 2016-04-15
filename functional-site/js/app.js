@@ -635,7 +635,7 @@ app.service('userState', function userStateService() {
 //add the login widget as a module
 var kbaseLogin = angular.module('kbaseLogin', []);
 kbaseLogin.factory('kbaseLogin', function() {
-  return $('#signin-button').kbaseLogin(); // assumes underscore has already been loaded on the page
+   new kbaseLogin(return $('#signin-button')); // assumes underscore has already been loaded on the page
 });
 
 //add the Google Feeds API as a module
@@ -694,7 +694,7 @@ app.run(function ($rootScope, $state, $stateParams, $location) {
     });
 
 
-    $('#signin-button').kbaseLogin();
+     new kbaseLogin($('#signin-button'));
     
     // This is an important part of the app lifecycle!
     // Login and out events trigger a refresh of the entire page. 

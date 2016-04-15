@@ -1,5 +1,25 @@
-define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'postal', 'json!functional-site/config.json'],
-  function(nunjucks, $, Q, Session, Utils, Postal, config) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'nunjucks',
+		'jquery',
+		'q',
+		'kb.session',
+		'kb.utils',
+		'postal',
+		'json!functional-site/config.json'
+	], function(
+		KBWidget,
+		bootstrap,
+		nunjucks,
+		$,
+		Q,
+		Session,
+		Utils,
+		Postal,
+		config
+	) {
     "use strict";
     var BaseWidget = Object.create({}, {
 

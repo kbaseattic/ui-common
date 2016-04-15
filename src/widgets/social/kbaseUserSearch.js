@@ -1,5 +1,19 @@
-define(['kb.widget.social.base', 'kb.client.user_profile', 'kb.session', 'kb.utils'],
-   function (SocialWidget, UserProfileService, Session, Utils) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.widget.social.base',
+		'kb.client.user_profile',
+		'kb.session',
+		'kb.utils'
+	], function(
+		KBWidget,
+		bootstrap,
+		SocialWidget,
+		UserProfileService,
+		Session,
+		Utils
+	) {
       "use strict";
       var widget = Object.create(SocialWidget, {
          init: {

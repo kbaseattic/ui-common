@@ -5,9 +5,9 @@
  */
 
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseAssemblyView",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         ws_id: null,
         ws_name: null,

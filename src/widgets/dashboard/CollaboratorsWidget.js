@@ -1,5 +1,19 @@
-define(['kb.widget.dashboard.base', 'kb.client.methods', 'kb.appstate', 'q'],
-   function (DashboardWidget, ClientMethods, AppState, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.widget.dashboard.base',
+		'kb.client.methods',
+		'kb.appstate',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		DashboardWidget,
+		ClientMethods,
+		AppState,
+		Q
+	) {
       "use strict";
       var Widget = Object.create(DashboardWidget, {
          init: {

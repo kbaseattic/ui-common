@@ -2,8 +2,7 @@
 
     Simplified prompt for error messages.
 
-    var $errorModal = $('<div></div>').kbaseErrorPrompt(
-        {
+    var $errorModal =  new kbaseErrorPrompt($('<div></div>'), {
             title : 'OH NOES!',
             message: 'Your action failed',
         }
@@ -18,10 +17,10 @@
 (function( $, undefined ) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseErrorPrompt",
-		parent: 'kbasePrompt',
+		parent : kbasePrompt,
 
         version: "1.0.0",
         options: {
@@ -32,8 +31,7 @@
 
             this._super(options);
 
-            return $('<div></div>').kbasePrompt(
-                {
+             new kbasePrompt(return $('<div></div>'), {
                     title : options.title,
                     body : $('<div></div>')
                         .attr('class', 'alert alert-error')

@@ -1,7 +1,7 @@
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseNarrativeStoreView",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
 
         options: {
             namespace: null, // generally a module name
@@ -294,8 +294,7 @@
                                         .css('width', '100%')
                                     ;
 
-                                    var $prompt = $.jqElem('div').kbasePrompt(
-                                        {
+                                    var $prompt =  new kbasePrompt($.jqElem('div'), {
                                             body : $img
                                         }
                                     );
@@ -533,8 +532,7 @@
                                         .css('width', '100%')
                                     ;
 
-                                    var $prompt = $.jqElem('div').kbasePrompt(
-                                        {
+                                    var $prompt =  new kbasePrompt($.jqElem('div'), {
                                             body : $img
                                         }
                                     );

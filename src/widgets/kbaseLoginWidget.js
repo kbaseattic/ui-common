@@ -1,5 +1,27 @@
-define(['kb.widget.base', 'kb.session', 'jquery', 'postal', 'q', 'kb.appstate', 'kb.utils', 'kb.user_profile'], 
-function (BaseWidget, Session, $, Postal, Q, AppState, Utils, UserProfile) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.widget.base',
+		'kb.session',
+		'jquery',
+		'postal',
+		'q',
+		'kb.appstate',
+		'kb.utils',
+		'kb.user_profile'
+	], function(
+		KBWidget,
+		bootstrap,
+		BaseWidget,
+		Session,
+		$,
+		Postal,
+		Q,
+		AppState,
+		Utils,
+		UserProfile
+	) {
     'use strict';
     // make a widget ... on the fly?
     var W = Object.create(BaseWidget, {

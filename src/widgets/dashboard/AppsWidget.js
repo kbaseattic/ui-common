@@ -1,5 +1,27 @@
-define(['kb.widget.dashboard.base', 'kb.utils', 'kb.session', 'kb.client.narrative_method_store', 'kb.client.workspace', 'kb.client.methods', 'kb.logger', 'q'],
-   function (DashboardWidget, Utils, Session, NarrativeMethodStore, WorkspaceService, KBService, Logger, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.widget.dashboard.base',
+		'kb.utils',
+		'kb.session',
+		'kb.client.narrative_method_store',
+		'kb.client.workspace',
+		'kb.client.methods',
+		'kb.logger',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		DashboardWidget,
+		Utils,
+		Session,
+		NarrativeMethodStore,
+		WorkspaceService,
+		KBService,
+		Logger,
+		Q
+	) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {

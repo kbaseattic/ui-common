@@ -14,7 +14,7 @@ angular.module('modeling-directives')
 
             var selectionTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped">');
-            var tabs = container.kbTabs({tabs: [
+            var tabs = container.kbaseTabTableTabs({tabs: [
                                             {name: 'Selection', content: selectionTable, active: true} 
                                         ]});
 
@@ -44,7 +44,7 @@ angular.module('modeling-directives')
             function load_map(map, container) {
                 container.rmLoading();                        
 
-                container.kbasePathway({model_ws: $stateParams.ws,
+                 new kbasePathway(container, {model_ws: $stateParams.ws,
                                         model_name: $stateParams.id,
                                         map_ws: map_ws,
                                         map_name: map,
@@ -224,7 +224,7 @@ angular.module('modeling-directives')
                         $('#path-'+map).rmLoading();                        
                         var d = d[0].data
 
-                        $('#path-'+map).kbasePathway({ws: self.ws, 
+                         new kbasePathway($('#path-'+map), {ws: self.ws, 
                                                      mapID: map, 
                                                      mapData: d,
                                                      editable: true,
@@ -700,7 +700,7 @@ angular.module('modeling-directives')
     return {
         link: function(scope, ele, attrs) {
             console.log('here')
-            $(ele).kbaseModelEditor({ws: scope.ws, id: scope.id})
+             new kbaseModelEditor($(ele), {ws: scope.ws, id: scope.id})
 
         }
     }

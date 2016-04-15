@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseRunFba",
     version: "1.0.0",
     options: {
@@ -18,7 +18,7 @@ $.KBWidget({
         var fba_button = $('<button type="button" class="btn btn-primary run-fba-btn" disabled="disabled">Run FBA</button>');
         body.append(fba_button)
 
-        var panel = container.kbasePanel({title: 'Run FBA', body: body.html()});
+        var panel =  new kbasePanel(container, {title: 'Run FBA', body: body.html()});
 
         self.$elem.append(container);
 

@@ -5,9 +5,9 @@
  */
 
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseMSA',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             msaID: null,

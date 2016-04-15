@@ -1,5 +1,13 @@
-define(['jquery'],
-   function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
       "use strict";
       return Object.create({}, {
          init: {

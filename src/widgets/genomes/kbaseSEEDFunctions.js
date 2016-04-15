@@ -8,9 +8,9 @@
  */
 
  (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseSEEDFunctions",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
 
         wsUrl:"https://kbase.us/services/ws",

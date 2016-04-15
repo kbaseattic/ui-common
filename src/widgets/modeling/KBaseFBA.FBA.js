@@ -1,3 +1,4 @@
+define(['kbasePMIBarchart'], function(kbasePMIBarchart) {
 function KBaseFBA_FBA(modeltabs) {
     var self = this;
     this.modeltabs = modeltabs;
@@ -537,8 +538,7 @@ function KBaseFBA_FBA(modeltabs) {
                     }
 
                     var $barchartElem = $.jqElem('div')
-                    $barchartElem.kbasePMIBarchart(
-                            {
+                     new kbasePMIBarchart($barchartElem, {
                                 fba_workspace : self.workspace,
                                 fba_object : self.objName,
                                 subsystem_annotation_object    :
@@ -714,3 +714,5 @@ function KBaseFBA_FBA(modeltabs) {
 
 // make method of base class
 KBModeling.prototype.KBaseFBA_FBA = KBaseFBA_FBA;
+
+})

@@ -5,7 +5,7 @@
 (function( $, undefined ) {
 
   'use strict';
-    $.KBWidget({
+    return KBWidget({
 
         name: "kbaseAuthenticatedWidget",
 

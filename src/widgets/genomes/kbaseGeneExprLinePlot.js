@@ -1,7 +1,7 @@
 (function ($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGeneExprLinePlot",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             title: "Gene expression line plot",

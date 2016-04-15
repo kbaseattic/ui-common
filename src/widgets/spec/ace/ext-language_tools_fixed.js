@@ -28,7 +28,30 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/ext/language_tools', ['require', 'exports', 'module' , 'ace/snippets', 'ace/autocomplete', 'ace/config', 'ace/autocomplete/text_completer', 'ace/editor'], function(require, exports, module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'require',
+		'exports',
+		'module',
+		'ace/snippets',
+		'ace/autocomplete',
+		'ace/config',
+		'ace/autocomplete/text_completer',
+		'ace/editor'
+	], function(
+		KBWidget,
+		bootstrap,
+		require,
+		exports,
+		module,
+		ace_snippets,
+		ace_autocomplete,
+		ace_config,
+		ace_autocomplete_text_completer,
+		ace_editor
+	) {
 
 
 var snippetManager = require("../snippets").snippetManager;

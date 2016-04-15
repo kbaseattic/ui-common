@@ -3,9 +3,9 @@
  *
  */
 (function ($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGenomeLineage",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
 
         options: {

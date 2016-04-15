@@ -8,8 +8,7 @@
     Upon init, takes at least one and possibly two arguments - elements and values
     (plus a few defaults that can be set as well. Just look at the options block below).
 
-    $('#container').kbaseFormBuilder(
-        {
+     new kbaseFormBuilder($('#container'), {
             elements : some_array_of_elems
             values   : some_object_of_elems
         }
@@ -84,8 +83,7 @@
 
         Quick example:
 
-        var $form = $('#foobar').kbaseFormBuilder(
-            {
+        var $form =  new kbaseFormBuilder($('#foobar'), {
                 elements :
                     [
                          {
@@ -117,7 +115,7 @@
 (function( $, undefined ) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		   name: "kbaseFormBuilder",
 

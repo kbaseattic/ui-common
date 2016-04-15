@@ -450,7 +450,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
             cell_type: 'markdown',
             source: "<div id='" + cellId + "'></div>" +
                     "\n<script>" +
-                    "$('#" + cellId + "').kbaseNarrativeAppCell({'appSpec' : '" + this._safeJSONStringify(spec) + "', 'cellId' : '" + cellId + "'});" +
+                     new kbaseNarrativeAppCell("$('#" + cellId + "'), {'appSpec' : '" + this._safeJSONStringify(spec) + "', 'cellId' : '" + cellId + "'});" +
                     "</script>",
             metadata: { }
         };
@@ -482,7 +482,7 @@ var NarrativeManager = function(options, auth, auth_cb) {
             cell_type: 'markdown',
             source: "<div id='" + cellId + "'></div>" +
                     "\n<script>" +
-                    "$('#" + cellId + "').kbaseNarrativeMethodCell({'method' : '" + this._safeJSONStringify(spec) + "'});" +
+                     new kbaseNarrativeMethodCell("$('#" + cellId + "'), {'method' : '" + this._safeJSONStringify(spec) + "'});" +
                     "</script>",
             metadata: { }
         };

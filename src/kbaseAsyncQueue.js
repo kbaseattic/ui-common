@@ -12,7 +12,16 @@
 
 
 
-define(['q'], function (Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		Q
+	) {
     "use strict";
 
     /**

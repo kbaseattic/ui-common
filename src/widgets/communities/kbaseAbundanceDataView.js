@@ -2,9 +2,9 @@
  * KBase widget to display table and boxplot of BIOM data
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'AbundanceDataView',
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: '1.0.0',
         token: null,
         options: {

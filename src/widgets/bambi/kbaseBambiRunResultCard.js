@@ -1,7 +1,7 @@
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseBambiRunResultCard",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             bambi_run_result_id: null,

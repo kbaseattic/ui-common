@@ -1,7 +1,21 @@
 /*global define: true */
 /*jslint browser:true  vars: true */
-define(['jquery', 'nunjucks', 'kb.session', 'kb.config'],
-   function ($, nunjucks, Session, Config) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'nunjucks',
+		'kb.session',
+		'kb.config'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		nunjucks,
+		Session,
+		Config
+	) {
       "use strict";
       var Navbar = Object.create({}, {
         version: {

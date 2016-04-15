@@ -229,7 +229,7 @@ angular.module('narrative-directives')
                     
                 }
             }
-            $(element).kbaseNarrativeManager({
+             new kbaseNarrativeManager($(element), {
                 params:p,
                 loadingImage: "assets/img/ajax-loader.gif"
                 });

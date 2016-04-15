@@ -1,7 +1,7 @@
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseMastRunResultCard",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             id: null,

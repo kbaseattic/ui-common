@@ -1,5 +1,29 @@
-define(['jquery', 'postal', 'kb.utils', 'kb.utils.api', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar', 'q'],
-   function ($, Postal, Utils, APIUtils, DashboardWidget, KBService, Session, Buttonbar, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'postal',
+		'kb.utils',
+		'kb.utils.api',
+		'kb.widget.dashboard.base',
+		'kb.client.methods',
+		'kb.session',
+		'kb.widget.buttonbar',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		Postal,
+		Utils,
+		APIUtils,
+		DashboardWidget,
+		KBService,
+		Session,
+		Buttonbar,
+		Q
+	) {
       "use strict";
       var widget = Object.create(DashboardWidget, {
          init: {

@@ -1,5 +1,23 @@
-define(['q', 'kb.utils', 'md5', 'kb.client.user_profile', 'kb.config', 'kb.session'],
-function(Q, Utils, md5,  UserProfileService, Config, Session) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'q',
+		'kb.utils',
+		'md5',
+		'kb.client.user_profile',
+		'kb.config',
+		'kb.session'
+	], function(
+		KBWidget,
+		bootstrap,
+		Q,
+		Utils,
+		md5,
+		UserProfileService,
+		Config,
+		Session
+	) {
     "use strict"; 
     var UserProfile = Object.create({}, {
 

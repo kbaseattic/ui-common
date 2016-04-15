@@ -14,15 +14,15 @@ angular.module('iris-directives')
     .directive('processlist', function($rootScope) {
         return {
             link: function(scope, element, attrs, routeParams) {
-                //$loginbox = $('#login').kbaseLogin();                
+                //$loginbox =  new kbaseLogin($('#login'));                
 
-                $rootScope.plist = $(element).kbaseIrisProcessList();
+                $rootScope.plist =  new kbaseIrisProcessList($(element));
 
-                $rootScope.term = $.jqElem('div').kbaseIrisTerminal({
+                $rootScope.term =  new kbaseIrisTerminal($.jqElem('div'), {
                     'promptIfUnauthenticated'   : 0,
                     'invocationURL'             : 'http://kbase.us/services/invocation',
                     'commandsElement'           : $rootScope.commandlist,
-                    'grammar'                   : $('<div></div>').kbaseIrisGrammar(),
+                     new kbaseIrisGrammar('grammar'                   : $('<div></div>')),
                     autocreateFileBrowser       : false,
                 });
             }
@@ -30,8 +30,7 @@ angular.module('iris-directives')
     }).directive('tabs', function($rootScope) {
         return {
             link: function(scope, element, attrs, routeParams) {
-                var $tabs = $(element).kbaseTabs(
-                    {
+                var $tabs =  new kbaseTabs($(element), {
                         tabPosition : 'bottom', //or left or right or top. Defaults to 'top'
                         canDelete : true,
                         tabs : [
@@ -50,8 +49,7 @@ angular.module('iris-directives')
         return {
             link: function(scope, element, attrs, routeParams) {
                 $rootScope.commandlist = $(element);
-                $(element).kbaseIrisCommands(
-                    {
+                 new kbaseIrisCommands($(element), {
                         client          : $rootScope.term.client(),
                         terminal        : $rootScope.term,
                         englishCommands : false,
@@ -71,8 +69,7 @@ angular.module('iris-directives')
     }).directive('filebrowser', function($rootScope) {
         return {
            link: function(scope, element, attrs, routeParams) {
-                var $fb = $(element).kbaseIrisFileBrowser (
-                    {
+                var $fb =  new kbaseIrisFileBrowser($(element), {
                         client : $rootScope.term.client(),
                         invocationURL   : $rootScope.term.options.invocationURL,
                         addFileCallback : function (file, $fb) {
@@ -80,8 +77,7 @@ angular.module('iris-directives')
                         },
                         editFileCallback : function (file, $fb) {
 
-                            var $editor = $.jqElem('div').kbaseIrisFileEditor(
-                                {
+                            var $editor =  new kbaseIrisFileEditor($.jqElem('div'), {
                                     file : file,
                                     client : $fb.client(),
                                     saveFileCallback : function(file) {

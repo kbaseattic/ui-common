@@ -12,9 +12,9 @@
  * And here's an example:
  *
  *     @example
- *     var widget = $.KBWidget({
+ *     var widget = return KBWidget({
  *         name: "MyFancyWidget",
- *         parent: "MommyWidget",
+ *         parent : MommyWidget,
  *         init: function () {}
  *     });
  */
@@ -333,7 +333,7 @@
         return $(tag);
     }
 
-    $.KBWidget = function (def) {
+    return KBWidget = function (def) {
         def = (def || {});
         var name    = def.name;
         var parent  = def.parent;
@@ -589,7 +589,7 @@
      * @return {Object} return.value The widget
      * @static
      */
-    $.KBWidget.registry = function () {
+    return KBWidget.registry = function () {
         var registry = {};
         for (var widget in widgetRegistry) {
             if (widget !== 'kbaseWidget') {
@@ -607,7 +607,7 @@
      * @static
      * @chainable
      */
-    $.KBWidget.resetRegistry = function () {
+    return KBWidget.resetRegistry = function () {
         for (var widget in widgetRegistry) {
             if (widget !== 'kbaseWidget') {
                 delete widgetRegistry[widget];
@@ -616,7 +616,7 @@
         return this;
     }
 
-    $.KBWidget(
+    return KBWidget(
         {
             name : 'kbaseWidget',
 

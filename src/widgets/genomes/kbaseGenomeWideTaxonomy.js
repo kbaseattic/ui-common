@@ -1,7 +1,7 @@
 (function( $, undefined ) { 
-    $.KBWidget({ 
+    return KBWidget({ 
         name: "KBaseGenomeWideTaxonomy", 
-        parent: "kbaseWidget", 
+         
         version: "1.0.0",
 
         options: {
@@ -67,7 +67,7 @@
 			    .append($('<td>')
 				.append($buildNarPanel))));
 		    
-		    $widgetDiv.kbaseTree({treeID: treeName, workspaceID: treeWs, genomeInfo: self.options.genomeInfo});   
+		     new kbaseTree($widgetDiv, {treeID: treeName, workspaceID: treeWs, genomeInfo: self.options.genomeInfo});   
                     $div.append($widgetDiv);       		
             	} else {
 		    $buildBtn.html("Launch a new Tree Building Narrative");

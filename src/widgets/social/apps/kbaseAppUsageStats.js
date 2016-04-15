@@ -1,7 +1,7 @@
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseAppUsageStats",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         
         userNameFetchUrl:"https://kbase.us/services/genome_comparison/users?usernames=",
@@ -33,7 +33,7 @@
 		if (options.kbCache.token) {
 		    self.wsUserInfoClient = new Workspace(options.wsUserInfoUrl, {token: self.options.kbCache.token});
 		    self.loggedIn = true;
-		    self.loggedInUserId = $('<div></div>').kbaseLogin().get_kbase_cookie('user_id');;
+		    self.loggedInUserId =  new kbaseLogin($('<div></div>')).get_kbase_cookie('user_id');;
 		}
             }
 	    

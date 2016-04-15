@@ -15,7 +15,7 @@
  * @public
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         /* 
          * (required) Your widget should be named in CamelCase.
          */
@@ -25,7 +25,7 @@
          * (optional) If your widget extends an existing widget, its
          * parent's name should go here. All widgets extend kbaseWidget.
          */
-        parent: 'kbaseWidget',
+        
 
         /*
          * (optional) Widgets should be semantically versioned.

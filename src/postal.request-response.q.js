@@ -1,4 +1,15 @@
-define(['postal.request-response', 'q'], function (postal, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'postal.request-response',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		postal,
+		Q
+	) {
   postal.configuration.promise.createDeferred = function () {
     return Q.defer();
   };

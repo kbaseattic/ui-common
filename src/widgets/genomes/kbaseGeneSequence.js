@@ -6,9 +6,9 @@
  * is in a different widget.
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGeneSequence",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         options: {

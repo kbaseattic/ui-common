@@ -1,5 +1,25 @@
-define(['kb.widget.dashboard.base', 'kb.user_profile', 'kb.client.user_profile', 'kb.session', 'kb.appstate', 'kb.utils', 'q'],
-        function (DashboardWidget, UserProfile, UserProfileService, Session, AppState, Utils, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.widget.dashboard.base',
+		'kb.user_profile',
+		'kb.client.user_profile',
+		'kb.session',
+		'kb.appstate',
+		'kb.utils',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		DashboardWidget,
+		UserProfile,
+		UserProfileService,
+		Session,
+		AppState,
+		Utils,
+		Q
+	) {
             "use strict";
             var widget = Object.create(DashboardWidget, {
                 init: {

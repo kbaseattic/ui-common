@@ -2,9 +2,9 @@
  * Shows gene domains.
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGeneDomains",
-        parent: "kbaseWidget",
+        
         version: "1.0.1",
 
         options: {

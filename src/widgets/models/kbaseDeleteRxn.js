@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseModelTabs",    
     version: "1.0.0",
     options: {
@@ -31,7 +31,7 @@ $.KBWidget({
         /*var rxnTable = $('<table cellpadding="0" cellspacing="0" border="0" \
                 class="table table-bordered table-striped" style="width: 100%;">');
 
-        var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
+        var tabs = container.kbaseTabTableTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
                                            {name: 'Compounds', content: cpdTable},
                                           {name: 'Compartment', content: compartTable},
                                            {name: 'Biomass', content: biomassTable},

@@ -2,8 +2,7 @@
 
     e.g.,
 
-    $('#table').kbaseTable(
-        {
+     new kbaseTable($('#table'), {
             structure : {
                 header : [
                     {'value' : 'a', 'sortable' : true},
@@ -60,7 +59,7 @@
 (function( $, undefined ) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseTable",
 
@@ -383,8 +382,7 @@
 
 
         deletePrompt : function(row) {
-            var $deleteModal = $('<div></div>').kbaseDeletePrompt(
-                {
+            var $deleteModal =  new kbaseDeletePrompt($('<div></div>'), {
                     name     : row,
                     callback : this.deleteRowCallback(row),
                 }

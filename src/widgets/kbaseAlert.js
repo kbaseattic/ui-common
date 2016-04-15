@@ -1,4 +1,13 @@
-define(['jquery'], function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
    return Object.create({}, {
 
       init: {

@@ -3,9 +3,9 @@
  * 
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseRegulome",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             color: "black",
@@ -43,7 +43,7 @@
                 // setup tabs
                 var pcTable = $('<table class="table table-bordered table-striped" style="width: 100%;">');
 
-                var tabs = container.kbTabs({tabs: [
+                var tabs = container.kbaseTabTableTabs({tabs: [
                                             {name: 'Overview', active: true},
                                             {name: 'Regulome', content: pcTable}]
                                           })

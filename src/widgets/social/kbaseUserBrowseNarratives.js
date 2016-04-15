@@ -1,5 +1,25 @@
-define(['jquery', 'nunjucks', 'kb.utils', 'kb.widget.social.base', 'kb.client.workspace', 'kb.session', 'q'],
-        function ($, nunjucks, Utils, SocialWidget, WorkspaceService, Session, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'nunjucks',
+		'kb.utils',
+		'kb.widget.social.base',
+		'kb.client.workspace',
+		'kb.session',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		nunjucks,
+		Utils,
+		SocialWidget,
+		WorkspaceService,
+		Session,
+		Q
+	) {
             "use strict";
             var RecentActivityWidget = Object.create(SocialWidget, {
                 init: {

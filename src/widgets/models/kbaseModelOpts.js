@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseModelOpts",
     version: "1.0.0",
     options: {
@@ -21,7 +21,7 @@ $.KBWidget({
         var ws = options.workspace;
         var token = options.auth;
 
-        var panel = this.$elem.kbasePanel({title: 'Model Options', 
+        var panel =  new kbasePanel(this.$elem, {title: 'Model Options', 
                                            rightLabel: ws,
                                            subText: id});
 

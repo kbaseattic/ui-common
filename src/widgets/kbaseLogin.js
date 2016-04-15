@@ -50,7 +50,7 @@
 
 (function( $, undefined ) {
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseLogin",
 
@@ -460,8 +460,7 @@
                     }
                     else {
 
-                        var $errorModal = $('<div></div>').kbasePrompt(
-                            {
+                        var $errorModal =  new kbasePrompt($('<div></div>'), {
                                 title : 'Login failed',
                                 body : $('<div></div>')
                                     .attr('class', 'alert alert-error')
@@ -693,8 +692,7 @@
 
             var $elem = this.$elem;
 
-            var $ld = $('<div></div').kbasePrompt(
-                {
+            var $ld =  new kbasePrompt($('<div></div'), {
                     title : 'Login to KBase',
                     controls : [
                         'cancelButton',

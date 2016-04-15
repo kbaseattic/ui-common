@@ -30,7 +30,26 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-define('ace/ext/keybinding_menu', ['require', 'exports', 'module' , 'ace/editor', 'ace/ext/menu_tools/overlay_page', 'ace/ext/menu_tools/get_editor_keyboard_shortcuts'], function(require, exports, module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'require',
+		'exports',
+		'module',
+		'ace/editor',
+		'ace/ext/menu_tools/overlay_page',
+		'ace/ext/menu_tools/get_editor_keyboard_shortcuts'
+	], function(
+		KBWidget,
+		bootstrap,
+		require,
+		exports,
+		module,
+		ace_editor,
+		ace_ext_menu_tools_overlay_page,
+		ace_ext_menu_tools_get_editor_keyboard_shortcuts
+	) {
     
     var Editor = require("ace/editor").Editor;
     function showKeyboardShortcuts (editor) {

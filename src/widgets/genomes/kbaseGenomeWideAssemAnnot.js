@@ -1,7 +1,7 @@
 (function( $, undefined ) { 
-    $.KBWidget({ 
+    return KBWidget({ 
         name: "KBaseGenomeWideAssemAnnot", 
-        parent: "kbaseWidget", 
+         
         version: "1.0.0",
 
         options: {

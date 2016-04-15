@@ -6,10 +6,10 @@
 (function( $, undefined ) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisFileBrowser",
-		parent: 'kbaseDataBrowser',
+		parent : kbaseDataBrowser,
 
         version: "1.0.0",
         _accessors : ['invocationURL', 'client', 'addFileCallback', 'editFileCallback', 'singleFileSize', 'chunkSize', 'stalledUploads'],
@@ -206,8 +206,7 @@
             $ul.css('height', (parseInt(this.options.height) - 25) + 'px');
 
             var $pc = $('<div></div>').css('margin-top', '2px')
-            $pc.kbaseButtonControls(
-                {
+             new kbaseButtonControls($pc, {
                     onMouseover : false,
                     context : this,
                     controls : [
@@ -783,8 +782,7 @@
                         //otherwise the whole ball of wax is junked up and we need to fail out entirely. Unrecoverable.
                         else {
                             var $pe = $('<div></div>').text('Uploading ' + chunkMap.fullFilePath + ' failed. Please start over');
-                            $pe.kbaseButtonControls(
-                                {
+                             new kbaseButtonControls($pe, {
                                     onMouseover : true,
                                     context : this,
                                     controls : [
@@ -852,8 +850,7 @@
                                             .css('padding', '2px')
                                             .text('Uploading ' + chunkMap.fullFilePath + '...stalled')
                                     );//*/
-                        $pe.kbaseButtonControls(
-                            {
+                         new kbaseButtonControls($pe, {
                                 onMouseover : true,
                                 context : this,
                                 controls : [
@@ -1020,8 +1017,7 @@
 
             var promptFile = file.replace(this.options.root, '');
 
-            var $deleteModal = $('<div></div>').kbaseDeletePrompt(
-                {
+            var $deleteModal =  new kbaseDeletePrompt($('<div></div>'), {
                     name : promptFile,
                     callback : function(e, $prompt) {
                         $prompt.closePrompt();
@@ -1044,8 +1040,7 @@
 
             var displayDir = parentDir.replace(this.options.root, '/');
 
-            var $addDirectoryModal = $('<div></div>').kbasePrompt(
-                {
+            var $addDirectoryModal =  new kbasePrompt($('<div></div>'), {
                     title : 'Create directory',
                     body : $('<p></p>')
                             .append('Create directory ')

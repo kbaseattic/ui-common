@@ -8,10 +8,10 @@
 (function( $, undefined ) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseWorkspaceBrowser",
-		parent: 'kbaseFileBrowser',
+		parent : kbaseFileBrowser,
 
         version: "1.0.0",
         options: {
@@ -212,8 +212,7 @@
                     }, this),
                 $.proxy (function(res) {
                     win.close();
-                    var $errorModal = $('<div></div>').kbaseErrorPrompt(
-                        {
+                    var $errorModal =  new kbaseErrorPrompt($('<div></div>'), {
                             title : 'Fetch failed',
                             message : res.message
                         }
@@ -240,8 +239,7 @@
                         this.listDirectory(this.workspace, this.data('ul-nav'));
                     }, this),
                     $.proxy (function(res) {
-                        var $errorModal = $('<div></div>').kbaseErrorPrompt(
-                            {
+                        var $errorModal =  new kbaseErrorPrompt($('<div></div>'), {
                                 title : 'Deletion failed',
                                 message : res.message
                             }
@@ -280,8 +278,7 @@
                         if (this.options.processList) {
                             this.options.processList.removeProcess($processElem);
                         }
-                        var $errorModal = $('<div></div>').kbaseErrorPrompt(
-                            {
+                        var $errorModal =  new kbaseErrorPrompt($('<div></div>'), {
                                 title : 'Creation failed',
                                 message : res.message
                             }
@@ -294,8 +291,7 @@
         },
 
         createWorkspace : function() {
-            var $addWorkspaceModal = $('<div></div>').kbasePrompt(
-                {
+            var $addWorkspaceModal =  new kbasePrompt($('<div></div>'), {
                     title : 'Create workspace',
                     body : $('<p></p>')
                             .append('Create workspace ')
@@ -326,8 +322,7 @@
                                         this.listWorkspaces();
                                     }, this),
                                     $.proxy(function(res) {
-                                        var $errorModal = $('<div></div>').kbaseErrorPrompt(
-                                            {
+                                        var $errorModal =  new kbaseErrorPrompt($('<div></div>'), {
                                                 title : 'Creation failed',
                                                 message : res.message
                                             }
@@ -345,8 +340,7 @@
         },
 
         deleteWorkspace : function() {
-            var $deleteModal = $('<div></div>').kbaseDeletePrompt(
-                {
+            var $deleteModal =  new kbaseDeletePrompt($('<div></div>'), {
                     name : this.data('workspace-select').val(),
                     callback : $.proxy(function(e, $prompt) {
                         $prompt.closePrompt();
@@ -369,8 +363,7 @@
                 }, this),
                 $.proxy(function(res) {
 
-                    var $errorModal = $('<div></div>').kbaseErrorPrompt(
-                        {
+                    var $errorModal =  new kbaseErrorPrompt($('<div></div>'), {
                             title : 'deletion failed',
                             message : res.message
                         }

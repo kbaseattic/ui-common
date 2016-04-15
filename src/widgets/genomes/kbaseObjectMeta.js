@@ -3,9 +3,9 @@
  *
  */
 (function( $, undefined ) {
-	$.KBWidget({
+	return KBWidget({
 		name: "KBaseObjectMeta",
-		parent: "kbaseWidget",
+		
 		version: "1.0.0",
 
 		wsUrl:"https://kbase.us/services/ws",

@@ -4,9 +4,9 @@
  * @public
  */
 
-$.KBWidget({
+return KBWidget({
 		name: 'kbaseExpressionEstimateKTable',
-		parent: 'kbaseAuthenticatedWidget',
+		parent : kbaseAuthenticatedWidget,
 		version: '1.0.0',
 		options: {
 			estimateKID: null,

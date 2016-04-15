@@ -4,9 +4,9 @@
  * @public
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseJsonView',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             id: null,

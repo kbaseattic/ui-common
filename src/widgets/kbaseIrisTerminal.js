@@ -6,10 +6,10 @@
 (function( $, undefined ) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisTerminal",
-		parent: 'kbaseAuthenticatedWidget',
+		parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         _accessors : ['terminalHeight', 'client'],
@@ -85,7 +85,7 @@
                 );
             }
 
-            this.tutorial = $('<div></div>').kbaseIrisTutorial();
+            this.tutorial =  new kbaseIrisTutorial($('<div></div>'));
 
             this.commandHistory = [];
             this.commandHistoryPosition = 0;
@@ -104,8 +104,7 @@
             else if (this.options.autocreateFileBrowser) {
 
                 this.addFileBrowser(
-                    $('<div></div>').kbaseIrisFileBrowser (
-                        {
+                     new kbaseIrisFileBrowser($('<div></div>'), {
                             client              : this.client(),
                             externalControls    : false,
                         }
@@ -597,8 +596,7 @@
                 )
             ;
 
-            $wrapperDiv.kbaseButtonControls(
-                {
+             new kbaseButtonControls($wrapperDiv, {
                     controls : [
                         {
                             icon : 'icon-eye-open',
@@ -1475,8 +1473,7 @@
             var pid = this.uuid();
 
             var $pe = $('<div></div>').text(command);
-            $pe.kbaseButtonControls(
-                {
+             new kbaseButtonControls($pe, {
                     onMouseover : true,
                     context : this,
                     controls : [

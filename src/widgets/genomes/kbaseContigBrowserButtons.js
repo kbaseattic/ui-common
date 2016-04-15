@@ -2,9 +2,9 @@
  * Requires bootstrap 3 for buttons
  */
 (function( $, undefined ){
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseContigBrowserButtons", 
-        parent: "kbaseWidget", 
+         
         version: "1.0.0",
         options: {
             direction: "horizontal", // also "vertical" eventually.

@@ -6,9 +6,9 @@
  * is in a different widget.
  */
 (function( $, undefined ) {
-	$.KBWidget({
+	return KBWidget({
 		name: "KBaseGeneInfo",
-		parent: "kbaseWidget",
+		
 		version: "1.0.0",
 
 		// the only options are the feature ID, whether it should be embedded in a card, and (optionally) the auth token.

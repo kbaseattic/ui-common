@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseModelTable",
     version: "1.0.0",
     options: {
@@ -21,7 +21,7 @@ $.KBWidget({
         var token = options.auth;
         var ws = options.ws
 
-        var panel = this.$elem.kbasePanel({title: 'Model Info', 
+        var panel =  new kbasePanel(this.$elem, {title: 'Model Info', 
                                            rightLabel: ws});
         panel.loading();
         var panel_body = panel.body();

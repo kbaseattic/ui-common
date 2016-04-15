@@ -1,5 +1,13 @@
-define(['kb.utils'],
-   function (Utils) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.utils'
+	], function(
+		KBWidget,
+		bootstrap,
+		Utils
+	) {
       "use strict";
       return Object.create({}, {
        // KBase Service Utility Methods

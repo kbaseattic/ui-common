@@ -2,9 +2,9 @@
  * KBase widget to display a Metagenome Collection
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'CollectionView',
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: '1.0.0',
         token: null,
         options: {

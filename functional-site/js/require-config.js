@@ -1,8 +1,24 @@
 // This is main.js
-define('jquery', [], function () {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		']',
+		'function () {
    return jQuery;
 });
-define('kb_clients', [], function () {
+define(kb_clients',
+		'['
+	], function(
+		KBWidget,
+		bootstrap,
+		],
+		function () {
+   return jQuery;
+});
+define(kb_clients,
+		[
+	) {
    return 'KBCLIENTS DUMMY OBJECT';
 });
 //NB underscore, as of 1.6, inclues AMD compatible loading. However, other parts of the kbase

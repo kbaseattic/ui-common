@@ -1,5 +1,27 @@
-define(['nunjucks', 'jquery', 'q', 'kb.session', 'kb.utils', 'kb.user_profile', 'postal', 'json!functional-site/config.json'],
-    function (nunjucks, $, Q, Session, Utils, UserProfile, Postal, config) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'nunjucks',
+		'jquery',
+		'q',
+		'kb.session',
+		'kb.utils',
+		'kb.user_profile',
+		'postal',
+		'json!functional-site/config.json'
+	], function(
+		KBWidget,
+		bootstrap,
+		nunjucks,
+		$,
+		Q,
+		Session,
+		Utils,
+		UserProfile,
+		Postal,
+		config
+	) {
         "use strict";
         var DashboardWidget = Object.create({}, {
             // The init function interfaces this object with the caller, and sets up any 

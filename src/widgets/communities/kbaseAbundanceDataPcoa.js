@@ -2,9 +2,9 @@
  * KBase widget to display table of BIOM data
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
             name: 'AbundanceDataPcoa',
-            parent: "kbaseAuthenticatedWidget",
+            parent : kbaseAuthenticatedWidget,
             version: '1.0.0',
             token: null,
             options: {

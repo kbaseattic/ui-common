@@ -2,9 +2,9 @@
  * KBase widget to display a Metagenome
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'MetagenomeView',
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: '1.0.0',
         token: null,
         options: {
@@ -90,7 +90,7 @@
                     // set tabs
                     var tabPane = $('<div id="'+pref+'tab-content">');
         		    container.append(tabPane);
-        		    tabPane.kbaseTabs({canDelete : false, tabs : []});
+        		     new kbaseTabs(tabPane, {canDelete : false, tabs : []});
                 
                     // overview tab
                     var oTabDiv = $('<div id="'+pref+'overview">');

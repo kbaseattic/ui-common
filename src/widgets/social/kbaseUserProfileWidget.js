@@ -1,5 +1,29 @@
-define(['nunjucks', 'jquery', 'q', 'postal', 'kb.utils', 'kb.widget.social.base', 'kb.user_profile', 'kb.session', 'kb.widget.navbar'],
-  function(nunjucks, $, Q, Postal, Utils, SocialWidget, UserProfile, Session, NAVBAR) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'nunjucks',
+		'jquery',
+		'q',
+		'postal',
+		'kb.utils',
+		'kb.widget.social.base',
+		'kb.user_profile',
+		'kb.session',
+		'kb.widget.navbar'
+	], function(
+		KBWidget,
+		bootstrap,
+		nunjucks,
+		$,
+		Q,
+		Postal,
+		Utils,
+		SocialWidget,
+		UserProfile,
+		Session,
+		NAVBAR
+	) {
     "use strict";
     // var NAVBAR = Object.create(Navbar).init({container: '#kbase-navbar'});
     var UserProfileWidget = Object.create(SocialWidget, {

@@ -30,7 +30,16 @@
  * @typedef {(string|string[])} PropertyPath
  */
 
-define(['q'], function (Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		Q
+	) {
     "use strict";
     var Utils = Object.create({}, {
         version: {

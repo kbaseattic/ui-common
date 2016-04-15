@@ -8,7 +8,16 @@
   define, window, process, Packages,
   java, location, Components, FileUtils */
 
-define(['module'], function (module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'module'
+	], function(
+		KBWidget,
+		bootstrap,
+		module
+	) {
     'use strict';
 
     var text, fs, Cc, Ci, xpcIsWindows,

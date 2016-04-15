@@ -1,5 +1,27 @@
-define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'kb.client.user_profile', 'kb.client.narrative_method_store', 'kb.config'],
-   function (Q, Session, Utils, APIUtils, Workspace, UserProfile, NarrativeMethodStore, Config) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'q',
+		'kb.session',
+		'kb.utils',
+		'kb.utils.api',
+		'kb.client.workspace',
+		'kb.client.user_profile',
+		'kb.client.narrative_method_store',
+		'kb.config'
+	], function(
+		KBWidget,
+		bootstrap,
+		Q,
+		Session,
+		Utils,
+		APIUtils,
+		Workspace,
+		UserProfile,
+		NarrativeMethodStore,
+		Config
+	) {
 
       return Object.create({}, {
          init: {

@@ -5,7 +5,7 @@
 
 (function( $, undefined ) {
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisProcessList",
 
@@ -112,8 +112,7 @@
 
         appendUI : function($elem) {
 
-            var $box = $elem.kbaseBox(
-                {
+            var $box =  new kbaseBox($elem, {
                     'title' : 'Running processes',
                     'content' :
                         $('<ul></ul>')

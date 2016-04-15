@@ -4,9 +4,9 @@
  *
  */ 
 (function( $, undefined ) { 
-    $.KBWidget({ 
+    return KBWidget({ 
         name: "KBaseDataViewGenericViz",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
 
         options: {
             objid: null,

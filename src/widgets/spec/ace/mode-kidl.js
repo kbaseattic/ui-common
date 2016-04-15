@@ -1,4 +1,27 @@
-define('ace/mode/kidl', ['require', 'exports', 'module' , 'ace/lib/oop', 'ace/mode/text', 'ace/tokenizer', 'ace/mode/sql_highlight_rules', 'ace/range'], function(require, exports, module) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'require',
+		'exports',
+		'module',
+		'ace/lib/oop',
+		'ace/mode/text',
+		'ace/tokenizer',
+		'ace/mode/sql_highlight_rules',
+		'ace/range'
+	], function(
+		KBWidget,
+		bootstrap,
+		require,
+		exports,
+		module,
+		ace_lib_oop,
+		ace_mode_text,
+		ace_tokenizer,
+		ace_mode_sql_highlight_rules,
+		ace_range
+	) {
 
 
 var oop = require("../lib/oop");

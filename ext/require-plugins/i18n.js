@@ -85,7 +85,16 @@
         }
     }
 
-    define(['module'], function (module) {
+    define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'module'
+	], function(
+		KBWidget,
+		bootstrap,
+		module
+	) {
         var masterConfig = module.config ? module.config() : {};
 
         return {

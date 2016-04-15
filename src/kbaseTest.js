@@ -22,7 +22,18 @@
  * 
  */
 
-define(['underscore', 'q'], function (_, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'underscore',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		_,
+		Q
+	) {
     'use strict';
     return Object.create({}, {
         /**

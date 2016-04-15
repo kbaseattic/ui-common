@@ -6,9 +6,9 @@
  * is in a different widget.
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseGeneStructureMatches",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         options: {
@@ -153,8 +153,7 @@
                                            else
                                            	  {
                                         	   self.$infoPara.append( "PDB Sequence matches");
-                                               self.$structTable.kbaseTable( 
-                                                                             {
+                                                new kbaseTable(self.$structTable, {
                                                                                structure : 
                                                                                    {
                                                                                     header : [

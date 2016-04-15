@@ -7,7 +7,7 @@
  */
 (function ($) {
     $.KBApplication = $.fn.KBApplication = function (def) {
-        this.constructor = $.KBWidget.constructor;
+        this.constructor = return KBWidget.constructor;
         return this;
     }
 })(jQuery);

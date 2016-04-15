@@ -1,7 +1,7 @@
 (function( $, undefined ) { 
-    $.KBWidget({ 
+    return KBWidget({ 
         name: "KBaseSpecTypeCard", 
-        parent: "kbaseAuthenticatedWidget", 
+        parent : kbaseAuthenticatedWidget, 
         version: "1.0.0",
         timer: null,
         

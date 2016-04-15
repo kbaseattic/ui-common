@@ -33,7 +33,20 @@
  * @typedef {(object|string|number|boolean|undefined|function)} Any
  */
 
-define(['kb.utils', 'kb.asyncqueue', 'q'], function (Utils, AsyncQueue, Q) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.utils',
+		'kb.asyncqueue',
+		'q'
+	], function(
+		KBWidget,
+		bootstrap,
+		Utils,
+		AsyncQueue,
+		Q
+	) {
     "use strict";
     var StateMachine = Object.create({}, {
         /**

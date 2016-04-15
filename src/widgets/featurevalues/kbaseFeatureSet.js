@@ -5,9 +5,9 @@
  */
 'use strict';
 
-$.KBWidget({
+return KBWidget({
         name: 'kbaseFeatureSet',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             featureset_name: null,

@@ -1,6 +1,6 @@
 (function ($) {
     'use strict';
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseLogin",
         version: "1.1.0",
         options: {

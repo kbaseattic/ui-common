@@ -881,7 +881,7 @@ angular.module('ws-directives')
                 $('.nar-id').click(function(e) {
                     e.stopPropagation();
                     if (!USER_ID) {
-                        var mustLogin = $('<div class="must-login-modal">').kbasePrompt({
+                        var mustLogin =  new kbasePrompt($('<div class="must-login-modal">'), {
                                     title : 'Please login',
                                     body : '<b>You must login to view narratives at this time.</b>',
                                     modalClass : '', 
@@ -1086,7 +1086,7 @@ angular.module('ws-directives')
 
 
             function showObjectVersions(ws, id) {
-                var historyModal = $('<div class="history-modal"></div>').kbasePrompt({
+                var historyModal =  new kbasePrompt($('<div class="history-modal"></div>'), {
                         title : 'History of '+id,
                         modalClass : '', 
                         controls : ['cancelButton']
@@ -1165,7 +1165,7 @@ angular.module('ws-directives')
             }
 
             function showObjectInfo(ws, id) {
-                var info_modal = $('<div></div>').kbasePrompt({
+                var info_modal =  new kbasePrompt($('<div></div>'), {
                         title : id,
                         modalClass : '', 
                         controls : ['closeButton']
@@ -1456,7 +1456,7 @@ angular.module('ws-directives')
                                     </div>\
                                  </div>').loading()
 
-                var copyObjectsModal = $('<div></div>').kbasePrompt({
+                var copyObjectsModal =  new kbasePrompt($('<div></div>'), {
                         title : 'Copy Objects',
                         body: content,
                         modalClass : '', 
@@ -1488,7 +1488,7 @@ angular.module('ws-directives')
                                         </div>\
                                      </div>').loading()
 
-                var copyObjectsModal = $('<div></div>').kbasePrompt({
+                var copyObjectsModal =  new kbasePrompt($('<div></div>'), {
                         title : 'Copy Objects',
                         body: content,
                         modalClass : '', 
@@ -1551,7 +1551,7 @@ angular.module('ws-directives')
                 var alert = '<div class="alert alert-danger"><strong>Warning</strong> Are you sure you want to copy these <b>'
                         +scope.checkedList.length+'</b> objects to <i>'+new_ws+'</i>?';
 
-                var confirmCopy = $('<div></div>').kbasePrompt({
+                var confirmCopy =  new kbasePrompt($('<div></div>'), {
                         title : 'Confirm',
                         body: alert,
                         modalClass : '',
@@ -1611,7 +1611,7 @@ angular.module('ws-directives')
                 var body = $('<form class="form-horizontal" role="form">');
 
                 body.loading();
-                var newNarrativeModal = $('<div>').kbasePrompt({
+                var newNarrativeModal =  new kbasePrompt($('<div>'), {
                         title : 'Create New Narrative',
                         body : body,
                         modalClass : '', 

@@ -1,4 +1,19 @@
-define(['kb.statemachine', 'kb.config', 'kb.session', 'postal'], function (StateMachine, Config, Session, Postal) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.statemachine',
+		'kb.config',
+		'kb.session',
+		'postal'
+	], function(
+		KBWidget,
+		bootstrap,
+		StateMachine,
+		Config,
+		Session,
+		Postal
+	) {
    /**
    The app state is a specialized state machine with the following properties:
    methods for adding, updating, and listening for the kbase global app state

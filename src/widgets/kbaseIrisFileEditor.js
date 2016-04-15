@@ -6,10 +6,10 @@
 (function( $, undefined ) {
 
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseIrisFileEditor",
-		parent: 'kbaseAuthenticatedWidget',
+		parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         _accessors : [
@@ -120,8 +120,7 @@
                 return;
             }
 
-            var $saveModal = $.jqElem('div').kbasePrompt(
-                    {
+            var $saveModal =  new kbasePrompt($.jqElem('div'), {
                         title : 'Save changes',
                         body : 'Save changes to <strong>' + this.file() + '</strong> before closing?',
                         controls : [

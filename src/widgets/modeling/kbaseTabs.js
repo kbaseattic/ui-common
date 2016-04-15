@@ -37,12 +37,14 @@
         tabs.showTab('tab_name');
 */
 
-(function( $, undefined ) {
+define(['kbwidget', 'jquery', 'bootstrap'],
+function(KBWidget, $, bootstrap) {
 
-    $.KBWidget({
-        name: "kbTabs",
+    return KBWidget({
+        name: "kbaseTabTableTabs",
         version: "1.0.0",
         init: function(options) {
+
             this._super(options);
             if (!options) options = {};
             var container = this.$elem;
@@ -159,4 +161,4 @@
             return this;
         },
     });
-}( jQuery ) );
+})

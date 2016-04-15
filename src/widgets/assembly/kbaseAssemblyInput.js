@@ -7,9 +7,9 @@
 
 
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseAssemblyInput',
-        parent: 'kbaseSingleObjectBasicWidget',
+        parent : kbaseSingleObjectBasicWidget,
         version: '1.0.1',
 
         

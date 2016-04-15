@@ -3,9 +3,9 @@
  * 
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseFunctGenomeComparison",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         init: function(options) {

@@ -2,7 +2,7 @@
  * KBase widget to display table of BIOM data
  */
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
             name: 'AbundanceDataTable',
             version: '1.0.0',
             options: {

@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseFbaTabs",
     version: "1.0.0",
     options: {
@@ -29,7 +29,7 @@ $.KBWidget({
                 class="table table-bordered table-striped" style="width: 100%;">');
         var mapTable = $('<div>')            
 
-        var tabs = container.kbTabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
+        var tabs = container.kbaseTabTableTabs({tabs: [{name: 'Overview', content: overviewTable, active: true},
                                            {name: 'Reactions', content: rxnTable},
                                            {name: 'Compounds', content: cpdTable},
                                            {name: 'Pathways', content: mapTable},                                               
@@ -50,7 +50,7 @@ $.KBWidget({
 
 
         self.loadTable = function(data) {
-            mapTable.kbasePathways({fba_ws: ws, fba_name: name});
+             new kbasePathways(mapTable, {fba_ws: ws, fba_name: name});
 
             var keys = [{key: 'id'},
                         {key: 'maximizeObjective', type: 'bool'},        
@@ -181,7 +181,7 @@ $.KBWidget({
             $('.rxn-click').click(function() {
                 var name = $(this).data('rxn');
                 var c = $('<div>');
-                c.kbaseRxn({id: name});
+                 new kbaseRxn(c, {id: name});
                 tabs.addTab({name: name, content: c, removable: true});
                 tabs.showTab(name);
             });            
@@ -189,7 +189,7 @@ $.KBWidget({
             $('.cpd-click').click(function() {
                 var name = $(this).data('cpd');
                 var c = $('<div>');
-                c.kbaseCpd({id: name});
+                 new kbaseCpd(c, {id: name});
                 tabs.addTab({name: name, content: c,  removable: true});
                 tabs.showTab(name);
             });                        

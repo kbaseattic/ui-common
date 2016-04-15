@@ -19,9 +19,9 @@
  * @author Dylan Chivian [dcchivian@lbl.gov]
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseWikiDescription",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         /**

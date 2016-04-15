@@ -8,9 +8,9 @@
 //TODO handle case when one or more workspaces have had narrative deleted but still have narrative metadata
 (function( $, undefined ) {
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseNarrativeManager", 
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         
 //        dontRedirect: true, //for testing

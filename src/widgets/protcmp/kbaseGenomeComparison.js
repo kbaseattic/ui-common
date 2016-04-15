@@ -6,9 +6,9 @@
 
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "GenomeComparisonWidget",
-    parent: "kbaseAuthenticatedWidget",
+    parent : kbaseAuthenticatedWidget,
     version: "1.0.0",
 	ws_name: null,
 	ws_id: null,

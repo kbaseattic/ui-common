@@ -1,5 +1,15 @@
-define(['kb.utils', 'json!functional-site/config.json'],
-function(Utils, config) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'kb.utils',
+		'json!functional-site/config.json'
+	], function(
+		KBWidget,
+		bootstrap,
+		Utils,
+		config
+	) {
   var Config = Object.create({}, {
     config: {
       value: null,

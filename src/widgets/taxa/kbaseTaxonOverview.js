@@ -3,9 +3,9 @@
  * Also includes a picture, but that'll be under a tab or something.
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseTaxonOverview",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         options: {

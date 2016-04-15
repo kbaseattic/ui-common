@@ -1,6 +1,6 @@
 (function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseModelTabs",    
     version: "1.0.0",
     options: {
@@ -37,7 +37,7 @@ $.KBWidget({
                 class="table table-bordered table-striped" style="width: 100%;">');
         var mapTable = $('<div>');
 
-        var tabs = container.kbTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
+        var tabs = container.kbaseTabTableTabs({tabs: [{name: 'Reactions', content: rxnTable, active: true},
                                             {name: 'Compounds', content: cpdTable},
                                             {name: 'Compartment', content: compartTable},
                                             {name: 'Biomass', content: biomassTable},
@@ -62,7 +62,7 @@ $.KBWidget({
 
 
         self.loadTable = function(data) {
-            mapTable.kbasePathways({model_ws: ws, 
+             new kbasePathways(mapTable, {model_ws: ws, 
                                     model_name: name, 
                                     editable: (options.editable ? true : false)});
 
@@ -161,7 +161,7 @@ $.KBWidget({
             $('.rxn-click').click(function() {
                 var name = $(this).data('rxn');
                 var c = $('<div>');
-                c.kbaseRxn({id: name});
+                 new kbaseRxn(c, {id: name});
                 tabs.addTab({name: name, content: c,  removable: true});
                 tabs.showTab(name);
             });
@@ -172,7 +172,7 @@ $.KBWidget({
             $('.cpd-click').click(function() {
                 var name = $(this).data('cpd');
                 var c = $('<div>');
-                c.kbaseCpd({id: name});
+                 new kbaseCpd(c, {id: name});
                 tabs.addTab({name: name, content: c,  removable: true});
                 tabs.showTab(name);
             });

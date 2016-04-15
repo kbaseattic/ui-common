@@ -1,5 +1,23 @@
-define(['jquery', 'q', 'kb.widget.dashboard.base', 'kb.client.methods', 'kb.session', 'kb.widget.buttonbar'],
-        function ($, Q, DashboardWidget, KBService, Session, Buttonbar) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'q',
+		'kb.widget.dashboard.base',
+		'kb.client.methods',
+		'kb.session',
+		'kb.widget.buttonbar'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		Q,
+		DashboardWidget,
+		KBService,
+		Session,
+		Buttonbar
+	) {
             "use strict";
             var widget = Object.create(DashboardWidget, {
                 init: {

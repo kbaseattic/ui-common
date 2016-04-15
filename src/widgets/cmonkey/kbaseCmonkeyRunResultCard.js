@@ -1,7 +1,7 @@
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseCmonkeyRunResultCard",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             id: null,

@@ -6,9 +6,9 @@
 
 
 (function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseDomainAnnotation',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '1.0.1',
         options: {
             domainAnnotationID: null,
@@ -117,7 +117,7 @@
                     container.empty();
                     var tabPane = $('<div id="'+self.pref+'tab-content">');
                     container.append(tabPane);
-                    tabPane.kbaseTabs({canDelete : true, tabs : []});                    
+                     new kbaseTabs(tabPane, {canDelete : true, tabs : []});                    
 
                     ///////////////////////////////////// Overview table ////////////////////////////////////////////           
                     var tabOverview = $("<div/>");

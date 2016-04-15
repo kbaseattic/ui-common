@@ -4,9 +4,9 @@
  * @public
  */
 (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseDownloadPanel",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             dropdown: null,

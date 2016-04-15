@@ -1,5 +1,23 @@
-define(['q', 'kb.session', 'kb.utils', 'kb.utils.api', 'kb.client.workspace', 'kb.config'],
-   function (Q, Session, Utils, APIUtils, Workspace, Config) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'q',
+		'kb.session',
+		'kb.utils',
+		'kb.utils.api',
+		'kb.client.workspace',
+		'kb.config'
+	], function(
+		KBWidget,
+		bootstrap,
+		Q,
+		Session,
+		Utils,
+		APIUtils,
+		Workspace,
+		Config
+	) {
 
       return Object.create({}, {
          init: {
