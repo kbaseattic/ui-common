@@ -215,17 +215,21 @@ console.log("RET", ids);
           var $li = $.jqElem('li');
           $ul.append($li);
 
-          var lineage = {};
+          var ret = {root : $ul, parent : $ul};
 
           $.each(lineage, function(k, v) {
+            //if ($li.html().length) {
+            //  $li.append(',')
+            //}
             $li.append(k);
             if (v != undefined) {
-              lineage = $self.buildLineageElem(v);
-              $parent.append($ul)
+              ret = $self.buildLineageElem(v);
+              ret.parent.append($ul);
+              ret.parent = $ul;
             }
           });
 
-          return {root : $parent, parent : $ul};
+          return ret;
 
         },
 
@@ -244,6 +248,7 @@ var lineage = $self.getLineage(term.id);
 console.log(lineage);
 
 var $lineageElem = $self.buildLineageElem(lineage);
+console.log("LE", $lineageElem);
 
           var $table = $.jqElem('div').kbaseTable(
             {
@@ -256,7 +261,7 @@ var $lineageElem = $self.buildLineageElem(lineage);
                   namespace     : term.namespace,
                   synonym       : $.isArray(term.synonym) ? term.synonym.join('<br>') : term.synonym,
                   comment       : term.comment,
-                  is_a          : $lineageElem,//term.is_a,
+                  is_a          : $lineageElem.root,//term.is_a,
                   relationship  : term.relationship,
                   xref          : $.isArray(term.xref) ? term.xref.join('<br>') : term.xref,
                 }
