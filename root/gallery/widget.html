@@ -192,7 +192,7 @@ $('#tabs a').click(function (e) {
                             var $line = $('#linechartWidget').kbaseLinechart(
 
                                 {
-
+debug : true,
                                     legendRegion : 'xGutter',
                                     xGutter : 75,
                                     useOverLine : false,
@@ -209,7 +209,7 @@ $('#tabs a').click(function (e) {
                                     xLabelRegion : 'yPadding',
                                     yLabelRegion : 'xPadding',
                                     hGrid : true,
-                                    xLabels : false,
+                                    xLabels : true,
                                     transitionTime : 500,
 
                                     xPadding : 40,
@@ -380,48 +380,7 @@ $('#tabs a').click(function (e) {
                                 }
                             );
 
-                            function generate_pmi_data () {
-                                var pmi = { subsystems : {} };
-                                var pmi_subs = pmi.subsystems;
 
-                                var subsystems = ['Glycine metabolism', 'Serine metabolism', 'Some other metabolism', 'Important metabolism'];
-
-                                for (var s = 0; s < subsystems.length; s++) {
-
-                                    var sub = subsystems[s];
-
-                                    var bars = [];
-
-                                    for (var i = 0; i < Math.random() * 30; i++) {
-
-                                        var val = Math.random() * 20 - 10;
-
-                                        bars.push(
-                                            {
-                                                bar   : i,
-                                                value : val,
-                                                tooltip : 'Pop up for ' + val
-                                            }
-                                        );
-                                    }
-
-                                    pmi_subs[sub] = bars;
-
-                                }
-
-                                return pmi;
-
-                            }
-
-                            var $pmi = $('#PMIbarchartWidget').kbasePMIBarchart(
-                                {
-                                    dataset : generate_pmi_data(),
-                                }
-                            );
-
-                            $.jqElem('div')/*('#pmi-button')*/.on('click', function(e) {
-                                $pmi.setDataset(generate_pmi_data());
-                            });
 
                             var scatterset = [];
 
@@ -906,7 +865,6 @@ transitionTime : 250,
             <li roll = 'presentation' ><a href = '#vennPane'>Venn Diagram</a></li>
             <li roll = 'presentation' ><a href = '#accordionPane'>Accordion</a></li>
             <li roll = 'presentation' ><a href = '#jsonPane'>JSON Reflector</a></li>
-            <li roll = 'presentation' ><a href = '#PMIbarchartWidget'>PMI Barchart</a></li>
         </ul>
 
         <div class = 'tab-content'>
@@ -949,9 +907,6 @@ transitionTime : 250,
             </div>
             <div roll = 'tabpanel' class = 'tab-pane ' id = 'jsonPane'>
                 <div id = 'json' style = 'border : 1px solid green;'></div>
-            </div>
-            <div roll = 'tabpanel' class = 'tab-pane ' id = 'pmiPane'>
-                <div id = 'PMIbarchartWidget' style = 'border : 1px solid green;'></div>
             </div>
 
         </div>

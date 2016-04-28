@@ -553,7 +553,7 @@ define('kbwidget', ['jquery', /*'kbaseBinding',*/ 'handlebars'], function ($) {
             subclass(Widget, pWidget);
         }
 
-        var defCopy = $.extend(true, {}, def);
+        var defCopy = $.extend(true, {constructor : Widget}, def);
 
         Widget.prototype.__attributes = {};
 

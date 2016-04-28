@@ -2,7 +2,6 @@ define('vis',
     [
         'kbaseBarchart',
         'kbasePMIBarchart',
-        'kbaseHistogram',
         'kbaseHeatmap',
         'kbaseLinechart',
         'kbaseSparkline',

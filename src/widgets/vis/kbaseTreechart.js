@@ -55,6 +55,7 @@ define('kbaseTreechart',
         staticWidth : false,
         staticHeight : false,
         canShrinkWidth : true,
+        chartRegion : 'chart',
 
         bias : "root",
 
@@ -253,7 +254,8 @@ define('kbaseTreechart',
     },
 
     updateTree: function (source) {
-        var chart = this.data('D3svg').select(this.region('chart'));
+    console.log("CHART REGION IS ", this.region(this.options.chartRegion));
+        var chart = this.D3svg().select(this.region(this.options.chartRegion));
 
         var $tree = this;
 
