@@ -2,12 +2,13 @@
 define('kbaseOntologyDictionary',
     [
         'jquery',
+        'colorbrewer',
         'datatables',
         'kbaseAuthenticatedWidget',
         'kbase-client-api',
         'bootstrap',
         'kbaseTable',
-    ], function( $ ) {
+    ], function( $, colorbrewer) {
 
     'use strict';
 
@@ -28,6 +29,9 @@ define('kbaseOntologyDictionary',
         init : function init(options) {
 
           this._super(options);
+
+          this.colors   = colorbrewer.Set2[8];
+          this.colorMap = {};
 
           var $self = this;
 
@@ -90,13 +94,12 @@ define('kbaseOntologyDictionary',
                 data.term_hash,
                 function (k, v) {
 
-
                   table_data.push(
                     [
                       v,
                       //[v.name, $.isArray(v.synonym) ? v.synonym.join('<br>') : v.synonym, v.def].join('<br>')
                       v.name,
-                      [v.name, v.id, v.def, v.synonym, v.xref].join(',')
+                      [v.name, v.id, v.def, v.synonym, v.xref, v.namespace].join(',')
                     ]
                   )
                 }
@@ -110,23 +113,41 @@ define('kbaseOntologyDictionary',
                   ],
                   createdRow : function(row, data, index) {
 
-                    var $cell = $('td', row).eq(0);
-                    $cell.empty();
+                    var $linkCell = $('td', row).eq(0);
+                    $linkCell.empty();
 
-                    var v = data[0];
+                    $linkCell.append( $self.termLink(data[0]) )
 
-                    var $link = $.jqElem('a')
-                      .append(v.id)
-                      .on('click', function(e) {
-                        $self.appendTerm(v);
-                      });
+                    var $nameCell = $('td', row).eq(1);
 
-                    $cell.append($link)
+                    var color = $self.colorMap[data[0].namespace];
+                    if (color == undefined) {
+                      color = $self.colorMap[data[0].namespace] = $self.colors.shift();
+                    }
+
+                    $nameCell.css('color', color)
+
                   }
               });
+
               $dt.rows.add(table_data).draw();
 
               console.log("TABLE DATA", table_data, $dt.rows, $dt.rows.add)
+
+              $self.data('colorMapElem').append('Ontology namespace key: ');
+
+              $.each(
+                $self.colorMap,
+                function (k, v) {
+                  $self.data('colorMapElem').append(
+                    $.jqElem('span')
+                      .css('padding-left', '25px')
+                      .css('color', v)
+                      .append(k)
+                  )
+
+                }
+              );
 
               $self.data('loaderElem').hide();
               $self.data('globalContainerElem').show();
@@ -145,6 +166,15 @@ define('kbaseOntologyDictionary',
             this.appendUI(this.$elem);
 
             return this
+        },
+
+        termLink : function(term) {
+          var $self = this;
+          return $.jqElem('a')
+            .append(term.id)
+            .on('click', function(e) {
+              $self.appendTerm(term);
+            });
         },
 
         getTerm : function(term_id) {
@@ -175,6 +205,7 @@ console.log("RET", ids);
           console.log("CHECK TERM", term, term_id)
           var parents = {}
           if (term.is_a) {
+          console.log("TIA ", term.is_a);
             $.each(
               this.parseISA(term.is_a),
               function (i, v) {
@@ -183,10 +214,11 @@ console.log("RET", ids);
             )
           }
           else {
+          console.log("UNDEF", term_id, recursive)
             return undefined
           }
 
-
+console.log("ITERATES HERE WITH", parents);
           $.each(
             parents,
             function (k, v) {
@@ -209,11 +241,17 @@ console.log("RET", ids);
 
         buildLineageElem : function(lineage) {
 
+          if (!lineage) {
+            return ''
+          }
+
           var $self = this;
 
           var $ul = $.jqElem('ul')
-          var $li = $.jqElem('li');
-          $ul.append($li);
+            .css('padding-left', '10px')
+            .css('list-style-position', 'inside')
+            //.css('list-style-type', 'none')
+          ;
 
           var ret = {root : $ul, parent : $ul};
 
@@ -221,7 +259,20 @@ console.log("RET", ids);
             //if ($li.html().length) {
             //  $li.append(',')
             //}
-            $li.append(k);
+
+            var $li = $.jqElem('li');
+            $ul.append($li);
+
+            var term = $self.getTerm(k);
+
+            $li.append( $self.termLink(term) );
+            $li.append(' ');
+            $li.append(
+              $.jqElem('span')
+                .css('color', $self.colorMap[term.namespace])
+                .append(term.name)
+            );
+
             if (v != undefined) {
               ret = $self.buildLineageElem(v);
               ret.parent.append($ul);
@@ -248,6 +299,7 @@ var lineage = $self.getLineage(term.id);
 console.log(lineage);
 
 var $lineageElem = $self.buildLineageElem(lineage);
+$lineageElem.root.css('padding-left', '0px')
 console.log("LE", $lineageElem);
 
           var $table = $.jqElem('div').kbaseTable(
@@ -261,7 +313,7 @@ console.log("LE", $lineageElem);
                   namespace     : term.namespace,
                   synonym       : $.isArray(term.synonym) ? term.synonym.join('<br>') : term.synonym,
                   comment       : term.comment,
-                  is_a          : $lineageElem.root,//term.is_a,
+                  is_a          : $lineageElem.root,
                   relationship  : term.relationship,
                   xref          : $.isArray(term.xref) ? term.xref.join('<br>') : term.xref,
                 }
@@ -322,7 +374,7 @@ console.log("LE", $lineageElem);
                           .addClass('fa fa-chevron-right fa-rotate-90')
                           .css('color', 'lightgray')
                       )
-                      .append('&nbsp; Genome Dictionary')
+                      .append('&nbsp; Ontology Dictionary')
                   )
               )
               .append(
@@ -340,6 +392,7 @@ console.log("LE", $lineageElem);
             ;
 
             $self.data('tableElem', $tableElem);
+            var $colorMapElem = $self.data('colorMapElem', $.jqElem('div'));
 
             var $containerElem = $.jqElem('div')
               .addClass('panel panel-default')
@@ -366,6 +419,7 @@ console.log("LE", $lineageElem);
                 $.jqElem('div')
                   .addClass('panel-body collapse in')
                     .append($tableElem)
+                    .append($colorMapElem)
               )
             ;
 
