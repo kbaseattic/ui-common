@@ -163,7 +163,7 @@ define('kbaseVisWidget',
                     if (scaleType == undefined) {
                         scaleType = this.xScaleType() || this.options.xScaleType;
                     }
-
+console.log("SCALE TYPE", scaleType, this.xScaleType(), this.options.xScaleType, this.options);
                     xScale = d3.scale[scaleType]();
 
                     this.setXScaleRange([0, this.chartBounds().size.width], xScale);

@@ -8,6 +8,7 @@ define('kbaseOntologyDictionary',
         'kbase-client-api',
         'bootstrap',
         'kbaseTable',
+        'kbaseForcedNetwork',
     ], function( $, colorbrewer) {
 
     'use strict';
@@ -19,7 +20,7 @@ define('kbaseOntologyDictionary',
 
         version: "1.0.0",
         options: {
-            dictionary_object    : 'gene_ontology',
+            dictionary_object    : 'plant_ontology',
             dictionary_workspace : 'KBaseOntology',
             workspaceURL         : "https://ci.kbase.us/services/ws", //window.kbconfig.urls.workspace,
         },
@@ -320,6 +321,40 @@ console.log("ITERATES HERE WITH", parents);
 
         },
 
+        lineageAsNodes : function(parent, lineage, nodes, edges, cache, depth) {
+          var $self = this;
+          if (nodes == undefined) {
+            nodes = [];
+          }
+          if (edges == undefined) {
+            edges = []
+          }
+          if (cache == undefined) {
+            cache = {}
+          }
+
+          if (depth == undefined) {
+            depth = 0;
+          }
+
+          if (cache[parent] == undefined) {
+            nodes.push({node : parent, tag : parent, color : $self.colorMap[$self.getTerm(parent).namespace]});
+            cache[parent] = nodes.length - 1;
+          }
+          $.each(lineage, function(k, v) {
+            if (cache[k] == undefined) {
+              nodes.push({name : k, tag : k, color : $self.colorMap[$self.getTerm(k).namespace]});
+              cache[k] = nodes.length - 1;
+            }
+
+            edges.push({source : cache[parent], target : cache[k], charge : -100 * depth});
+            if (v != undefined) {
+              $self.lineageAsNodes(k, v, nodes, edges, cache, depth + 1)
+            }
+          })
+          return {nodes : nodes, edges : edges};
+        },
+
         appendTerm : function(term) {
           var $self = this;
 
@@ -340,6 +375,17 @@ var $lineageElem = $self.buildLineageElem(lineage);
 $lineageElem.root.css('padding-left', '0px')
 console.log("LE", $lineageElem);
 
+var dataset = $self.lineageAsNodes(term.id, lineage);
+console.log("NODES ARE", dataset);
+dataset.nodes[0].stroke = 'yellow';
+
+var $force = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseForcedNetwork(
+                                {
+                                  linkDistance : 150,
+                                    dataset : dataset
+                                }
+                            );
+
           var $table = $.jqElem('div').kbaseTable(
             {
               structure : {
@@ -351,7 +397,7 @@ console.log("LE", $lineageElem);
                   namespace     : term.namespace,
                   synonym       : $.isArray(term.synonym) ? term.synonym.join('<br>') : term.synonym,
                   comment       : term.comment,
-                  is_a          : $lineageElem.root,
+                  is_a          : $force.$elem, //$lineageElem.root,
                   relationship  : term.relationship,
                   xref          : $.isArray(term.xref) ? term.xref.join('<br>') : term.xref,
                 }
