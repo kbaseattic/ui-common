@@ -19,7 +19,7 @@ define('kbaseOntologyDictionary',
 
         version: "1.0.0",
         options: {
-            dictionary_object    : 'plant_ontology',
+            dictionary_object    : 'gene_ontology',
             dictionary_workspace : 'KBaseOntology',
             workspaceURL         : "https://ci.kbase.us/services/ws", //window.kbconfig.urls.workspace,
         },
@@ -87,6 +87,42 @@ define('kbaseOntologyDictionary',
           );
 
           $metaElem.append($metaTable.$elem);
+
+          var $typeDefElem  = $self.data('typeDefElem');
+          var typedef_data = [];
+          $.each(
+            data.typedef_hash,
+            function (k, v) {
+
+              var $subtable = $.jqElem('div').kbaseTable(
+                {
+                  structure : {
+                    keys : Object.keys(v).sort(),
+                    rows : v
+                  },
+                  striped : false
+                }
+              );
+console.log($subtable.$elem, Object.keys(v).sort())
+              typedef_data.push(
+                [
+                  v.name,
+                  $subtable.$elem.html()
+                ]
+              );
+
+            }
+          )
+
+console.log("TDE", $typeDefElem, typedef_data);
+              var $tt = $typeDefElem.DataTable({
+                columns : [
+                  {title : 'TypeDef', 'class' : 'ontology-top'},
+                  {title : 'Info'}
+                ]
+              });
+
+              $tt.rows.add(typedef_data).draw();
 
               var table_data = []
 
@@ -291,9 +327,11 @@ console.log("ITERATES HERE WITH", parents);
           $termElem.empty();
           $self.data('termContainerElem').show();
           $self.data('metaContainerElem').find('.panel-heading').find('i').removeClass('fa-rotate-90');
-          $self.data('containerElem').find('.panel-heading').find('i').removeClass('fa-rotate-90');
           $self.data('metaContainerElem').find('.panel-body').collapse('hide');
+          $self.data('containerElem').find('.panel-heading').find('i').removeClass('fa-rotate-90');
           $self.data('containerElem').find('.panel-body').collapse('hide');
+          $self.data('typeDefContainerElem').find('.panel-heading').find('i').removeClass('fa-rotate-90');
+          $self.data('typeDefContainerElem').find('.panel-body').collapse('hide');
 
 var lineage = $self.getLineage(term.id);
 console.log(lineage);
@@ -356,33 +394,7 @@ console.log("LE", $lineageElem);
 
             var $metaElem = $self.data('metaElem', $.jqElem('div'));
 
-            var $metaContainerElem = $.jqElem('div')
-              .addClass('panel panel-default')
-              .append(
-                $.jqElem('div')
-                  .addClass('panel-heading')
-                  .on('click', function(e) {
-                    $(this).next().collapse('toggle')
-                    $(this).find('i').toggleClass('fa-rotate-90')
-
-                  })
-                  .append(
-                    $.jqElem('div')
-                      .addClass('panel-title')
-                      .append(
-                        $.jqElem('i')
-                          .addClass('fa fa-chevron-right fa-rotate-90')
-                          .css('color', 'lightgray')
-                      )
-                      .append('&nbsp; Ontology Dictionary')
-                  )
-              )
-              .append(
-                $.jqElem('div')
-                  .addClass('panel-body collapse in')
-                    .append($metaElem)
-              )
-            ;
+            var $metaContainerElem = $self.createContainerElem('Ontology Dictionary', [$metaElem]);
 
             $self.data('metaContainerElem', $metaContainerElem);
             $globalContainer.append($metaContainerElem);
@@ -394,74 +406,69 @@ console.log("LE", $lineageElem);
             $self.data('tableElem', $tableElem);
             var $colorMapElem = $self.data('colorMapElem', $.jqElem('div'));
 
-            var $containerElem = $.jqElem('div')
-              .addClass('panel panel-default')
-              .append(
-                $.jqElem('div')
-                  .addClass('panel-heading')
-                  .on('click', function(e) {
-                    $(this).next().collapse('toggle')
-                    $(this).find('i').toggleClass('fa-rotate-90')
-
-                  })
-                  .append(
-                    $.jqElem('div')
-                      .addClass('panel-title')
-                      .append(
-                        $.jqElem('i')
-                          .addClass('fa fa-chevron-right fa-rotate-90')
-                          .css('color', 'lightgray')
-                      )
-                      .append('&nbsp; Term Dictionary')
-                  )
-              )
-              .append(
-                $.jqElem('div')
-                  .addClass('panel-body collapse in')
-                    .append($tableElem)
-                    .append($colorMapElem)
-              )
-            ;
+            var $containerElem = $self.createContainerElem('Term Dictionary', [$tableElem, $colorMapElem]);
 
             $self.data('containerElem', $containerElem);
             $globalContainer.append($containerElem);
 
             var $termElem = $self.data('termElem', $.jqElem('div'));
 
-            var $termContainerElem = $.jqElem('div')
-              .css('display', 'none')
-              .addClass('panel panel-default')
-              .append(
-                $.jqElem('div')
-                  .addClass('panel-heading')
-                  .on('click', function(e) {
-                    $(this).next().collapse('toggle')
-                    $(this).find('i').toggleClass('fa-rotate-90')
-
-                  })
-                  .append(
-                    $.jqElem('div')
-                      .addClass('panel-title')
-                      .append(
-                        $.jqElem('i')
-                          .addClass('fa fa-chevron-right fa-rotate-90')
-                          .css('color', 'lightgray')
-                      )
-                      .append('&nbsp; Term')
-                  )
-              )
-              .append(
-                $.jqElem('div')
-                  .addClass('panel-body collapse in')
-                    .append($termElem)
-              )
-            ;
+            var $termContainerElem = $self.createContainerElem('Term', [$termElem], 'none');
 
             $self.data('termContainerElem', $termContainerElem);
             $globalContainer.append($termContainerElem);
 
+            var $typeDefElem = $self.data('typeDefElem', $.jqElem('table').addClass('display'));
+
+            var $typeDefContainerElem = $self.createContainerElem('Type Definitions', [$typeDefElem]);
+
+            $self.data('typeDefContainerElem', $typeDefContainerElem);
+            $globalContainer.append($typeDefContainerElem);
+
             return $elem
 
+        },
+
+        createContainerElem : function(name, content, display) {
+
+          var $panelBody = $.jqElem('div')
+            .addClass('panel-body collapse in')
+
+          $.each(
+            content,
+            function (i, v) {
+              $panelBody.append(v)
+            }
+          )
+
+          var $containerElem = $.jqElem('div')
+            .addClass('panel panel-default')
+            .css('display', display)
+            .append(
+              $.jqElem('div')
+                .addClass('panel-heading')
+                .on('click', function(e) {
+                  $(this).next().collapse('toggle')
+                  $(this).find('i').toggleClass('fa-rotate-90')
+
+                })
+                .append(
+                  $.jqElem('div')
+                    .addClass('panel-title')
+                    .append(
+                      $.jqElem('i')
+                        .addClass('fa fa-chevron-right fa-rotate-90')
+                        .css('color', 'lightgray')
+                    )
+                    .append('&nbsp; ' + name)
+                )
+            )
+            .append(
+              $panelBody
+            )
+          ;
+
+          return $containerElem
         },
 
     });
