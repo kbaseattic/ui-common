@@ -223,6 +223,7 @@
 				'kbaseRNASeqPie'                       : 'kbaseRNASeqPie',
 				'kbaseRNASeqHistogram'                       : 'kbaseRNASeqHistogram',
 				'kbaseOntologyDictionary'                       : 'kbaseOntologyDictionary',
+				'kbaseOntologyTranslation'                       : 'kbaseOntologyTranslation',
 				'vis'                               : 'vis/vis',
 				'kbaseSimpleWSSelect'               : 'workspaces/kbaseSimpleWSSelect',
 				'kbaseWSButtons'                    : 'workspaces/kbaseWSButtons',

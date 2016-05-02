@@ -20,14 +20,48 @@ define('kbaseOntologyDictionary',
 
         version: "1.0.0",
         options: {
-            dictionary_object    : 'plant_ontology',
+            dictionary_object    : 'gene_ontology',
             dictionary_workspace : 'KBaseOntology',
             workspaceURL         : "https://ci.kbase.us/services/ws", //window.kbconfig.urls.workspace,
         },
 
-        parseWorkspaceData : function parseWorkspaceData(d1, d2) {},
+        extractLink : function(text) {
+          if (text == undefined) {
+            return text;
+          }
+          var mappings = {
+            "(EC:(\\w+))"                 : "<a target = '_blank' href = 'http://enzyme.expasy.org/EC/$2'>$1</a>",
+            "(PMID:(\\w+))"               : "<a target = '_blank' href = 'http://www.ncbi.nlm.nih.gov/pubmed/$2'>$1</a>",
+            "(GOC:(\\w+))"                : "<a target = '_blank' href = 'http://www.geneontology.org/doc/GO.curator_dbxrefs'>$1</a>",
+            "(Wikipedia:(\\w+))"          : "<a target = '_blank' href = 'https://en.wikipedia.org/wiki/$2'>$1</a>",
+            "(Reactome:(\\w+))"           : "<a target = '_blank' href = 'http://www.reactome.org/content/query?q=$2'>$1</a>",
+            "(KEGG:(\\w+))"               : "<a target = '_blank' href = 'http://www.genome.jp/dbget-bin/www_bget?rn:$2'>$1</a>",
+            "(RHEA:(\\w+))"               : "<a target = '_blank' href = 'http://www.rhea-db.org/reaction?id=$2'>$1</a>",
+            "(MetaCyc:(\\w+))"            : "<a target = '_blank' href = 'http://biocyc.org/META/NEW-IMAGE?type=NIL&object=$2'>$1</a>",
+            "(UM-BBD_reactionID:(\\w+))"  : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/servlets/pageservlet?ptype=r&reacID=$2'>$1</a>",
+            "(UM-BBD_enzymeID:(\\w+))"    : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/servlets/pageservlet?ptype=ep&enzymeID=$2'>$1</a>",
+            "(UM-BBD_pathwayID:(\\w+))"   : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/$2/$2_map.html'>$1</a>",
+            "(RESID:(\\w+))"              : "<a target = '_blank' href = 'http://pir.georgetown.edu/cgi-bin/resid?id=$2'>$1</a>",
+            "(PO_GIT:(\\w+))"             : "<a target = '_blank' href = 'https://github.com/Planteome/plant-ontology/issues/$2'>$1</a>",
+            "(TO_GIT:(\\w+))"             : "<a target = '_blank' href = 'https://github.com/Planteome/plant-trait-ontology/issues/$2'>$1</a>",
+            "(GC_ID:(\\w+))"              : "<a target = '_blank' href = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG$2'>$1</a>",
+          }
+console.log("GOES OVER TEXT", text);
+          for (var map in mappings) {
+            var regex = new RegExp(map, 'g');
+            console.log("CHECKS ", regex);
+            /*text = text.replace(regex, function(match, p1) {
+              return "<a href = '" + mappings[map] + "'>" + p1 + "</a>"
+            });*/
+            text = text.replace(regex, mappings[map]);
+          }
+console.log("RETURNS", text);
+          return text;
+        },
 
         init : function init(options) {
+
+console.log(this.extractLink('EC:123 EC:456 Wikipedia:fooBar EC:789 RHEA:888 EC:111 KEGG:R05612 RHEA:20839'));
 
           this._super(options);
 
@@ -56,6 +90,7 @@ define('kbaseOntologyDictionary',
 
             var $metaTable = $.jqElem('div').kbaseTable(
               {
+                allowNullRows : false,
                 structure : {
                   keys : [
                     {value : 'format-version',                    label : 'Format version'},
@@ -98,7 +133,7 @@ define('kbaseOntologyDictionary',
               var $subtable = $.jqElem('div').kbaseTable(
                 {
                   structure : {
-                    keys : Object.keys(v).sort(),
+                    keys : Object.keys(v).sort().map(function(v) { return {value : v, label : v, style : 'width : 200px' } } ),
                     rows : v
                   },
                   striped : false
@@ -357,7 +392,7 @@ console.log("ITERATES HERE WITH", parents);
 
         appendTerm : function(term) {
           var $self = this;
-
+console.log("APPENDS TERM HERE!!!", term);
           var $termElem = $self.data('termElem');
           $termElem.empty();
           $self.data('termContainerElem').show();
@@ -371,35 +406,65 @@ console.log("ITERATES HERE WITH", parents);
 var lineage = $self.getLineage(term.id);
 console.log(lineage);
 
-var $lineageElem = $self.buildLineageElem(lineage);
-$lineageElem.root.css('padding-left', '0px')
-console.log("LE", $lineageElem);
+var $lineageElem;
+var $force;
 
-var dataset = $self.lineageAsNodes(term.id, lineage);
-console.log("NODES ARE", dataset);
-dataset.nodes[0].stroke = 'yellow';
+if ($lineageElem = $self.buildLineageElem(lineage)) {
+  $lineageElem.root.css('padding-left', '0px')
+  console.log("LE", $lineageElem);
 
-var $force = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseForcedNetwork(
+  var dataset = $self.lineageAsNodes(term.id, lineage);
+  console.log("NODES ARE", dataset);
+  dataset.nodes[0].stroke = 'yellow';
+  console.log("BUILDS CLOSURE ELEM");
+
+  $force = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseForcedNetwork(
                                 {
                                   linkDistance : 150,
                                     dataset : dataset
                                 }
                             );
+}
+
+var $closureElem;
+if (term.relationship_closure != undefined) {
+  $closureElem = $.jqElem('ul').css('style', 'float : left');
+  for (var type in term.relationship_closure) {
+    $closureElem
+      .append(
+        $.jqElem('li')
+          .append(type + ' relationships')
+      )
+    ;
+
+    for (var elem of term.relationship_closure[type]) {
+    console.log("REL CLOSURE ELEM", elem);
+    console.log("TL", $self.termLink(elem[0]));
+      $closureElem.append(
+        $.jqElem('li')
+          .append($self.termLink($self.getTerm(elem[0])))
+          .append(' is ' + elem[1] + ' away')
+      );
+    }
+
+  }
+}
 
           var $table = $.jqElem('div').kbaseTable(
             {
+              allowNullRows : false,
               structure : {
                 keys : [{value : 'id', label : 'ID'}, 'name', 'def', 'namespace', 'synonym', 'comment', {value : 'is_a', label : 'Is A'}, 'relationship', 'xref'],
                 rows : {
                   id            : term.id,
                   name          : term.name,
-                  def           : term.def,
+                  def           : $self.extractLink($.isArray(term.def) ? term.def.join('<br>') : term.def),
                   namespace     : term.namespace,
                   synonym       : $.isArray(term.synonym) ? term.synonym.join('<br>') : term.synonym,
                   comment       : term.comment,
-                  is_a          : $force.$elem, //$lineageElem.root,
+                  is_a          : $closureElem && $force ? $.jqElem('div').append($closureElem).append($force.$elem) : undefined, //$lineageElem.root,
                   relationship  : term.relationship,
-                  xref          : $.isArray(term.xref) ? term.xref.join('<br>') : term.xref,
+                  xref          : $self.extractLink($.isArray(term.xref) ? term.xref.join('<br>') : term.xref),
                 }
               }
             }

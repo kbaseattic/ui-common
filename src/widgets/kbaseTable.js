@@ -86,6 +86,7 @@ define('kbaseTable',
             row_callback : function (cell, header, row, $kb) {},
             sortButtons : {},
             navControls : false,
+            allowNullRows : true,
 
         },
 
@@ -607,19 +608,25 @@ define('kbaseTable',
                     }
 
                     key.type = 'th';
-                    key.style = 'white-space : nowrap';
 
-                    var $row = this.createRow(
-                        {
-                            key : key,
-                            value : {value : rows[key.value], key : key.value},
-                        },
-                        [{value : 'key'}, {value : 'value'}]
-                    );
+                    if (key.style == undefined) {
+                      key.style = '';
+                    }
+                    key.style += '; white-space : nowrap';
 
-                    if ($row != undefined && $row.children().length) {
-                        numRows++;
-                        this.data('tbody').append($row);
+                    if (rows[key.value] != undefined || this.options.allowNullRows) {
+                      var $row = this.createRow(
+                          {
+                              key : key,
+                              value : {value : rows[key.value], key : key.value},
+                          },
+                          [{value : 'key'}, {value : 'value'}]
+                      );
+
+                      if ($row != undefined && $row.children().length) {
+                          numRows++;
+                          this.data('tbody').append($row);
+                      }
                     }
                 }
             }
