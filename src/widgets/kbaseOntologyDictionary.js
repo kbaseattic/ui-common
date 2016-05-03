@@ -20,7 +20,7 @@ define('kbaseOntologyDictionary',
 
         version: "1.0.0",
         options: {
-            dictionary_object    : 'gene_ontology',
+            dictionary_object    : 'gene_ontology', //'plant_ontology', 'ncbi_taxon_ontology',
             dictionary_workspace : 'KBaseOntology',
             workspaceURL         : "https://ci.kbase.us/services/ws", //window.kbconfig.urls.workspace,
         },
@@ -30,21 +30,21 @@ define('kbaseOntologyDictionary',
             return text;
           }
           var mappings = {
-            "(EC:(\\w+))"                 : "<a target = '_blank' href = 'http://enzyme.expasy.org/EC/$2'>$1</a>",
-            "(PMID:(\\w+))"               : "<a target = '_blank' href = 'http://www.ncbi.nlm.nih.gov/pubmed/$2'>$1</a>",
-            "(GOC:(\\w+))"                : "<a target = '_blank' href = 'http://www.geneontology.org/doc/GO.curator_dbxrefs'>$1</a>",
-            "(Wikipedia:(\\w+))"          : "<a target = '_blank' href = 'https://en.wikipedia.org/wiki/$2'>$1</a>",
-            "(Reactome:(\\w+))"           : "<a target = '_blank' href = 'http://www.reactome.org/content/query?q=$2'>$1</a>",
-            "(KEGG:(\\w+))"               : "<a target = '_blank' href = 'http://www.genome.jp/dbget-bin/www_bget?rn:$2'>$1</a>",
-            "(RHEA:(\\w+))"               : "<a target = '_blank' href = 'http://www.rhea-db.org/reaction?id=$2'>$1</a>",
-            "(MetaCyc:(\\w+))"            : "<a target = '_blank' href = 'http://biocyc.org/META/NEW-IMAGE?type=NIL&object=$2'>$1</a>",
-            "(UM-BBD_reactionID:(\\w+))"  : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/servlets/pageservlet?ptype=r&reacID=$2'>$1</a>",
-            "(UM-BBD_enzymeID:(\\w+))"    : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/servlets/pageservlet?ptype=ep&enzymeID=$2'>$1</a>",
-            "(UM-BBD_pathwayID:(\\w+))"   : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/$2/$2_map.html'>$1</a>",
-            "(RESID:(\\w+))"              : "<a target = '_blank' href = 'http://pir.georgetown.edu/cgi-bin/resid?id=$2'>$1</a>",
-            "(PO_GIT:(\\w+))"             : "<a target = '_blank' href = 'https://github.com/Planteome/plant-ontology/issues/$2'>$1</a>",
-            "(TO_GIT:(\\w+))"             : "<a target = '_blank' href = 'https://github.com/Planteome/plant-trait-ontology/issues/$2'>$1</a>",
-            "(GC_ID:(\\w+))"              : "<a target = '_blank' href = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG$2'>$1</a>",
+            "(EC:([\\w.-]+))"                 : "<a target = '_blank' href = 'http://enzyme.expasy.org/EC/$2'>$1</a>",
+            "(PMID:([\\w.-]+))"               : "<a target = '_blank' href = 'http://www.ncbi.nlm.nih.gov/pubmed/$2'>$1</a>",
+            "(GOC:([\\w.-]+))"                : "<a target = '_blank' href = 'http://www.geneontology.org/doc/GO.curator_dbxrefs'>$1</a>",
+            "(Wikipedia:([\\w.-]+))"          : "<a target = '_blank' href = 'https://en.wikipedia.org/wiki/$2'>$1</a>",
+            "(Reactome:([\\w.-]+))"           : "<a target = '_blank' href = 'http://www.reactome.org/content/query?q=$2'>$1</a>",
+            "(KEGG:([\\w.-]+))"               : "<a target = '_blank' href = 'http://www.genome.jp/dbget-bin/www_bget?rn:$2'>$1</a>",
+            "(RHEA:([\\w.-]+))"               : "<a target = '_blank' href = 'http://www.rhea-db.org/reaction?id=$2'>$1</a>",
+            "(MetaCyc:([\\w.-]+))"            : "<a target = '_blank' href = 'http://biocyc.org/META/NEW-IMAGE?type=NIL&object=$2'>$1</a>",
+            "(UM-BBD_reactionID:([\\w.-]+))"  : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/servlets/pageservlet?ptype=r&reacID=$2'>$1</a>",
+            "(UM-BBD_enzymeID:([\\w.-]+))"    : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/servlets/pageservlet?ptype=ep&enzymeID=$2'>$1</a>",
+            "(UM-BBD_pathwayID:([\\w.-]+))"   : "<a target = '_blank' href = 'http://eawag-bbd.ethz.ch/$2/$2_map.html'>$1</a>",
+            "(RESID:([\\w.-]+))"              : "<a target = '_blank' href = 'http://pir.georgetown.edu/cgi-bin/resid?id=$2'>$1</a>",
+            "(PO_GIT:([\\w.-]+))"             : "<a target = '_blank' href = 'https://github.com/Planteome/plant-ontology/issues/$2'>$1</a>",
+            "(TO_GIT:([\\w.-]+))"             : "<a target = '_blank' href = 'https://github.com/Planteome/plant-trait-ontology/issues/$2'>$1</a>",
+            "(GC_ID:([\\w.-]+))"              : "<a target = '_blank' href = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG$2'>$1</a>",
           }
 console.log("GOES OVER TEXT", text);
           for (var map in mappings) {
@@ -127,7 +127,7 @@ console.log(this.extractLink('EC:123 EC:456 Wikipedia:fooBar EC:789 RHEA:888 EC:
           var $typeDefElem  = $self.data('typeDefElem');
           var typedef_data = [];
           $.each(
-            data.typedef_hash,
+            data.typedef_hash || {},
             function (k, v) {
 
               var $subtable = $.jqElem('div').kbaseTable(
@@ -240,10 +240,10 @@ console.log("TDE", $typeDefElem, typedef_data);
             return this
         },
 
-        termLink : function(term) {
+        termLink : function(term, withName) {
           var $self = this;
           return $.jqElem('a')
-            .append(term.id)
+            .append(term.id + (withName ? ' [' + term.name + ']' : ''))
             .on('click', function(e) {
               $self.appendTerm(term);
             });
@@ -440,10 +440,11 @@ if (term.relationship_closure != undefined) {
     for (var elem of term.relationship_closure[type]) {
     console.log("REL CLOSURE ELEM", elem);
     console.log("TL", $self.termLink(elem[0]));
+      var term = $self.getTerm(elem[0]);
       $closureElem.append(
         $.jqElem('li')
-          .append($self.termLink($self.getTerm(elem[0])))
-          .append(' is ' + elem[1] + ' away')
+          .append(elem[1] + ' away - ')
+          .append($self.termLink(term, true))
       );
     }
 
