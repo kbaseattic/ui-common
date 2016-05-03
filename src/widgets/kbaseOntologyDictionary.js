@@ -171,7 +171,7 @@ console.log("TDE", $typeDefElem, typedef_data);
                       v,
                       //[v.name, $.isArray(v.synonym) ? v.synonym.join('<br>') : v.synonym, v.def].join('<br>')
                       v.name,
-                      [v.name, v.id, v.def, v.synonym, v.xref, v.namespace].join(',')
+                      [v.name, v.id, v.def, v.synonym, v.xref, v.namespace, v.relationship].join(',')
                     ]
                   )
                 }
@@ -269,9 +269,19 @@ console.log("RET", ids);
           return ids;
         },
 
-        getLineage : function(term_id, recursive) {
+        getLineage : function(term_id, recursive, circular_breaker) {
 
           var $self = this;
+
+          if (circular_breaker == undefined) {
+            circular_breaker = {}
+          }
+
+          if (circular_breaker[term_id]) {
+            return undefined;
+          }
+
+          circular_breaker[term_id] = 1;
 
           var term    = this.getTerm(term_id);
           console.log("CHECK TERM", term, term_id)
@@ -295,7 +305,7 @@ console.log("ITERATES HERE WITH", parents);
             parents,
             function (k, v) {
             console.log("P DIC", k, v, parents)
-              parents[k] = $self.getLineage(k, true);
+              parents[k] = $self.getLineage(k, true, circular_breaker);
             }
           )
 
@@ -436,8 +446,11 @@ if (term.relationship_closure != undefined) {
           .append(type + ' relationships')
       )
     ;
+console.log("TYPE IS WHAT NOW", type, term.relationship_closure, term.relationship_closure[type]);
 
-    for (var elem of term.relationship_closure[type]) {
+    $.each(
+      term.relationship_closure[type],
+      function (i, elem) {
     console.log("REL CLOSURE ELEM", elem);
     console.log("TL", $self.termLink(elem[0]));
       var term = $self.getTerm(elem[0]);
@@ -445,11 +458,23 @@ if (term.relationship_closure != undefined) {
         $.jqElem('li')
           .append(elem[1] + ' away - ')
           .append($self.termLink(term, true))
+          .append(' - ')
+          .append(
+           $.jqElem('span')
+              .css('color', $self.colorMap[term.namespace])
+              .append(term.name)
+          )
       );
-    }
+    });
 
   }
 }
+
+console.log("CLOSURE ELEM", $closureElem);
+          var relationship = term.relationship;
+          if (relationship != undefined) {
+            var rel = relationship.split(/ ! /, relationship);
+          }
 
           var $table = $.jqElem('div').kbaseTable(
             {
