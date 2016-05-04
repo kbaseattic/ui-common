@@ -471,7 +471,7 @@ define('kbaseOntologyDictionary',
             );
           }
 
-var $closureElem = $.jqElem('table');
+var $closureElem = undefined;
 if (term.relationship_closure != undefined) {
   $closureElem = $.jqElem('ul').css('style', 'float : left');
 
