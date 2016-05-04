@@ -66,6 +66,14 @@ define('kbaseOntologyTranslation',
             );
 
             if (Object.keys(comments).length) {
+
+              if (comments['external resource']) {
+                comments['external resource'] = $.jqElem('a')
+                  .attr('href', comments['external resource'])
+                  .attr('target', '_blank')
+                  .append(comments['external resource'])
+              }
+
               $commentsTable = $.jqElem('div').kbaseTable(
                 {
                   allowNullRows : false,
@@ -77,7 +85,7 @@ define('kbaseOntologyTranslation',
                 }
               );
             }
-
+console.log("COMMENTS", comments);
             var $metaTable = $.jqElem('div').kbaseTable(
               {
                 allowNullRows : false,
