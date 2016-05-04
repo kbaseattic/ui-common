@@ -650,11 +650,11 @@ define('kbaseTable',
             var minRows = this.options.minVisibleRowIndex || 0;
 
             this.data('tbody')
-                .find('tr:lt(' + minRows + ')')
+                .find('> tr:lt(' + minRows + ')')
                 .css('display', 'none');
 
             this.data('tbody')
-                .find('tr:gt(' + (maxRows - 1) + ')')
+                .find('> tr:gt(' + (maxRows - 1) + ')')
                 .css('display', 'none');
 
             this.visRowString('Rows ' + (minRows + 1) + ' to ' + maxRows + ' of ' + this.numRows());

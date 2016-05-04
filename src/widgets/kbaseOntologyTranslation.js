@@ -49,6 +49,35 @@ define('kbaseOntologyTranslation',
 
             $metaElem.empty();
 
+            var comments = {};
+
+            var $commentsTable;
+            data.comment.split(/\n/).forEach(
+              function(v,i) {
+                var tmp = v.split(/:/);
+                if (tmp.length > 2) {
+                  var tail = tmp.slice(1,tmp.length).join(':');
+                  tmp = [tmp[0], tail]
+                }
+                if (tmp.length == 2) {
+                  comments[tmp[0]] = tmp[1];
+                }
+              }
+            );
+
+            if (Object.keys(comments).length) {
+              $commentsTable = $.jqElem('div').kbaseTable(
+                {
+                  allowNullRows : false,
+                  structure :
+                    {
+                      keys : Object.keys(comments).sort(),
+                      rows : comments
+                    }
+                }
+              );
+            }
+
             var $metaTable = $.jqElem('div').kbaseTable(
               {
                 allowNullRows : false,
@@ -61,7 +90,7 @@ define('kbaseOntologyTranslation',
                   rows : {
                     'ontology1' : data.ontology1,
                     'ontology2' : data.ontology2,
-                    'comment' : data.comment
+                    'comment'   : $commentsTable ? $commentsTable.$elem : data.comment
                   }
                 }
             }
