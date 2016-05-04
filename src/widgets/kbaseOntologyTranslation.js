@@ -20,9 +20,9 @@ define('kbaseOntologyTranslation',
 
         version: "1.0.0",
         options: {
-            dictionary_object    : 'interpro2go',
-            dictionary_workspace : 'KBaseOntology',
-            workspaceURL         : "https://ci.kbase.us/services/ws", //window.kbconfig.urls.workspace,
+            object_name    : 'interpro2go',
+            workspace_name : 'KBaseOntology',
+            workspaceURL         : window.kbconfig ? window.kbconfig.urls.workspace : "https://ci.kbase.us/services/ws",
         },
 
         init : function init(options) {
@@ -38,8 +38,8 @@ define('kbaseOntologyTranslation',
           var ws = new Workspace(this.options.workspaceURL, {token : $self.authToken()});
 
           var dictionary_params = {
-              workspace : this.options.dictionary_workspace,
-              name      : this.options.dictionary_object,
+              workspace : this.options.workspace_name,
+              name      : this.options.object_name,
           };
 
           ws.get_objects([dictionary_params]).then(function(data) {

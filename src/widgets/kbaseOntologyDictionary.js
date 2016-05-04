@@ -20,9 +20,10 @@ define('kbaseOntologyDictionary',
 
         version: "1.0.0",
         options: {
-            dictionary_object    : 'gene_ontology', //'plant_ontology', 'ncbi_taxon_ontology', 'gene_ontology'
-            dictionary_workspace : 'KBaseOntology',
-            workspaceURL         : "https://ci.kbase.us/services/ws", //window.kbconfig.urls.workspace,
+            object_name    : 'gene_ontology', //'plant_ontology', 'ncbi_taxon_ontology', 'gene_ontology'
+            workspace_name : 'KBaseOntology',
+            workspaceURL         : window.kbconfig ? window.kbconfig.urls.workspace : "https://ci.kbase.us/services/ws",
+
         },
 
         extractLink : function(text) {
@@ -68,8 +69,8 @@ define('kbaseOntologyDictionary',
           $self.ws = new Workspace(this.options.workspaceURL, {token : $self.authToken()});
 
           var dictionary_params = {
-              workspace : this.options.dictionary_workspace,
-              name      : this.options.dictionary_object,
+              workspace : this.options.workspace_name,
+              name      : this.options.object_name,
               included : [
                 '/format_version','/data_version','/date','/saved_by','/auto_generated_by','/subsetdef','/synonymtypedef','/default_namespace',
                 '/treat_xrefs_as_differentia', '/treat_xrefs_as_is_a','/ontology',
@@ -417,8 +418,8 @@ define('kbaseOntologyDictionary',
             $self.data('loaderElem').show();
 
             var dictionary_params = {
-                workspace : this.options.dictionary_workspace,
-                name      : this.options.dictionary_object,
+                workspace : this.options.workspace_name,
+                name      : this.options.object_name,
                 included : [
                   '/term_hash/' + term_id + '/*',
                   ]
