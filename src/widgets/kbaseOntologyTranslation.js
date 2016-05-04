@@ -44,7 +44,6 @@ define('kbaseOntologyTranslation',
 
           ws.get_objects([dictionary_params]).then(function(data) {
             data = data[0].data;
-            console.log("GOT ME DATA", data);
 
             var $metaElem = $self.data('metaElem');
 

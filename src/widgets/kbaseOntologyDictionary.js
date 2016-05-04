@@ -20,7 +20,7 @@ define('kbaseOntologyDictionary',
 
         version: "1.0.0",
         options: {
-            dictionary_object    : 'gene_ontology', //'plant_ontology', 'ncbi_taxon_ontology',
+            dictionary_object    : 'gene_ontology', //'plant_ontology', 'ncbi_taxon_ontology', 'gene_ontology'
             dictionary_workspace : 'KBaseOntology',
             workspaceURL         : "https://ci.kbase.us/services/ws", //window.kbconfig.urls.workspace,
         },
@@ -46,42 +46,50 @@ define('kbaseOntologyDictionary',
             "(TO_GIT:([\\w.-]+))"             : "<a target = '_blank' href = 'https://github.com/Planteome/plant-trait-ontology/issues/$2'>$1</a>",
             "(GC_ID:([\\w.-]+))"              : "<a target = '_blank' href = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG$2'>$1</a>",
           }
-console.log("GOES OVER TEXT", text);
+
           for (var map in mappings) {
             var regex = new RegExp(map, 'g');
-            console.log("CHECKS ", regex);
-            /*text = text.replace(regex, function(match, p1) {
-              return "<a href = '" + mappings[map] + "'>" + p1 + "</a>"
-            });*/
             text = text.replace(regex, mappings[map]);
           }
-console.log("RETURNS", text);
+
           return text;
         },
 
         init : function init(options) {
 
-console.log(this.extractLink('EC:123 EC:456 Wikipedia:fooBar EC:789 RHEA:888 EC:111 KEGG:R05612 RHEA:20839'));
-
           this._super(options);
 
           this.colors   = colorbrewer.Set2[8];
           this.colorMap = {};
+          this.termCache = {};
 
           var $self = this;
 
-          var ws = new Workspace(this.options.workspaceURL, {token : $self.authToken()});
+          $self.ws = new Workspace(this.options.workspaceURL, {token : $self.authToken()});
 
           var dictionary_params = {
               workspace : this.options.dictionary_workspace,
               name      : this.options.dictionary_object,
+              included : [
+                '/format_version','/data_version','/date','/saved_by','/auto_generated_by','/subsetdef','/synonymtypedef','/default_namespace',
+                '/treat_xrefs_as_differentia', '/treat_xrefs_as_is_a','/ontology',
+                '/term_hash/*/id',
+                '/term_hash/*/name',
+                '/term_hash/*/namespace',
+//                '/term_hash/*/def',
+//                '/term_hash/*/synonym',
+//                '/term_hash/*/xref',
+//                '/term_hash/*/namespace',
+//                '/term_hash/*/relationship',
+//                '/typedef_hash/',
+                ]
           };
 
-          ws.get_objects([dictionary_params]).then(function(data) {
+          //$self.ws.get_objects([dictionary_params]).then(function(data) {
+          $self.ws.get_object_subset([dictionary_params]).then(function(data) {
 
             var data = data[0].data;
 
-            console.log("GOT ME DATA", data);
             $self.dataset = data;
 
             var $metaElem = $self.data('metaElem');
@@ -139,7 +147,7 @@ console.log(this.extractLink('EC:123 EC:456 Wikipedia:fooBar EC:789 RHEA:888 EC:
                   striped : false
                 }
               );
-console.log($subtable.$elem, Object.keys(v).sort())
+
               typedef_data.push(
                 [
                   v.name,
@@ -150,7 +158,7 @@ console.log($subtable.$elem, Object.keys(v).sort())
             }
           )
 
-console.log("TDE", $typeDefElem, typedef_data);
+
               var $tt = $typeDefElem.DataTable({
                 columns : [
                   {title : 'TypeDef', 'class' : 'ontology-top'},
@@ -171,7 +179,8 @@ console.log("TDE", $typeDefElem, typedef_data);
                       v,
                       //[v.name, $.isArray(v.synonym) ? v.synonym.join('<br>') : v.synonym, v.def].join('<br>')
                       v.name,
-                      [v.name, v.id, v.def, v.synonym, v.xref, v.namespace, v.relationship].join(',')
+                      //[v.name, v.id, v.def, v.synonym, v.xref, v.namespace, v.relationship].join(',')
+                      v.name
                     ]
                   )
                 }
@@ -203,8 +212,6 @@ console.log("TDE", $typeDefElem, typedef_data);
               });
 
               $dt.rows.add(table_data).draw();
-
-              console.log("TABLE DATA", table_data, $dt.rows, $dt.rows.add)
 
               $self.data('colorMapElem').append('Ontology namespace key: ');
 
@@ -245,7 +252,7 @@ console.log("TDE", $typeDefElem, typedef_data);
           return $.jqElem('a')
             .append(term.id + (withName ? ' [' + term.name + ']' : ''))
             .on('click', function(e) {
-              $self.appendTerm(term);
+              $self.appendTerm(term.id);
             });
         },
 
@@ -256,16 +263,15 @@ console.log("TDE", $typeDefElem, typedef_data);
         parseISA : function(isa) {
 
           var ids = []
-console.log("PARSE", isa)
+
           $.each(
             isa,
             function (i, v) {
-            console.log("ITERATE", v)
               var parts = v.split(/\s*!\s*/)
               ids.push(parts[0])
             }
           )
-console.log("RET", ids);
+
           return ids;
         },
 
@@ -284,10 +290,9 @@ console.log("RET", ids);
           circular_breaker[term_id] = 1;
 
           var term    = this.getTerm(term_id);
-          console.log("CHECK TERM", term, term_id)
+
           var parents = {}
           if (term.is_a) {
-          console.log("TIA ", term.is_a);
             $.each(
               this.parseISA(term.is_a),
               function (i, v) {
@@ -296,24 +301,17 @@ console.log("RET", ids);
             )
           }
           else {
-          console.log("UNDEF", term_id, recursive)
             return undefined
           }
 
-console.log("ITERATES HERE WITH", parents);
           $.each(
             parents,
             function (k, v) {
-            console.log("P DIC", k, v, parents)
               parents[k] = $self.getLineage(k, true, circular_breaker);
             }
           )
 
-          console.log("PARENTS : ", parents);
-
           if (! recursive) {
-            //okay...at this point, it's the initial term we looked up
-            console.log(parents);
             //$self.reverseLineage(parents);
           }
 
@@ -400,9 +398,9 @@ console.log("ITERATES HERE WITH", parents);
           return {nodes : nodes, edges : edges};
         },
 
-        appendTerm : function(term) {
+        appendTerm : function(term_id) {
           var $self = this;
-console.log("APPENDS TERM HERE!!!", term);
+
           var $termElem = $self.data('termElem');
           $termElem.empty();
           $self.data('termContainerElem').show();
@@ -413,32 +411,125 @@ console.log("APPENDS TERM HERE!!!", term);
           $self.data('typeDefContainerElem').find('.panel-heading').find('i').removeClass('fa-rotate-90');
           $self.data('typeDefContainerElem').find('.panel-body').collapse('hide');
 
-var lineage = $self.getLineage(term.id);
-console.log(lineage);
+          if ($self.termCache[term_id] == undefined) {
 
-var $lineageElem;
-var $force;
+            $termElem.append($self.data('loaderElem'));
+            $self.data('loaderElem').show();
 
-if ($lineageElem = $self.buildLineageElem(lineage)) {
-  $lineageElem.root.css('padding-left', '0px')
-  console.log("LE", $lineageElem);
+            var dictionary_params = {
+                workspace : this.options.dictionary_workspace,
+                name      : this.options.dictionary_object,
+                included : [
+                  '/term_hash/' + term_id + '/*',
+                  ]
+            };
 
-  var dataset = $self.lineageAsNodes(term.id, lineage);
-  console.log("NODES ARE", dataset);
-  dataset.nodes[0].stroke = 'yellow';
-  console.log("BUILDS CLOSURE ELEM");
+            $self.ws.get_object_subset([dictionary_params]).then(function(data) {
 
-  $force = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseForcedNetwork(
-                                {
-                                  linkDistance : 150,
-                                    dataset : dataset
-                                }
-                            );
-}
+              var term = data[0].data.term_hash[term_id];
 
-var $closureElem;
+              $self.termCache[term_id] = term;
+
+              $self.data('loaderElem').hide();
+              $termElem.empty();
+              $self.reallyAppendTerm(term);
+
+            }).fail(function(d) {
+                $self.$elem.empty();
+                $self.$elem
+                    .addClass('alert alert-danger')
+                    .html("Could not load object : " + d.error.message);
+            })
+
+          }
+          else {
+            $self.reallyAppendTerm($self.termCache[term_id]);
+          }
+        },
+
+        reallyAppendTerm: function(term) {
+          var $self = this;
+
+          var $termElem = $self.data('termElem');
+
+          var lineage = $self.getLineage(term.id);
+
+          var $lineageElem;
+          var $force;
+
+          if ($lineageElem = $self.buildLineageElem(lineage)) {
+            $lineageElem.root.css('padding-left', '0px')
+
+            var dataset = $self.lineageAsNodes(term.id, lineage);
+            dataset.nodes[0].stroke = 'yellow';
+
+            $force = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseForcedNetwork(
+              {
+                linkDistance : 150,
+                dataset : dataset
+              }
+            );
+          }
+
+var $closureElem = $.jqElem('table');
 if (term.relationship_closure != undefined) {
   $closureElem = $.jqElem('ul').css('style', 'float : left');
+
+/*  var closure_data = [];
+  var term_headers = [];
+
+  $.each(
+    Object.keys(term.relationship_closure).sort(),
+    function (i, k) {
+
+      closure_headers.push({'title' : k});
+
+      var v = term.relationship_closure[k];
+
+      $.each(
+        v,
+        function (i, elem) {
+
+        }
+      )
+
+      table_data.push(
+        [
+          v,
+          //[v.name, $.isArray(v.synonym) ? v.synonym.join('<br>') : v.synonym, v.def].join('<br>')
+          v.name,
+          [v.name, v.id, v.def, v.synonym, v.xref, v.namespace, v.relationship].join(',')
+        ]
+      )
+    }
+  );
+
+  var $dt = $self.data('tableElem').DataTable({
+      columns : [
+          { title : 'Term ID', 'class' : 'ontology-top'},
+          { title : 'Term name'},
+          { title : 'Search field', 'visible' : false }
+      ],
+      createdRow : function(row, data, index) {
+
+        var $linkCell = $('td', row).eq(0);
+        $linkCell.empty();
+
+        $linkCell.append( $self.termLink(data[0]) )
+
+        var $nameCell = $('td', row).eq(1);
+
+        var color = $self.colorMap[data[0].namespace];
+        if (color == undefined) {
+          color = $self.colorMap[data[0].namespace] = $self.colors.shift();
+        }
+
+        $nameCell.css('color', color)
+
+      }
+  });*/
+
+
   for (var type in term.relationship_closure) {
     $closureElem
       .append(
@@ -446,18 +537,20 @@ if (term.relationship_closure != undefined) {
           .append(type + ' relationships')
       )
     ;
-console.log("TYPE IS WHAT NOW", type, term.relationship_closure, term.relationship_closure[type]);
+
+    var $subUL = $.jqElem('ul');
+    $closureElem.append($subUL);
 
     $.each(
       term.relationship_closure[type],
       function (i, elem) {
-    console.log("REL CLOSURE ELEM", elem);
-    console.log("TL", $self.termLink(elem[0]));
+
       var term = $self.getTerm(elem[0]);
-      $closureElem.append(
+
+      $subUL.append(
         $.jqElem('li')
           .append(elem[1] + ' away - ')
-          .append($self.termLink(term, true))
+          .append($self.termLink(term))
           .append(' - ')
           .append(
            $.jqElem('span')
@@ -470,10 +563,22 @@ console.log("TYPE IS WHAT NOW", type, term.relationship_closure, term.relationsh
   }
 }
 
-console.log("CLOSURE ELEM", $closureElem);
-          var relationship = term.relationship;
-          if (relationship != undefined) {
-            var rel = relationship.split(/ ! /, relationship);
+          var $relationship = $.jqElem('div')
+
+          if (term.relationship != undefined) {
+            $.each(
+              term.relationship,
+              function (i, rel) {
+                var parts = rel.split(/ ! /);
+                $self.extractLink(parts[0]);
+                $relationship
+                  .append(parts[0])
+                  .append(' ! ')
+                  .append(parts[1])
+                  .append('<br>')
+
+              }
+            )
           }
 
           var $table = $.jqElem('div').kbaseTable(
@@ -488,8 +593,8 @@ console.log("CLOSURE ELEM", $closureElem);
                   namespace     : term.namespace,
                   synonym       : $.isArray(term.synonym) ? term.synonym.join('<br>') : term.synonym,
                   comment       : term.comment,
-                  is_a          : $closureElem && $force ? $.jqElem('div').append($closureElem).append($force.$elem) : undefined, //$lineageElem.root,
-                  relationship  : term.relationship,
+                  is_a          : $closureElem ? $.jqElem('div').append($closureElem) : undefined, //$lineageElem.root, // or $force.$elem
+                  relationship  : term.relationship ? $relationship : undefined,
                   xref          : $self.extractLink($.isArray(term.xref) ? term.xref.join('<br>') : term.xref),
                 }
               }
