@@ -8,7 +8,6 @@ define('kbaseOntologyDictionary',
         'kbase-client-api',
         'bootstrap',
         'kbaseTable',
-        'kbaseForcedNetwork',
     ], function( $, colorbrewer) {
 
     'use strict';
@@ -455,80 +454,9 @@ define('kbaseOntologyDictionary',
 
           var lineage = $self.getLineage(term.id);
 
-          var $lineageElem;
-          var $force;
-
-          if ($lineageElem = $self.buildLineageElem(lineage)) {
-            $lineageElem.root.css('padding-left', '0px')
-
-            var dataset = $self.lineageAsNodes(term.id, lineage);
-            dataset.nodes[0].stroke = 'yellow';
-
-            $force = $.jqElem('div').css({width : '500px', height : '500px'}).kbaseForcedNetwork(
-              {
-                linkDistance : 150,
-                dataset : dataset
-              }
-            );
-          }
-
 var $closureElem = undefined;
 if (term.relationship_closure != undefined) {
   $closureElem = $.jqElem('ul').css('style', 'float : left');
-
-/*  var closure_data = [];
-  var term_headers = [];
-
-  $.each(
-    Object.keys(term.relationship_closure).sort(),
-    function (i, k) {
-
-      closure_headers.push({'title' : k});
-
-      var v = term.relationship_closure[k];
-
-      $.each(
-        v,
-        function (i, elem) {
-
-        }
-      )
-
-      table_data.push(
-        [
-          v,
-          //[v.name, $.isArray(v.synonym) ? v.synonym.join('<br>') : v.synonym, v.def].join('<br>')
-          v.name,
-          [v.name, v.id, v.def, v.synonym, v.xref, v.namespace, v.relationship].join(',')
-        ]
-      )
-    }
-  );
-
-  var $dt = $self.data('tableElem').DataTable({
-      columns : [
-          { title : 'Term ID', 'class' : 'ontology-top'},
-          { title : 'Term name'},
-          { title : 'Search field', 'visible' : false }
-      ],
-      createdRow : function(row, data, index) {
-
-        var $linkCell = $('td', row).eq(0);
-        $linkCell.empty();
-
-        $linkCell.append( $self.termLink(data[0]) )
-
-        var $nameCell = $('td', row).eq(1);
-
-        var color = $self.colorMap[data[0].namespace];
-        if (color == undefined) {
-          color = $self.colorMap[data[0].namespace] = $self.colors.shift();
-        }
-
-        $nameCell.css('color', color)
-
-      }
-  });*/
 
 
   for (var type in term.relationship_closure) {
@@ -594,7 +522,7 @@ if (term.relationship_closure != undefined) {
                   namespace     : term.namespace,
                   synonym       : $.isArray(term.synonym) ? term.synonym.join('<br>') : term.synonym,
                   comment       : term.comment,
-                  is_a          : $closureElem ? $.jqElem('div').append($closureElem) : undefined, //$lineageElem.root, // or $force.$elem
+                  is_a          : $closureElem ? $.jqElem('div').append($closureElem) : undefined,
                   relationship  : term.relationship ? $relationship : undefined,
                   xref          : $self.extractLink($.isArray(term.xref) ? term.xref.join('<br>') : term.xref),
                 }
