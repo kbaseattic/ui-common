@@ -82,7 +82,7 @@ define('kbaseOntologyDictionary',
 //                '/term_hash/*/xref',
 //                '/term_hash/*/namespace',
 //                '/term_hash/*/relationship',
-//                '/typedef_hash/',
+                '/typedef_hash/',
                 ]
           };
 
@@ -181,7 +181,7 @@ define('kbaseOntologyDictionary',
                       //[v.name, $.isArray(v.synonym) ? v.synonym.join('<br>') : v.synonym, v.def].join('<br>')
                       v.name,
                       //[v.name, v.id, v.def, v.synonym, v.xref, v.namespace, v.relationship].join(',')
-                      v.name
+                      [v.id, v.name, v.namespace].join(',')
                     ]
                   )
                 }
@@ -198,7 +198,7 @@ define('kbaseOntologyDictionary',
                     var $linkCell = $('td', row).eq(0);
                     $linkCell.empty();
 
-                    $linkCell.append( $self.termLink(data[0]) )
+                    $linkCell.append( $self.termLink( data[0]) )
 
                     var $nameCell = $('td', row).eq(1);
 
