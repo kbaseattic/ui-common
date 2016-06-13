@@ -49,6 +49,16 @@ define([
         init: function init(options) {
             this._super(options);
 
+            this.wsKey = this.options.wsNameOrId.match(/^\d+/)
+              ? 'wsid'
+              : 'workspace'
+            ;
+
+            this.objKey = this.options.objNameOrId.match(/^\d+/)
+              ? 'objid'
+              : 'name'
+            ;
+
             this.colors = colorbrewer.Set2[8];
             this.colorMap = {};
             this.termCache = {};
@@ -60,8 +70,8 @@ define([
             });
 
             var dictionary_params = {
-                wsid: this.options.workspaceId,
-                objid: this.options.objectId,
+                //wsid: this.options.workspaceId,
+                //objid: this.options.objectId,
                 //workspace: this.options.workspace_name,
                 //name: this.options.object_name,
                 included: [
@@ -78,6 +88,9 @@ define([
                 '/typedef_hash/',
                 ]
             };
+
+            dictionary_params[this.wsKey] = this.options.wsNameOrId;
+            dictionary_params[this.objKey] = this.options.objNameOrId;
 
             //$self.ws.get_objects([dictionary_params]).then(function(data) {
             $self.ws.get_object_subset([dictionary_params])
@@ -409,13 +422,16 @@ define([
                 $self.data('loaderElem').show();
 
                 var dictionary_params = {
-                    wsid: this.options.workspaceId,
-                    objid: this.options.objectId,
+                    //wsid: this.options.workspaceId,
+                    //objid: this.options.objectId,
                     included: [
                         '/term_hash/' + term_id + '/*'
                         //'/term_hash/'
                     ]
                 };
+
+                dictionary_params[this.wsKey] = this.options.wsNameOrId;
+                dictionary_params[this.objKey] = this.options.objNameOrId;
 
                 $self.ws.get_object_subset([dictionary_params])
                     .then(function (data) {

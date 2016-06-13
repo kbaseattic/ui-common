@@ -20,6 +20,16 @@ define([
         init: function init(options) {
             this._super(options);
 
+            this.wsKey = this.options.wsNameOrId.match(/^\d+/)
+              ? 'wsid'
+              : 'workspace'
+            ;
+
+            this.objKey = this.options.objNameOrId.match(/^\d+/)
+              ? 'objid'
+              : 'name'
+            ;
+
             this.colors = colorbrewer.Set2[8];
             this.colorMap = {};
 
@@ -29,12 +39,9 @@ define([
                 token: this.runtime.service('session').getAuthToken()
             });
 
-            var dictionary_params = {
-                //workspace: this.options.workspace_name,
-                //name: this.options.object_name
-                wsid: this.options.workspaceId,
-                objid: this.options.objectId,
-            };
+            var dictionary_params = { };
+            dictionary_params[this.wsKey] = this.options.wsNameOrId;
+            dictionary_params[this.objKey] = this.options.objNameOrId;
 
             ws.get_objects([dictionary_params])
                 .then(function (data) {
@@ -80,7 +87,7 @@ define([
                             }
                         );
                     }
-                    console.log("COMMENTS", comments);
+
                     var $metaTable = $.jqElem('div').kbaseTable(
                         {
                             allowNullRows: false,
