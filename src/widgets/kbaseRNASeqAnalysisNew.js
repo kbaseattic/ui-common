@@ -1,6 +1,6 @@
 
 
-define('kbaseRNASeqAnalysis',
+define('kbaseRNASeqAnalysisNew',
     [
         'jquery',
         'kbaseTable',
@@ -15,7 +15,7 @@ define('kbaseRNASeqAnalysis',
 
     $.KBWidget({
 
-	    name: "kbaseRNASeqAnalysis",
+	    name: "kbaseRNASeqAnalysisNew",
 	    parent : "kbaseAuthenticatedWidget",
 
         version: "1.0.0",

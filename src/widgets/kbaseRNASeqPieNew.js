@@ -30,7 +30,7 @@
 
 */
 
-define('kbaseRNASeqPie',
+define('kbaseRNASeqPieNew',
     [
         'jquery',
         'colorbrewer',
@@ -47,7 +47,7 @@ define('kbaseRNASeqPie',
 
     $.KBWidget({
 
-	    name: "kbaseRNASeqPie",
+	    name: "kbaseRNASeqPieNew",
 	    parent : "kbaseAuthenticatedWidget",
 
         version: "1.0.0",
