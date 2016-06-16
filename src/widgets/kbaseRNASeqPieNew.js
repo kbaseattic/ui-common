@@ -100,7 +100,7 @@ define('kbaseRNASeqPieNew',
 
         setDataset : function setDataset(newDataset) {
             var alignment_stats = newDataset.alignment_stats;
-console.log("SETS DATASET TO ", alignment_stats, newDataset);
+
             var gradients = this.options.gradients;
 
             //hack to allow two separate keys - mapped_reads or mapped_sections.
@@ -130,7 +130,7 @@ console.log("SETS DATASET TO ", alignment_stats, newDataset);
                       value = this.value_for_wedge(alignment_stats[key]);
                     }
 
-console.log("CHECKS KV ", key, value), alignment_stats;
+
                     //skip all falsy values
                     if (!!value == false) {
                       continue;
@@ -147,7 +147,7 @@ console.log("CHECKS KV ", key, value), alignment_stats;
                     }
 
                 }
-console.log("TABLE VALUES ", keys, overViewValues);
+
                 var $table = $tableElem.kbaseTable(
                     {
                         structure : {
@@ -187,7 +187,7 @@ console.log("TABLE VALUES ", keys, overViewValues);
                 }
 
                 var minEdge = Math.min($pieElem.width(), $pieElem.height()) / 2 - 20;
-console.log("PIE DATA IS", pieData);
+
                 var $pie = $pieElem.kbasePiechart(
                     {
                         scaleAxes   : true,
@@ -294,7 +294,7 @@ console.log("PIE DATA IS", pieData);
 
 
         init : function init(options) {
-console.log("OPTS ARE ", options);
+
             var $pie = this;
 
             this._super(options);
@@ -356,7 +356,6 @@ console.log("OPTS ARE ", options);
                 };
 
                 ws.get_objects([ws_params]).then(function (d) {
-                console.log("LOADED ALIGNMENT", d[0].data);
                     $pie.setDataset(d[0].data);
                 })
                 .fail(function(d) {

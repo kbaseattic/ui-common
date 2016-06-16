@@ -60,7 +60,7 @@ define('kbaseRNASeqAnalysisNew',
         loadAnalysis : function(ws, analysis) {
 
             var $rna = this;
-console.log('ANALYSIS ', analysis);
+
             var all_promises = [
 //                ws.get_objects([{ ref : analysis.annotation_id}]),
 //                ws.get_objects([{ ref : analysis.genome_id}])
@@ -164,7 +164,7 @@ console.log('ANALYSIS ', analysis);
             $.when.apply($, all_promises).then(function () {
 
                 var extra_args = arguments;
-console.log("EA IS ", extra_args);
+
                 var info_keys = ['id', 'name', 'type', 'save_date', 'version', 'saved_by', 'ws_id', 'ws_name', 'chsum', 'size', 'meta'];
 
                 var ref_map = {};
@@ -206,7 +206,7 @@ console.log("EA IS ", extra_args);
                             {title: 'Treatment Labels'}
                         ]
                     });
-console.log("SIDD", sample_id_data);
+
                     $tt.rows.add(sample_id_data).draw();
 
                     //$rna.dataset().parsed_read_samples = $rna.ulFromData(analysis.sample_ids, ref_map);

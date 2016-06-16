@@ -106,7 +106,6 @@ define('kbaseExpressionSampleTableNew',
 
           return this;
 
-        console.log("INIT EXPR SAMPLE TABLE", options);
             this._super(options);
 
             var $self = this;
