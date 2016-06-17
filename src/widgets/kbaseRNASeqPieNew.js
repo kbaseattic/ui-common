@@ -304,7 +304,9 @@ define('kbaseRNASeqPieNew',
             }
             else {
 
-/*                var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pie.authToken()});
+              if (! $.isPlainObject(this.options.output)) {
+
+                var ws = new Workspace(window.kbconfig.urls.workspace, {token : $pie.authToken()});
 
                 var ws_key = 'workspace';
                 var ws_id_key = undefined;
@@ -315,9 +317,24 @@ define('kbaseRNASeqPieNew',
                     name : $pie.options[obj_key] || $pie.options.ws_alignment_sample_id,
                 };
 
-                ws.get_objects([{ref : '7925/25/1'}]).then(function (d) {
-                console.log("D B ", d[0].data);
-//                    $pie.setDataset(d[0].data);
+                ws.get_objects([ws_params]).then(function (d) {
+                  $pie.options.output = d[0].data;
+
+                  $pie.appendUI($pie.$elem);
+                  if (d[0].data.alignment_stats != undefined) {
+                    $pie.data('container').removeTab('Overview');
+                    //this.data('container').removeTab('Pie chart');
+                          $pie.data('container').addTab(
+                              {
+                                  tab : 'Overview',
+                                  content : 'Loading...',
+                              }
+                          );
+                    $pie.setDataset(d[0].data);
+                  }
+                  else {
+                    $pie.loadAlignment(d[0].data.sample_alignments[0]);
+                  }
                 })
                 .fail(function(d) {
 
@@ -325,14 +342,20 @@ define('kbaseRNASeqPieNew',
                     $pie.$elem
                         .addClass('alert alert-danger')
                         .html("Could not load object : " + d.error.message);
-                })*/
+                })
+
+              }
+              else {
+
+                this.appendUI(this.$elem);
+
+                if (this.options.output.sample_alignments.length) {
+                  this.loadAlignment(this.options.output.sample_alignments[0]);
+                }
+              }
+
             }
 
-            this.appendUI(this.$elem);
-
-            if (this.options.output.sample_alignments.length) {
-              this.loadAlignment(this.options.output.sample_alignments[0]);
-            }
 
             return this
         },
@@ -371,27 +394,30 @@ define('kbaseRNASeqPieNew',
 
             var $rnaseq = this;
 
-            var $selector = $.jqElem('select').css('width', '500px')
-              .on('change', function(e) {
-                $rnaseq.loadAlignment( $selector.val() );
-              }
-            );
+            if (this.options.output.read_sample_ids) {
 
-            $.each(
-              this.options.output.read_sample_ids,
-              function (i,v) {
-                $selector.append(
-                  $.jqElem('option')
-                    .attr('value', $rnaseq.options.output.sample_alignments[i])
-                    .append(v)
-                )
-              }
-            );
+              var $selector = $.jqElem('select').css('width', '500px')
+                .on('change', function(e) {
+                  $rnaseq.loadAlignment( $selector.val() );
+                }
+              );
 
-            this.$elem
-              .append("<br>Please select alignment: ")
-              .append($selector)
-              .append("<br><br>");
+              $.each(
+                this.options.output.read_sample_ids,
+                function (i,v) {
+                  $selector.append(
+                    $.jqElem('option')
+                      .attr('value', $rnaseq.options.output.sample_alignments[i])
+                      .append(v)
+                  )
+                }
+              );
+
+              this.$elem
+                .append("<br>Please select alignment: ")
+                .append($selector)
+                .append("<br><br>");
+            }
 
 
             var $containerElem = $.jqElem('div').attr('id', 'containerElem');

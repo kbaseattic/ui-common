@@ -99,12 +99,16 @@ define('kbaseExpressionSampleTableNew',
 
           this._super(options);
 
-          var $div = $.jqElem('div');
-          this.$elem.append($div);
+          if (this.options.report_name != undefined) {
 
-          $div.kbaseReportView( this.options);
+            var $div = $.jqElem('div');
+            this.$elem.append($div);
 
-          return this;
+            $div.kbaseReportView( this.options);
+            return this;
+          }
+
+
 
             this._super(options);
 
