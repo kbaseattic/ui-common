@@ -49,50 +49,88 @@ define('kbaseExpressionSampleTableNew',
             var min = Number.MAX_VALUE;
             var max = Number.MIN_VALUE;
 
-            var exprKeys = Object.keys(newDataset.expression_levels).sort();
+            var exprKeys = [];
+            if (newDataset.expression_levels != undefined) {
+              exprKeys = Object.keys(newDataset.expression_levels).sort();
 
-            $.each(
-                exprKeys,
-                function (i,k) {
+              $.each(
+                  exprKeys,
+                  function (i,k) {
 
-                    var val = Math.round(newDataset.expression_levels[k] * 1000) / 1000;
+                      var val = Math.round(newDataset.expression_levels[k] * 1000) / 1000;
 
-                    rows.push( [k, val] );
+                      rows.push( [k, val] );
 
-                    if (val < min) {
-                        min = val;
-                    }
-                    if (val > max) {
-                        max = val;
-                    }
-                    barData.push(val);
+                      if (val < min) {
+                          min = val;
+                      }
+                      if (val > max) {
+                          max = val;
+                      }
+                      barData.push(val);
 
-                    /*var bin = Math.floor(newDataset.expression_levels[k]);
+                      /*var bin = Math.floor(newDataset.expression_levels[k]);
 
-                    if (barData[bin] == undefined) {
-                        barData[bin] = 0;
-                    }
-                    barData[bin]++;*/
+                      if (barData[bin] == undefined) {
+                          barData[bin] = 0;
+                      }
+                      barData[bin]++;*/
 
-                }
-            );
+                  }
+              );
 
-            //this.setBarchartDataset(barData);
-            this.data('histogram').setDataset(barData);
-            //this.renderHistogram(this.options.numBins);
+              //this.setBarchartDataset(barData);
+              this.data('histogram').setDataset(barData);
+              //this.renderHistogram(this.options.numBins);
 
-            var $dt = this.data('tableElem').dataTable({
-                aoColumns : [
-                    { title : 'Gene ID'},
-                    { title : 'Feature Value : log2(FPKM + 1)'}
-                ]
-            });
-            $dt.fnAddData(rows);
+              var $dt = this.data('$dt');
+              if ($dt == undefined) {
+                $dt = this.data('tableElem').dataTable({
+                    aoColumns : [
+                        { title : 'Gene ID'},
+                        { title : 'Feature Value : log2(FPKM + 1)'}
+                    ]
+                });
+
+                this.data('$dt', $dt);
+              }
+
+              $dt.fnAddData(rows);
+              this.data('loader').hide();
+              this.data('containerElem').show();
+            }
+            else {
+              this.loadExpression(newDataset.sample_expression_ids[0]);
+              this.data('loader').hide();
+                this.$elem.append($.jqElem('div')
+                    .addClass('alert alert-danger')
+                    .html("No expression levels available")
+                )
+            }
 
 
-            this.data('loader').hide();
-            this.data('containerElem').show();
+        },
 
+        loadExpression : function(ref) {
+          var $sam = this;
+          this.data('containerElem').hide();
+          this.data('loader').show();
+          var ws = new Workspace(window.kbconfig.urls.workspace, {token : $sam.authToken()});
+
+          var ws_params = {
+              ref : ref
+          };
+
+          ws.get_objects([ws_params]).then(function (d) {
+              $sam.setDataset(d[0].data);
+          })
+          .fail(function(d) {
+
+              $sam.$elem.empty();
+              $sam.$elem
+                  .addClass('alert alert-danger')
+                  .html("Could not load object : " + d.error.message);
+          })
         },
 
         init : function init(options) {
@@ -123,10 +161,21 @@ define('kbaseExpressionSampleTableNew',
                 name : this.options.output
             };
 
-            this.appendUI(this.$elem);
-
             ws.get_objects([ws_params]).then(function (d) {
-                $self.setDataset(d[0].data);
+
+                var thing = d[0].data;
+                if (thing.sample_expression_ids) {
+                  $self.options.output = thing;
+                  $self.appendUI($self.$elem);
+                  if ($self.options.output.sample_expression_ids.length) {
+                    $self.loadExpression($self.options.output.sample_expression_ids[0]);
+                  }
+
+                }
+                else {
+                  $self.appendUI($self.$elem);
+                  $self.setDataset(d[0].data);
+                }
             }).fail(function(d) {
 
                 $self.$elem.empty();
@@ -141,6 +190,31 @@ define('kbaseExpressionSampleTableNew',
         appendUI : function appendUI($elem) {
 
             var $me = this;
+
+            if (this.options.output.sample_expression_ids) {
+
+              var $selector = $.jqElem('select').css('width', '500px')
+                .on('change', function(e) {
+                  $me.loadExpression( $selector.val() );
+                }
+              );
+
+              $.each(
+                this.options.output.sample_expression_ids,
+                function (i,v) {
+                  $selector.append(
+                    $.jqElem('option')
+                      .attr('value', v)
+                      .append(v)
+                  )
+                }
+              );
+
+              this.$elem
+                .append("<br>Please select expression level: ")
+                .append($selector)
+                .append("<br><br>");
+            }
 
             var $tableElem = $.jqElem('table')
                 .css('width', '95%')
