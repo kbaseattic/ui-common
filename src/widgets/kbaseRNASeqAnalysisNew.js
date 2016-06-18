@@ -304,8 +304,14 @@ define('kbaseRNASeqAnalysisNew',
                         name : this.options.output
                     }]
                 ).then(function(d) {
+
                     $rna.setDataset(d[0].data);
-                    $rna.loadAnalysis(ws, d[0].data);
+                    if ($rna.dataset().tool_used) {
+                      $rna.updateUI();
+                    }
+                    else {
+                      $rna.loadAnalysis(ws, d[0].data);
+                    }
                 })
                 .fail(function(d) {
 
@@ -327,40 +333,62 @@ define('kbaseRNASeqAnalysisNew',
 
         updateUI : function updateUI() {
 
-            this.data('tableElem').kbaseTable(
-                {
-                    structure : {
-                        keys : this.options.tableColumns,
-                        rows : {
-                            'RNA-seq Sample Set' : this.dataset().sampleset_id,
-                            'Sampleset Description' : this.dataset().sampleset_desc,
-                            //'Experiment name' : this.dataset().experiment_id,
-                            //'Title' : this.dataset().title,
-                            //'Experiment Description' : this.dataset().experiment_desc,
-                            //'Experiment design' : this.dataset().experiment_design,
-                            'Platform' : this.dataset().platform,
-                            'Library type' : this.dataset().Library_type,
-                            //'Genome name' : this.dataset().genome_name,
-                            //'Genome annotation' : this.dataset().genome_annotation,
-                            //'Number of samples' : this.dataset().num_samples,
-                            //'Number of replicates' : this.dataset().num_replicates,
-                            'Reads': this.dataset().parsed_read_samples,
-                            //'Condition' : this.dataset().condition ? this.dataset().condition.join(', ') : '',
+            if (this.dataset().tool_used) {
+
+              this.data('tableElem').kbaseTable(
+                  {
+                      structure : {
+                          keys : ['Tool Used', 'Tool Version', 'File', 'Condition'],
+                          rows : {
+                              'Tool Used' : this.dataset().tool_used,
+                              'Tool Version' : this.dataset().tool_version,
+                              'File' : $.jqElem('a')
+                                .attr('href', window.kbconfig.urls.shock + '/node/' + this.dataset().file.id + '?download_raw')
+                                .attr('target', '_blank')
+                                .append('Download'),
+                              'Condition' : this.dataset().condition.join('<br>')
+
+                          },
+                      }
+                  }
+              );
+            }
+            else {
+              this.data('tableElem').kbaseTable(
+                  {
+                      structure : {
+                          keys : this.options.tableColumns,
+                          rows : {
+                              'RNA-seq Sample Set' : this.dataset().sampleset_id,
+                              'Sampleset Description' : this.dataset().sampleset_desc,
+                              //'Experiment name' : this.dataset().experiment_id,
+                              //'Title' : this.dataset().title,
+                              //'Experiment Description' : this.dataset().experiment_desc,
+                              //'Experiment design' : this.dataset().experiment_design,
+                              'Platform' : this.dataset().platform,
+                              'Library type' : this.dataset().Library_type,
+                              //'Genome name' : this.dataset().genome_name,
+                              //'Genome annotation' : this.dataset().genome_annotation,
+                              //'Number of samples' : this.dataset().num_samples,
+                              //'Number of replicates' : this.dataset().num_replicates,
+                              'Reads': this.dataset().parsed_read_samples,
+                              //'Condition' : this.dataset().condition ? this.dataset().condition.join(', ') : '',
 
 
-                            //'Tissue' : this.dataset().tissue ? this.dataset().tissue.join(', ') : '',
-                            'Domain' : this.dataset().domain,
-                            'Source' : this.dataset().source,
-                            'Publication Details' : this.dataset().publication_id,
-                            'Source' : this.dataset().source,
-                            //'Alignments'  : this.dataset().parsed_alignments,
-                            //'Expression Values' : this.dataset().parsed_expression_values,
-                            //'Cuffmerge Output' : this.dataset().parsed_transcriptome,
-                            //'Cuffdiff Output' : this.dataset().parsed_cuffdiff,
-                        },
-                    }
-                }
-            );
+                              //'Tissue' : this.dataset().tissue ? this.dataset().tissue.join(', ') : '',
+                              'Domain' : this.dataset().domain,
+                              'Source' : this.dataset().source,
+                              'Publication Details' : this.dataset().publication_id,
+                              'Source' : this.dataset().source,
+                              //'Alignments'  : this.dataset().parsed_alignments,
+                              //'Expression Values' : this.dataset().parsed_expression_values,
+                              //'Cuffmerge Output' : this.dataset().parsed_transcriptome,
+                              //'Cuffdiff Output' : this.dataset().parsed_cuffdiff,
+                          },
+                      }
+                  }
+              );
+            }
 
                this.data('loader').hide();
             this.data('tableElem').show();
