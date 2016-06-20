@@ -1,12 +1,13 @@
 
 define([
     'jquery',
-    '../colorbrewer/colorbrewer', // TODO: new dependency
-    'kb/service/client/workspace',
-    'datatables_bootstrap',
-    'kb/widget/legacy/authenticatedWidget',
-    'kb/widget/legacy/kbaseTable'
-], function ($, colorbrewer, Workspace) {
+    //'colorbrewer', // TODO: new dependency
+    'kbase-client-api',
+    'datatables',
+    'bootstrap',
+    'kbaseAuthenticatedWidget',
+    'kbaseTable'
+], function ($) {
     'use strict';
 
     $.KBWidget({
@@ -16,6 +17,12 @@ define([
         options: {
             //object_name: 'gene_ontology', //'plant_ontology', 'ncbi_taxon_ontology', 'gene_ontology'
             //workspace_name: 'KBaseOntology'
+
+            dictionaryMap : {
+              'GO' : 'gene_ontology',
+              'SSO': 'seed_subsystem_ontology'
+            },
+
         },
         extractLink: function (text) {
             if (text === undefined) {
@@ -49,25 +56,38 @@ define([
         init: function init(options) {
             this._super(options);
 
-            this.wsKey = this.options.wsNameOrId.match(/^\d+/)
-              ? 'wsid'
-              : 'workspace'
-            ;
+            if (this.options.wsNameOrId != undefined) {
+              this.wsKey = this.options.wsNameOrId.match(/^\d+/)
+                ? 'wsid'
+                : 'workspace'
+              ;
+            }
 
-            this.objKey = this.options.objNameOrId.match(/^\d+/)
-              ? 'objid'
-              : 'name'
-            ;
+            if (this.options.objNameOrId != undefined) {
+              this.objKey = this.options.objNameOrId.match(/^\d+/)
+                ? 'objid'
+                : 'name'
+              ;
+            }
 
-            this.colors = colorbrewer.Set2[8];
+            if (this.options.objNameOrId == undefined && this.options.term_id != undefined) {
+              this.wsKey = 'workspace';
+              this.objKey = 'name';
+              this.options.wsNameOrId = 'KBaseOntology';
+
+              var m = this.options.term_id.match(/^([^:]+)/);
+              if (m.length) {
+                this.options.objNameOrId = this.options.dictionaryMap[m[1]]
+              };
+            }
+
+            this.colors = ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f","#e5c494","#b3b3b3"];
             this.colorMap = {};
             this.termCache = {};
 
             var $self = this;
 
-            $self.ws = new Workspace(this.runtime.config('services.workspace.url'), {
-                token: this.runtime.service('session').getAuthToken()
-            });
+            $self.ws = new Workspace(window.kbconfig.urls.workspace, {token : this.authToken()});
 
             var dictionary_params = {
                 //wsid: this.options.workspaceId,
@@ -89,12 +109,15 @@ define([
                 ]
             };
 
-            dictionary_params[this.wsKey] = this.options.wsNameOrId;
+            dictionary_params[this.wsKey]  = this.options.wsNameOrId;
             dictionary_params[this.objKey] = this.options.objNameOrId;
+
+            this.appendUI(this.$elem);
 
             //$self.ws.get_objects([dictionary_params]).then(function(data) {
             $self.ws.get_object_subset([dictionary_params])
-                .then(function (data) {
+              .then(function (data) {
+
                     var data = data[0].data;
 
                     $self.dataset = data;
@@ -243,19 +266,23 @@ define([
                       $self.appendTerm(m[1]);
                     }
 
+                    if ($self.options.term_id) {
+                      $self.appendTerm($self.options.term_id);
+                    }
+
 
                     $self.data('loaderElem').hide();
                     $self.data('globalContainerElem').show();
 
                 })
-                .catch(function (d) {
+                .fail(function (d) {
                     $self.$elem.empty();
                     $self.$elem
                         .addClass('alert alert-danger')
                         .html("Could not load object : " + d.error.message);
                 });
 
-            this.appendUI(this.$elem);
+
             return this;
         },
         termLink: function (term, withName) {
@@ -445,7 +472,7 @@ define([
                         $self.reallyAppendTerm(term);
 
                     })
-                    .catch(function (d) {
+                    .fail(function (d) {
                         console.error(d);
                         var message;
                         if (d.message) {

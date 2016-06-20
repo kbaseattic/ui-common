@@ -1,12 +1,13 @@
 
 define([
     'jquery',
-    '../colorbrewer/colorbrewer', // new dep
-    'kb/service/client/workspace',
-    'datatables_bootstrap',
-    'kb/widget/legacy/authenticatedWidget',
-    'kb/widget/legacy/kbaseTable'
-], function ($, colorbrewer, Workspace) {
+
+    'kbase-client-api',
+    'datatables',
+    'bootstrap',
+    'kbaseAuthenticatedWidget',
+    'kbaseTable'
+], function ($) {
     'use strict';
 
     $.KBWidget({
@@ -30,14 +31,12 @@ define([
               : 'name'
             ;
 
-            this.colors = colorbrewer.Set2[8];
+            this.colors = ["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f","#e5c494","#b3b3b3"];//colorbrewer.Set2[8];
             this.colorMap = {};
 
             var $self = this;
 
-            var ws = new Workspace(this.runtime.config('services.workspace.url'), {
-                token: this.runtime.service('session').getAuthToken()
-            });
+            var ws = new Workspace(window.kbconfig.urls.workspace, {token : this.authToken()});
 
             var dictionary_params = { };
             dictionary_params[this.wsKey] = this.options.wsNameOrId;
@@ -161,7 +160,7 @@ define([
                     $self.data('globalContainerElem').show();
 
                 })
-                .catch(function (d) {
+                .fail(function (d) {
 
                     $self.$elem.empty();
                     $self.$elem
