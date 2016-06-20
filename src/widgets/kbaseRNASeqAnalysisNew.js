@@ -225,6 +225,33 @@ define('kbaseRNASeqAnalysisNew',
 
         },
 
+        createInfoObject: function (info) {
+            return _.object(['id', 'name', 'type', 'save_date', 'version',
+                'saved_by', 'ws_id', 'ws_name', 'chsum', 'size',
+                'meta'], info);
+        },
+
+        linkFromData : function(info_obj) {
+          var $rna = this;
+
+          var $v =
+            $.jqElem('a')
+              .append(info_obj.name)
+              .on('click', function(e) {
+                  var $cell = $rna.$elem.nearest('.cell');
+                  var near_idx = IPython.notebook.find_cell_index($cell.data().cell);
+
+                  $rna.trigger('createViewerCell.Narrative', {
+                      'nearCellIdx': near_idx,
+                      'widget': 'kbaseNarrativeDataCell',
+                      'info' : info_obj
+                  });
+                  return false;
+              })
+
+          return $v;
+        },
+
         ulFromData : function(ids, ref_map) {
             var $rna = this;
             var $ul = $.jqElem('ul').css('list-style-type', 'none');
@@ -307,7 +334,34 @@ define('kbaseRNASeqAnalysisNew',
 
                     $rna.setDataset(d[0].data);
                     if ($rna.dataset().tool_used) {
-                      $rna.updateUI();
+
+                      var promises = [];
+                      var keys = ['alignmentSet_id', 'expressionSet_id', 'genome_id', 'sampleset_id'];
+                      var vals = ['alignmentset', 'expressionset', 'genome', 'sampleset'];
+                      $.each(
+                        keys,
+                        function (i,v) {
+                          promises.push(
+                            ws.get_object_info([{ref : $rna.dataset()[v]}])
+                          );
+                        }
+                      );
+
+                      $.when.apply($, promises).then(function () {
+
+                          var args = arguments;
+                          $.each(
+                            arguments,
+                            function (i, v) {
+
+                              $rna.dataset()[vals[i]] = v[0];
+                            }
+                          );
+
+
+                          $rna.updateUI();
+                      });
+
                     }
                     else {
                       $rna.loadAnalysis(ws, d[0].data);
@@ -338,7 +392,7 @@ define('kbaseRNASeqAnalysisNew',
               this.data('tableElem').kbaseTable(
                   {
                       structure : {
-                          keys : ['Tool Used', 'Tool Version', 'File', 'Condition'],
+                          keys : ['Tool Used', 'Tool Version', 'File', 'Condition', 'Alignment Set', 'Expression Set', 'Genome', 'Sample Set'],
                           rows : {
                               'Tool Used' : this.dataset().tool_used,
                               'Tool Version' : this.dataset().tool_version,
@@ -346,8 +400,11 @@ define('kbaseRNASeqAnalysisNew',
                                 .attr('href', window.kbconfig.urls.shock + '/node/' + this.dataset().file.id + '?download_raw')
                                 .attr('target', '_blank')
                                 .append('Download'),
-                              'Condition' : this.dataset().condition.join('<br>')
-
+                              'Condition' : this.dataset().condition.join('<br>'),
+                              'Alignment Set' : this.linkFromData(this.createInfoObject(this.dataset().alignmentset) ),
+                              'Expression Set' : this.linkFromData(this.createInfoObject(this.dataset().expressionset)),
+                              'Genome' : this.linkFromData(this.createInfoObject(this.dataset().genome)),
+                              'Sample Set' : this.linkFromData(this.createInfoObject(this.dataset().sampleset)),
                           },
                       }
                   }
