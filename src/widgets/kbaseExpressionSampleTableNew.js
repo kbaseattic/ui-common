@@ -166,10 +166,37 @@ define('kbaseExpressionSampleTableNew',
                 var thing = d[0].data;
                 if (thing.sample_expression_ids) {
                   $self.options.output = thing;
-                  $self.appendUI($self.$elem);
-                  if ($self.options.output.sample_expression_ids.length) {
-                    $self.loadExpression($self.options.output.sample_expression_ids[0]);
-                  }
+
+                  var promises = [];
+                  $.each(
+                    $self.options.output.sample_expression_ids,
+                    function (i,v) {
+                      promises.push(
+                        ws.get_object_info([{ref : v}])
+                      );
+                    }
+                  );
+
+                  $.when.apply($, promises).then(function () {
+
+                      var args = arguments;
+                      $self.options.output.sample_expression_names = [];
+                      $.each(
+                        arguments,
+                        function (i, v) {
+                          $self.options.output.sample_expression_names.push(v[0][1]);
+                        }
+                      );
+
+                      $self.appendUI($self.$elem);
+
+                      if ($self.options.output.sample_expression_ids.length) {
+                        $self.loadExpression($self.options.output.sample_expression_ids[0]);
+                      }
+
+                  });
+
+
 
                 }
                 else {
@@ -205,7 +232,7 @@ define('kbaseExpressionSampleTableNew',
                   $selector.append(
                     $.jqElem('option')
                       .attr('value', v)
-                      .append(v)
+                      .append($me.options.output.sample_expression_names[i])
                   )
                 }
               );

@@ -23,7 +23,7 @@ define('kbaseRNASeqAnalysisNew',
             //tableColumns : ['Experiment name', 'Title', 'Experiment Description', 'Experiment design', 'Platform', 'Library type',
             //                'Genome name', 'Genome annotation', 'Number of samples', 'Reads Label', 'Number of replicates', 'Tissue', 'Condition',
             //                'Domain', 'Source', 'Publication Details']
-            tableColumns : [ 'RNA-seq Sample Set','Sampleset Description', 'Platform', 'Library type', 'Reads', 'Domain', 'Source', 'Publication Details', 'Source']
+            tableColumns : [ 'RNA-seq Sample Set','Sampleset Description', 'Platform', 'Library type', 'Reads', 'Domain', 'Source', 'Publication Details']
 
         },
 
@@ -436,7 +436,6 @@ define('kbaseRNASeqAnalysisNew',
                               'Domain' : this.dataset().domain,
                               'Source' : this.dataset().source,
                               'Publication Details' : this.dataset().publication_id,
-                              'Source' : this.dataset().source,
                               //'Alignments'  : this.dataset().parsed_alignments,
                               //'Expression Values' : this.dataset().parsed_expression_values,
                               //'Cuffmerge Output' : this.dataset().parsed_transcriptome,
