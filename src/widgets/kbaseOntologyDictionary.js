@@ -3,7 +3,7 @@ define([
     'jquery',
     //'colorbrewer', // TODO: new dependency
     'kbase-client-api',
-    'datatables',
+    'jquery-dataTables',
     'bootstrap',
     'kbaseAuthenticatedWidget',
     'kbaseTable'

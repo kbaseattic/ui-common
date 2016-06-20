@@ -3,7 +3,7 @@ define([
     'jquery',
 
     'kbase-client-api',
-    'datatables',
+    'jquery-dataTables',
     'bootstrap',
     'kbaseAuthenticatedWidget',
     'kbaseTable'
