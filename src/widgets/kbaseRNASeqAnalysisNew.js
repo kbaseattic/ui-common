@@ -7,7 +7,7 @@ define('kbaseRNASeqAnalysisNew',
         'kbwidget',
         'kbaseAuthenticatedWidget',
         'kbase-client-api',
-        'datatables',
+        'jquery-dataTables',
         'bootstrap',
     ], function( $ ) {
 
