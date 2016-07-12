@@ -13,6 +13,8 @@ return KBWidget({
 
         this._super(input);
         var self = this;
+        var $tableContainer = $('<div>');
+        this.$elem.append($tableContainer);
 
         // root url path for landing pages
         var DATAVIEW_URL = '/functional-site/#/dataview/';
@@ -50,7 +52,7 @@ return KBWidget({
 
         uiTabs[0].active = true;
         //tabs = self.$elem.kbaseTabTableTabs({tabs: uiTabs});
-        tabs = new kbaseTabTableTabs(self.$elem, {tabs : uiTabs});
+        tabs = new kbaseTabTableTabs($tableContainer, {tabs : uiTabs});
 
 
         //
