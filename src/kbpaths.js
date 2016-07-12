@@ -7,9 +7,15 @@
                 'jquery-private' : '../jquery-private',
                 'jqueryui'    : '../../ext/jquery-ui/1.10.3/js/jquery-ui-1.10.3.custom.min',
                 'bootstrap'   : "../../ext/bootstrap/3.3.0/js/bootstrap.min",
+                //'newick'      : "../../ext/newick/biojs-io-newick.min",
+                'newick'      : "../../ext/newick/extended_newickbiojs-adm",
                 'd3'          : "../../ext/d3/d3.min",
                 'colorbrewer' : "../../ext/colorbrewer.min",
                 'handlebars'  : '../../ext/handlebars/handlebars-v1.3.0',
+                'dataTables' : '../../ext/dataTables/1.9.4/js/jquery.dataTables',
+                //'jquery-dataTables' : '../../ext/dataTables/1.9.4/js/jquery.dataTables',
+                'jquery-dataTables' : '../../ext/dataTables/1.10.9/media/js/jquery.dataTables',
+                'datatables' : '../../ext/dataTables/1.10.9/media/js/jquery.dataTables',
 				'CDMI_API'                          : '../js/CDMI_API',
 				'kbase-client-api'                          : '../js/kbase-client-api.min',
 				'IdMapClient'                       : '../js/IdMapClient',
@@ -118,7 +124,7 @@
 				'kbaseFormBuilder'                  : 'kbaseFormBuilder',
 				'kbaseGeneTable'                    : 'kbaseGeneTable',
 				'kbaseJSONReflector'                : 'kbaseJSONReflector',
-				'kbaseLogin'                        : 'kbaseLogin',
+				'kbaseLogin'                        : 'kbaseLoginFuncSite',
 				'kbaseLoginFuncSite'                : 'kbaseLoginFuncSite',
 				'kbaseAppDescription'            : 'kbaseAppDescription',
 				'kbaseMethodDescription'            : 'kbaseMethodDescription',
@@ -210,10 +216,14 @@
 				'kbasePlantsNetworkTable'           : 'vis/plants/kbasePlantsNetworkTable',
 				'kbasePMIBarchart'                       : 'vis/plants/kbasePMIBarchart',
 				'kbaseRNASeq'                       : 'kbaseRNASeq',
+				'kbaseMulticlusterHeatmap'                       : 'kbaseMulticlusterHeatmap',
+				'kbaseExpressionSampleTable'                       : 'kbaseExpressionSampleTable',
 				'kbaseCummerbundPlot'                       : 'kbaseCummerbundPlot',
 				'ProteinDomainAnnotation'                       : 'vis/ProteinDomainAnnotation',
 				'kbaseRNASeqPie'                       : 'kbaseRNASeqPie',
 				'kbaseRNASeqHistogram'                       : 'kbaseRNASeqHistogram',
+				'kbaseOntologyDictionary'                       : 'kbaseOntologyDictionary',
+				'kbaseOntologyTranslation'                       : 'kbaseOntologyTranslation',
 				'vis'                               : 'vis/vis',
 				'kbaseSimpleWSSelect'               : 'workspaces/kbaseSimpleWSSelect',
 				'kbaseWSButtons'                    : 'workspaces/kbaseWSButtons',
@@ -229,9 +239,10 @@
             shim : {
                 bootstrap : {deps : ["jquery"]}
             },
-            map : {
-                //'*' : {'jquery' : 'jquery-private'},
-                //'jquery-private' : {'jquery' : 'jquery'}
-            }
+            /*map : {
+                '*' : {'jquery' : 'jquery-private'},
+                'jquery-private' : {'jquery' : 'jquery'}
+            }*/
         });
     });
+

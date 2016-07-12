@@ -93,6 +93,7 @@ define (
             row_callback : function (cell, header, row, $kb) {},
             sortButtons : {},
             navControls : false,
+            allowNullRows : true,
 
         },
 
@@ -613,19 +614,25 @@ define (
                     }
 
                     key.type = 'th';
-                    key.style = 'white-space : nowrap';
 
-                    var $row = this.createRow(
-                        {
-                            key : key,
-                            value : {value : rows[key.value], key : key.value},
-                        },
-                        [{value : 'key'}, {value : 'value'}]
-                    );
+                    if (key.style == undefined) {
+                      key.style = '';
+                    }
+                    key.style += '; white-space : nowrap';
 
-                    if ($row != undefined && $row.children().length) {
-                        numRows++;
-                        this.data('tbody').append($row);
+                    if (rows[key.value] != undefined || this.options.allowNullRows) {
+                      var $row = this.createRow(
+                          {
+                              key : key,
+                              value : {value : rows[key.value], key : key.value},
+                          },
+                          [{value : 'key'}, {value : 'value'}]
+                      );
+
+                      if ($row != undefined && $row.children().length) {
+                          numRows++;
+                          this.data('tbody').append($row);
+                      }
                     }
                 }
             }
@@ -649,11 +656,11 @@ define (
             var minRows = this.options.minVisibleRowIndex || 0;
 
             this.data('tbody')
-                .find('tr:lt(' + minRows + ')')
+                .find('> tr:lt(' + minRows + ')')
                 .css('display', 'none');
 
             this.data('tbody')
-                .find('tr:gt(' + (maxRows - 1) + ')')
+                .find('> tr:gt(' + (maxRows - 1) + ')')
                 .css('display', 'none');
 
             this.visRowString('Rows ' + (minRows + 1) + ' to ' + maxRows + ' of ' + this.numRows());

@@ -148,8 +148,8 @@ define (
             highlightLineWidth : 1,
             shapeArea : 64,
 
-            xInset : 0.1,
-            yInset : 0.1,
+            xInset : 0.0,
+            yInset : 0.0,
 
         },
 
@@ -262,7 +262,7 @@ define (
             var delta = Math.max(this.options.xInset * ret[0], this.options.xInset * ret[1]);
             ret[0] -= delta;
             ret[1] += delta;
-
+console.log("DXD", ret);
             return ret;
 
         },
@@ -291,7 +291,7 @@ define (
             var delta = Math.max(this.options.yInset * ret[0], this.options.yInset * ret[1]);
             ret[0] -= delta;
             ret[1] += delta;
-
+console.log("DYD", ret);
             return ret;
         },
 
@@ -303,7 +303,7 @@ define (
 
             var bounds = this.chartBounds();
             var $line  = this;
-
+console.log("BOUNDS ", bounds);
             var lineMaker = d3.svg.line()
                 .x(function(d) { return $line.xScale()(d.x) })
                 .y(function(d) { return $line.yScale()(d.y) });
