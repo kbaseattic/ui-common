@@ -59,7 +59,13 @@ define('kbaseExpressionSampleTableNew',
 
                       var val = Math.round(newDataset.expression_levels[k] * 1000) / 1000;
 
-                      rows.push( [k, val] );
+                      var row = [k,val];
+                      if (newDataset.tpm_expression_levels != undefined) {
+                        var tpm = Math.round(newDataset.tpm_expression_levels[k] * 1000) / 1000 || 0;
+                        row.push(tpm);
+                      }
+
+                      rows.push( row );
 
                       if (val < min) {
                           min = val;
@@ -79,17 +85,59 @@ define('kbaseExpressionSampleTableNew',
                   }
               );
 
+              if (newDataset.tpm_expression_levels != undefined) {
+                this.data('container').addTab(
+                  {
+                    'tab' : 'TPM Histogram',
+                    'content' : this.data('tpmHistElem')
+                  }
+                )
+                var tpm_min = Number.MAX_VALUE;
+                var tpm_max = Number.MIN_VALUE;
+                var tpmBarData = [];
+
+                exprKeys = Object.keys(newDataset.tpm_expression_levels).sort();
+
+                $.each(
+                    exprKeys,
+                    function (i,k) {
+
+                        var val = Math.round(newDataset.tpm_expression_levels[k] * 1000) / 1000;
+
+                        //rows.push( [k, val] );
+
+                        if (val < tpm_min) {
+                            tpm_min = val;
+                        }
+                        if (val > tpm_max) {
+                            tpm_max = val;
+                        }
+                        tpmBarData.push(val);
+
+                    }
+                );
+                this.data('tpmHistogram').setDataset(tpmBarData);
+
+              }
+
               //this.setBarchartDataset(barData);
               this.data('histogram').setDataset(barData);
               //this.renderHistogram(this.options.numBins);
 
               var $dt = this.data('$dt');
               if ($dt == undefined) {
+
+                var aoColumns = [
+                    { title : 'Gene ID'},
+                    { title : 'Feature Value : log2(FPKM + 1)'},
+                ];
+                if (newDataset.tpm_expression_levels != undefined) {
+                  this.data('tableElem').find('th').css('display', '');
+                  aoColumns.push({ title : 'Feature Value : TPM'});
+                }
+
                 $dt = this.data('tableElem').dataTable({
-                    aoColumns : [
-                        { title : 'Gene ID'},
-                        { title : 'Feature Value : log2(FPKM + 1)'}
-                    ]
+                    aoColumns : aoColumns
                 });
 
                 this.data('$dt', $dt);
@@ -251,6 +299,7 @@ define('kbaseExpressionSampleTableNew',
                                 $.jqElem('tr')
                                     .append($.jqElem('th').append('Gene ID'))
                                     .append($.jqElem('th').append('Feature Value : log2(FPKM + 1)'))
+                                    .append($.jqElem('th').css('display', 'none').append('Feature Value : TPM'))
                             )
                     )
             ;
@@ -267,12 +316,14 @@ define('kbaseExpressionSampleTableNew',
                             content : $tableElem
                         },
                         {
-                            tab : 'Histogram',
+                            tab : 'FPKM Histogram',
                             content : $histElem
                         }
                     ]
                 }
             )
+
+            var $tpmHistElem = $.jqElem('div').css({width : 800, height : 500});
 
             $container.$elem.find('[data-tab=Histogram]').on('click', function(e) {
                 $histogram.renderXAxis();
@@ -318,10 +369,34 @@ define('kbaseExpressionSampleTableNew',
                 )
             ;
 
+            var $tpmHistogram =
+                $tpmHistElem.kbaseHistogram(
+                    {
+                        scaleAxes   : true,
+                        xPadding : 60,
+                        yPadding : 120,
+
+                        xLabelRegion : 'yPadding',
+                        yLabelRegion : 'xPadding',
+
+                        xLabelOffset : 45,
+                        yLabelOffset : -10,
+
+                        yLabel : 'Number of Genes',
+                        xLabel : 'Gene Expression Level TPM',
+                        xAxisVerticalLabels : true,
+                        useUniqueID : true,
+
+                    }
+                )
+            ;
+
             this.data('tableElem', $tableElem);
             this.data('histElem',   $histElem);
+            this.data('tpmHistElem',   $tpmHistElem);
             this.data('container', $container);
             this.data('histogram', $histogram);
+            this.data('tpmHistogram', $tpmHistogram);
 
         },
 
