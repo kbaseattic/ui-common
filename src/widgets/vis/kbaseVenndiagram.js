@@ -1,5 +1,12 @@
 /*
 
+Circles are:
+
+    c1    c2
+
+       c3
+
+
 */
 
 define('kbaseVenndiagram',
@@ -236,6 +243,16 @@ define('kbaseVenndiagram',
             var intersects2 = this.intersectCircles(circleData[1], circleData[2]);
             var intersects3 = this.intersectCircles(circleData[0], circleData[2]);
 
+            var necessary_keys = ['c1', 'c2', 'c3', 'c1c3', 'c1c2', 'c2c3', 'c1c2c3'];
+            $.each(
+              necessary_keys,
+              function(i,v) {
+                if (dataset[v] == undefined) {
+                  dataset[v] = {value : 0, label : ''}
+                }
+              }
+            );
+
 
             var labelData = [//];/*
                 {
@@ -245,6 +262,7 @@ define('kbaseVenndiagram',
                     radius : overlapRadius * 1.3,
                     anchor : 'end',
                     fontSize : this.options.circleFontSize,
+                    dy : dataset.c1.ldy
                 },
                 {
                     angle : circleData[0].angle,
@@ -253,55 +271,60 @@ define('kbaseVenndiagram',
                     radius : overlapRadius * 1.3,
                     anchor : 'end',
                     fontSize : this.options.circleFontSize,
-                    dy : '1.5em',
+                    dy : dataset.c1.vdy || '1.5em',
                 },
                 {
                     angle : circleData[1].angle,
-                    label : dataset.c2.label,
-                    value : dataset.c2.value,
+                    label : dataset.c3.label,
+                    value : dataset.c3.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'start',
                     fontSize : this.options.circleFontSize,
+                    dy : dataset.c3.ldy
                 },
                 {
                     angle : circleData[1].angle,
                     //label : dataset.c2.label,
-                    value : dataset.c2.value,
+                    value : dataset.c3.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'start',
                     fontSize : this.options.circleFontSize,
-                    dy : '1.5em',
+                    dy : dataset.c3.vdy || '1.5em',
+
                 },
                 {
                     angle : circleData[2].angle,
-                    label : dataset.c3.label,
-                    value : dataset.c3.value,
+                    label : dataset.c2.label,
+                    value : dataset.c2.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'middle',
                     fontSize : this.options.circleFontSize,
+                    dy : dataset.c2.ldy
                 },
                 {
                     angle : circleData[2].angle,
                     //label : dataset.c3.label,
-                    value : dataset.c3.value,
+                    value : dataset.c2.value,
                     radius : overlapRadius * 1.3,
                     anchor : 'middle',
                     fontSize : this.options.circleFontSize,
-                    dy : '1.5em',
+                    dy : dataset.c2.vdy || '1.5em',
                 },
                 {
                     angle : 2 * Math.PI * 90 / 360,
-                    //label : dataset.c1c3.label,
-                    value : dataset.c1c3.value,
-                    radius : overlapRadius * 0.7,
-                    fontSize : this.options.intersectFontSize,
-                },
-                {
-                    angle : 2 * Math.PI * 210 / 360,
                     //label : dataset.c1c2.label,
                     value : dataset.c1c2.value,
                     radius : overlapRadius * 0.7,
                     fontSize : this.options.intersectFontSize,
+                    dy : dataset.c1c2.vdy
+                },
+                {
+                    angle : 2 * Math.PI * 210 / 360,
+                    //label : dataset.c1c3.label,
+                    value : dataset.c1c3.value,
+                    radius : overlapRadius * 0.7,
+                    fontSize : this.options.intersectFontSize,
+                    dy : dataset.c1c3.vdy
                 },
                 {
                     angle : 2 * Math.PI * 330 / 360,
@@ -309,6 +332,7 @@ define('kbaseVenndiagram',
                     value : dataset.c2c3.value,
                     radius : overlapRadius * 0.7,
                     fontSize : this.options.intersectFontSize,
+                    dy : dataset.c2c3.vdy
                 },
 
                 {
@@ -317,6 +341,7 @@ define('kbaseVenndiagram',
                     value : dataset.c1c2c3.value,
                     radius : 0,
                     fontSize : this.options.intersectFontSize,
+                    dy : dataset.c1c2c3.vdy
                 },
             ];
 
@@ -324,7 +349,7 @@ define('kbaseVenndiagram',
                 ? this.options.transitionTime
                 : 0;
 
-            var circleAction = function() {
+            var circleAction = function(d) {
 
                 this
                     .on('mouseover', function(d) {
@@ -366,7 +391,8 @@ define('kbaseVenndiagram',
                             if (typeof func == 'string') {
                                 func = Function("d", func);
                             }
-                            func(d.data);
+
+                            func.call(this, $venn, d.data);
                         }
                     })
             };
@@ -440,7 +466,7 @@ arcs.enter()
         .attr('class', 'arc')
 ;
 arcs
-    .call(circleAction)
+    .call(function(d) {circleAction.call(this, d)})
     .transition().duration(transitionTime)
     .attr('d', function(d) { return d.d})
     .attr('fill', function(d, idx) { var c =  $venn.options.fillColor(d.circle, d, $venn); return c; })
@@ -485,7 +511,7 @@ arcs.exit().remove();
 
                 this
                     .attr("text-anchor", "middle")
-                    .attr('dy', function (d) { return d.dy || '0.5em'} )
+                    .attr('dy', function (d) {return d.dy || '0.5em'} )
                     .attr('cursor', 'default')
                 ;
 
