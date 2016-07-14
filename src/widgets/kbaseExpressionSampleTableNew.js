@@ -128,12 +128,12 @@ define('kbaseExpressionSampleTableNew',
               if ($dt == undefined) {
 
                 var aoColumns = [
-                    { title : 'Gene ID'},
+                    { title : 'Feature ID'},
                     { title : 'Feature Value : log2(FPKM + 1)'},
                 ];
                 if (newDataset.tpm_expression_levels != undefined) {
                   this.data('tableElem').find('th').css('display', '');
-                  aoColumns.push({ title : 'Feature Value : TPM'});
+                  aoColumns.push({ title : 'Feature Value : log2(TPM + 1)'});
                 }
 
                 $dt = this.data('tableElem').dataTable({
@@ -297,9 +297,9 @@ define('kbaseExpressionSampleTableNew',
                         $.jqElem('thead')
                             .append(
                                 $.jqElem('tr')
-                                    .append($.jqElem('th').append('Gene ID'))
+                                    .append($.jqElem('th').append('Feature ID'))
                                     .append($.jqElem('th').append('Feature Value : log2(FPKM + 1)'))
-                                    .append($.jqElem('th').css('display', 'none').append('Feature Value : TPM'))
+                                    .append($.jqElem('th').css('display', 'none').append('Feature Value : log2(TPM + 1)'))
                             )
                     )
             ;
