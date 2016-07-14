@@ -1,22 +1,30 @@
 
 
-define('kbaseRNASeqAnalysisNew',
-    [
-        'jquery',
-        'kbaseTable',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbase-client-api',
-        'jquery-dataTables',
-        'bootstrap',
-    ], function( $ ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseTable',
+		'kbaseAuthenticatedWidget',
+		'kbase-client-api',
+		'jquery-dataTables'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseTable,
+		kbaseAuthenticatedWidget,
+		kbase_client_api,
+		jquery_dataTables
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseRNASeqAnalysisNew",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -36,8 +44,7 @@ define('kbaseRNASeqAnalysisNew',
 
         /*setDataset : function setDataset(newDataset) {
 
-                var $table = $tableElem.kbaseTable(
-                    {
+                var $table =  new kbaseTable($tableElem, {
                         structure : {
                             keys : keys,
                             rows : overViewValues
@@ -389,8 +396,7 @@ define('kbaseRNASeqAnalysisNew',
 
             if (this.dataset().tool_used) {
 
-              this.data('tableElem').kbaseTable(
-                  {
+               new kbaseTable(this.data('tableElem'), {
                       structure : {
                           keys : ['Tool Used', 'Tool Version', 'File', 'Condition', 'Alignment Set', 'Expression Set', 'Genome', 'Sample Set'],
                           rows : {
@@ -411,8 +417,7 @@ define('kbaseRNASeqAnalysisNew',
               );
             }
             else {
-              this.data('tableElem').kbaseTable(
-                  {
+               new kbaseTable(this.data('tableElem'), {
                       structure : {
                           keys : this.options.tableColumns,
                           rows : {

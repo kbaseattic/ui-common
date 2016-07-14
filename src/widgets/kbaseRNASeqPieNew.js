@@ -1,7 +1,6 @@
 /*
 
-    $('#piechart').kbaseRNASeqPie(
-        {
+     new kbaseRNASeqPie($('#piechart'), {
             workspace : "name of workspace",
 
             output : "name of object"
@@ -30,25 +29,37 @@
 
 */
 
-define('kbaseRNASeqPieNew',
-    [
-        'jquery',
-        'colorbrewer',
-        'd3',
-        'kbasePiechart',
-        'kbaseTable',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbaseTabs',
-        'kbase-client-api',
-    ], function( $, colorbrewer ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'colorbrewer',
+		'd3',
+		'kbasePiechart',
+		'kbaseTable',
+		'kbaseAuthenticatedWidget',
+		'kbaseTabs',
+		'kbase-client-api'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		colorbrewer,
+		d3,
+		kbasePiechart,
+		kbaseTable,
+		kbaseAuthenticatedWidget,
+		kbaseTabs,
+		kbase_client_api
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseRNASeqPieNew",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -148,8 +159,7 @@ define('kbaseRNASeqPieNew',
 
                 }
 
-                var $table = $tableElem.kbaseTable(
-                    {
+                var $table =  new kbaseTable($tableElem, {
                         structure : {
                             keys : keys,
                             rows : overViewValues
@@ -188,8 +198,7 @@ define('kbaseRNASeqPieNew',
 
                 var minEdge = Math.min($pieElem.width(), $pieElem.height()) / 2 - 20;
 
-                var $pie = $pieElem.kbasePiechart(
-                    {
+                var $pie =  new kbasePiechart($pieElem, {
                         scaleAxes   : true,
                         useUniqueID : false,
                         gradient : true,
@@ -265,8 +274,7 @@ define('kbaseRNASeqPieNew',
 
 
                 if (donutData.length) {
-                    var $donut = $.jqElem('div').kbasePiechart(
-                        {
+                    var $donut =  new kbasePiechart($.jqElem('div'), {
                             parent : $pie,
                             dataset : donutData,
                             innerRadius : $pie.outerRadius(),
@@ -422,8 +430,7 @@ define('kbaseRNASeqPieNew',
 
             var $containerElem = $.jqElem('div').attr('id', 'containerElem');
 
-            var $container = $containerElem.kbaseTabs(
-                {
+            var $container =  new kbaseTabs($containerElem, {
                     tabs : [
                         {
                             tab : 'Overview',

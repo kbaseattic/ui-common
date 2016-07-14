@@ -1,24 +1,36 @@
 
 
-define('kbaseExpressionSampleTableNew',
-    [
-        'jquery',
-        'kbwidget',
-        'kbaseAuthenticatedWidget',
-        'kbaseTabs',
-        'kbaseHistogram',
-        'kbase-client-api',
-        'kbaseTable',
-        'jquery-dataTables',
-        'kbaseReportView',
-    ], function( $, colorbrewer ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAuthenticatedWidget',
+		'kbaseTabs',
+		'kbaseHistogram',
+		'kbase-client-api',
+		'kbaseTable',
+		'jquery-dataTables',
+		'kbaseReportView'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		colorbrewer,
+		kbaseTabs,
+		kbaseHistogram,
+		kbase_client_api,
+		kbaseTable,
+		jquery_dataTables,
+		kbaseReportView
+	) {
 
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
 
 	    name: "kbaseExpressionSampleTableNew",
-	    parent : "kbaseAuthenticatedWidget",
+	    parent : kbaseAuthenticatedWidget,
 
         version: "1.0.0",
         options: {
@@ -308,8 +320,7 @@ define('kbaseExpressionSampleTableNew',
 
             var $containerElem = $.jqElem('div').attr('id', 'containerElem').css('display', 'none');
 
-            var $container = $containerElem.kbaseTabs(
-                {
+            var $container =  new kbaseTabs($containerElem, {
                     tabs : [
                         {
                             tab : 'Overview',
@@ -348,8 +359,7 @@ define('kbaseExpressionSampleTableNew',
             this._rewireIds($elem, this);
 
             var $histogram =
-                $histElem.kbaseHistogram(
-                    {
+                 new kbaseHistogram($histElem, {
                         scaleAxes   : true,
                         xPadding : 60,
                         yPadding : 120,
@@ -370,8 +380,7 @@ define('kbaseExpressionSampleTableNew',
             ;
 
             var $tpmHistogram =
-                $tpmHistElem.kbaseHistogram(
-                    {
+                 new kbaseHistogram($tpmHistElem, {
                         scaleAxes   : true,
                         xPadding : 60,
                         yPadding : 120,

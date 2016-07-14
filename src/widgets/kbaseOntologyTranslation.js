@@ -1,18 +1,27 @@
 
-define([
-    'jquery',
-
-    'kbase-client-api',
-    'jquery-dataTables',
-    'bootstrap',
-    'kbaseAuthenticatedWidget',
-    'kbaseTable'
-], function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbase-client-api',
+		'jquery-dataTables',
+		'kbaseAuthenticatedWidget',
+		'kbaseTable'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbase_client_api,
+		jquery_dataTables,
+		kbaseAuthenticatedWidget,
+		kbaseTable
+	) {
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseOntologyTranslation",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
             //object_name: 'interpro2go',
@@ -75,8 +84,7 @@ define([
                                 .append(comments['external resource']);
                         }
 
-                        $commentsTable = $.jqElem('div').kbaseTable(
-                            {
+                        $commentsTable =  new kbaseTable($.jqElem('div'), {
                                 allowNullRows: false,
                                 structure:
                                     {
@@ -87,8 +95,7 @@ define([
                         );
                     }
 
-                    var $metaTable = $.jqElem('div').kbaseTable(
-                        {
+                    var $metaTable =  new kbaseTable($.jqElem('div'), {
                             allowNullRows: false,
                             structure: {
                                 keys: [

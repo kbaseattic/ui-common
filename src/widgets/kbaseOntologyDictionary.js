@@ -1,18 +1,31 @@
 
-define([
-    'jquery',
-    //'colorbrewer', // TODO: new dependency
-    'kbase-client-api',
-    'jquery-dataTables',
-    'bootstrap',
-    'kbaseAuthenticatedWidget',
-    'kbaseTable'
-], function ($) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'//colorbrewer',
+		'// TODO: new dependency
+    kbase-client-api',
+		'jquery-dataTables',
+		'kbaseAuthenticatedWidget',
+		'kbaseTable'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		_colorbrewer,
+		_ TODO: new dependency
+    kbase_client_api,
+		jquery_dataTables,
+		kbaseAuthenticatedWidget,
+		kbaseTable
+	) {
     'use strict';
 
-    $.KBWidget({
+    return KBWidget({
         name: "kbaseOntologyDictionary",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
             //object_name: 'gene_ontology', //'plant_ontology', 'ncbi_taxon_ontology', 'gene_ontology'
@@ -126,8 +139,7 @@ define([
 
                     $metaElem.empty();
 
-                    var $metaTable = $.jqElem('div').kbaseTable(
-                        {
+                    var $metaTable =  new kbaseTable($.jqElem('div'), {
                             allowNullRows: false,
                             structure: {
                                 keys: [
@@ -168,8 +180,7 @@ define([
                         data.typedef_hash || {},
                         function (k, v) {
 
-                            var $subtable = $.jqElem('div').kbaseTable(
-                                {
+                            var $subtable =  new kbaseTable($.jqElem('div'), {
                                     structure: {
                                         keys: Object.keys(v).sort().map(function (v) {
                                             return {value: v, label: v, style: 'width : 200px'};
@@ -506,8 +517,7 @@ define([
                 var dataset = $self.lineageAsNodes(term.id, lineage);
                 dataset.nodes[0].stroke = 'yellow';
 
-                $force = $.jqElem('div').css({width: '500px', height: '500px'}).kbaseForcedNetwork(
-                    {
+                $force =  new kbaseForcedNetwork($.jqElem('div').css({width: '500px', height: '500px'}), {
                         linkDistance: 150,
                         dataset: dataset
                     }
@@ -624,8 +634,7 @@ define([
                 );
             }
 
-            var $table = $.jqElem('div').kbaseTable(
-                {
+            var $table =  new kbaseTable($.jqElem('div'), {
                     allowNullRows: false,
                     structure: {
                         keys: [{value: 'id', label: 'ID'}, 'name', 'def', 'namespace', 'synonym', 'comment', {value: 'is_a', label: 'Is A'}, 'relationship', 'xref'],
