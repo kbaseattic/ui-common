@@ -16,7 +16,7 @@ define (
 		KBWidget,
 		bootstrap,
 		$,
-		colorbrewer,
+		kbaseAuthenticatedWidget,
 		kbaseTabs,
 		kbaseHistogram,
 		kbase_client_api,
