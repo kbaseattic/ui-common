@@ -4,9 +4,8 @@ define (
 		'kbwidget',
 		'bootstrap',
 		'jquery',
-		'//colorbrewer',
-		'// TODO: new dependency
-    kbase-client-api',
+		'colorbrewer',
+    'kbase-client-api',
 		'jquery-dataTables',
 		'kbaseAuthenticatedWidget',
 		'kbaseTable'
@@ -14,8 +13,7 @@ define (
 		KBWidget,
 		bootstrap,
 		$,
-		_colorbrewer,
-		_ TODO: new dependency
+		colorbrewer,
     kbase_client_api,
 		jquery_dataTables,
 		kbaseAuthenticatedWidget,
