@@ -236,6 +236,13 @@ define (
 
         },
 
+        load_data_ref : function(ws, dataset) {
+          ws.get_objects([{ref : dataset.data_ref}]).then(function(b) {
+
+              $self.setDataset(b[0].data, dataset);
+
+          });
+        },
 
         init : function init(options) {
 
@@ -255,10 +262,13 @@ define (
 
             ws.get_objects([ws_params]).then(function (d) {
 
-                ws.get_objects([{ref : d[0].data.data_ref}]).then(function(b) {
-
-                    $self.setDataset(b[0].data, d[0].data);
-
+                if (d[0].data.figure_obj) {
+                  ws.get_objects([{ref : d[0].data.figure_obj}]).then(function(d) {
+                    $self.load_data_ref(ws, d[0].data);
+                  });
+                }
+                else {
+                    $self.load_data_ref(ws, d[0].data);
                 });
             }).fail(function(d) {
 
