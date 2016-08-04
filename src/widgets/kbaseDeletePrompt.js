@@ -52,23 +52,22 @@ define (
 
         init: function(options) {
 
-            this._super(options);
-
-            var $div = $('<div></div>');
-            new kbasePrompt($div, {
-                        title : 'Confirm deletion',
-                        body : 'Really delete <strong>' + this.options.name + '</strong>?',
-                        controls : [
-                            'cancelButton',
-                            {
-                                name : 'Delete',
-                                type : 'primary',
-                                callback : this.options.callback
-                            }
-                        ],
+            this._super(
+              {
+                title : 'Confirm deletion',
+                body : 'Really delete <strong>' + options.name + '</strong>?',
+                controls : [
+                    'cancelButton',
+                    {
+                        name : 'Delete',
+                        type : 'primary',
+                        callback : options.callback
                     }
-                );
-            return $div;
+                ],
+              }
+            );
+
+            return this;
 
         },
 
