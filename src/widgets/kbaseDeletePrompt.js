@@ -54,7 +54,8 @@ define (
 
             this._super(options);
 
-            return new kbasePrompt($('<div></div>'), {
+            var $div = $('<div></div>');
+            new kbasePrompt($div, {
                         title : 'Confirm deletion',
                         body : 'Really delete <strong>' + this.options.name + '</strong>?',
                         controls : [
@@ -66,7 +67,8 @@ define (
                             }
                         ],
                     }
-                )
+                );
+            return $div;
 
         },
 
