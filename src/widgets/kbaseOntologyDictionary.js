@@ -8,7 +8,8 @@ define (
     'kbase-client-api',
 		'jquery-dataTables',
 		'kbaseAuthenticatedWidget',
-		'kbaseTable'
+		'kbaseTable',
+		'kbaseTabs',
 	], function(
 		KBWidget,
 		bootstrap,
@@ -17,7 +18,8 @@ define (
     kbase_client_api,
 		jquery_dataTables,
 		kbaseAuthenticatedWidget,
-		kbaseTable
+		kbaseTable,
+		kbaseTabs
 	) {
     'use strict';
 
@@ -33,6 +35,8 @@ define (
               'GO' : 'gene_ontology',
               'SSO': 'seed_subsystem_ontology'
             },
+
+            isNarrativeWidget : true, // I honestly have no better idea how to do this.
 
         },
         extractLink: function (text) {
@@ -442,7 +446,9 @@ define (
         appendTerm: function (term_id) {
             var $self = this;
 
-            var $termElem = $self.data('termElem');
+            var $termElem = $self.options.isNarrativeWidget
+              ? $.jqElem('div')
+              : $self.data('termElem');
             $termElem.empty();
             $self.data('termContainerElem').show();
             $self.data('metaContainerElem').find('.panel-heading').find('i').removeClass('fa-rotate-90');
@@ -502,7 +508,9 @@ define (
         reallyAppendTerm: function (term) {
             var $self = this;
 
-            var $termElem = $self.data('termElem');
+            var $termElem = $self.options.isNarrativeWidget
+              ? $.jqElem('div')
+              : $self.data('termElem');
 
             var lineage = $self.getLineage(term.id);
 
@@ -653,6 +661,15 @@ define (
 
             $termElem.append($table.$elem);
 
+            if ($self.options.isNarrativeWidget) {
+              $self.globalTabs.addTab({
+                tab : 'Term ' + term.id,
+                content : $table.$elem,
+                show : true,
+                canDelete : true,
+              });
+            }
+
         },
         appendUI: function appendUI($elem) {
 
@@ -683,12 +700,25 @@ define (
             var $globalContainer = $self.data('globalContainerElem', $.jqElem('div').css('display', 'none'));
             $elem.append($globalContainer);
 
+            if (this.options.isNarrativeWidget) {
+              this.globalTabs = new kbaseTabs($globalContainer);
+            }
+
+
             var $metaElem = $self.data('metaElem', $.jqElem('div'));
 
             var $metaContainerElem = $self.createContainerElem('Overview', [$metaElem]);
 
             $self.data('metaContainerElem', $metaContainerElem);
-            $globalContainer.append($metaContainerElem);
+            if (this.options.isNarrativeWidget) {
+              this.globalTabs.addTab({
+                tab : 'Overview',
+                content : $metaContainerElem
+              });
+            }
+            else {
+              $globalContainer.append($metaContainerElem);
+            }
 
             var $tableElem = $.jqElem('table')
                 .addClass('display')
@@ -701,14 +731,25 @@ define (
             var $containerElem = $self.createContainerElem('Term Dictionary', [$tableElem, $colorMapElem]);
 
             $self.data('containerElem', $containerElem);
-            $globalContainer.append($containerElem);
+            if (this.options.isNarrativeWidget) {
+              this.globalTabs.addTab({
+                tab : 'Term Dictionary',
+                content : $containerElem
+              });
+            }
+            else {
+              $globalContainer.append($containerElem);
+            }
 
             var $termElem = $self.data('termElem', $.jqElem('div'));
 
             var $termContainerElem = $self.createContainerElem('Term', [$termElem], 'none');
 
             $self.data('termContainerElem', $termContainerElem);
-            $globalContainer.append($termContainerElem);
+
+            if (! this.options.isNarrativeWidget) {
+              $globalContainer.append($termContainerElem);
+            }
 
             var $typeDefElem = $self.data('typeDefElem', $.jqElem('table').addClass('display')).css({ 'width' : '100%', 'border': '1px solid #ddd'});
 
@@ -722,8 +763,7 @@ define (
         },
         createContainerElem: function (name, content, display) {
 
-            var $panelBody = $.jqElem('div')
-                .addClass('panel-body collapse in');
+            var $panelBody = $.jqElem('div');
 
             $.each(
                 content,
@@ -732,32 +772,43 @@ define (
                 }
             );
 
-            var $containerElem = $.jqElem('div')
-                .addClass('panel panel-default')
-                .css('display', display)
-                .append(
-                    $.jqElem('div')
-                    .addClass('panel-heading')
-                    .on('click', function (e) {
-                        $(this).next().collapse('toggle');
-                        $(this).find('i').toggleClass('fa-rotate-90');
+            var $containerElem;
 
-                    })
-                    .append(
-                        $.jqElem('div')
-                        .addClass('panel-title')
-                        .append(
-                            $.jqElem('i')
-                            .addClass('fa fa-chevron-right fa-rotate-90')
-                            .css('color', 'lightgray')
-                            )
-                        .append('&nbsp; ' + name)
-                        )
-                    )
-                .append(
-                    $panelBody
-                    )
-                ;
+            if (this.options.isNarrativeWidget) {
+              $containerElem = $panelBody.css('display', display);
+            }
+            else {
+
+              $panelBody.addClass('panel-body collapse in');
+
+              $containerElem = $.jqElem('div')
+                  .addClass('panel panel-default')
+                  .css('display', display)
+                  .append(
+                      $.jqElem('div')
+                      .addClass('panel-heading')
+                      .on('click', function (e) {
+                          $(this).next().collapse('toggle');
+                          $(this).find('i').toggleClass('fa-rotate-90');
+
+                      })
+                      .append(
+                          $.jqElem('div')
+                          .addClass('panel-title')
+                          .append(
+                              $.jqElem('i')
+                              .addClass('fa fa-chevron-right fa-rotate-90')
+                              .css('color', 'lightgray')
+                              )
+                          .append('&nbsp; ' + name)
+                          )
+                      )
+                  .append(
+                      $panelBody
+                      )
+                  ;
+
+            }
 
             return $containerElem;
         }
