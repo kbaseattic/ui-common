@@ -4,14 +4,24 @@
     This is a helper widget for rendering modals using bootstrap v3.0.0
 
     API Example:
-        var modal = $('<div>').kbaseModal({title: 'Model Details', 
+        var modal =  new kbaseModal($('<div>'), {title: 'Model Details', 
                                            rightLabel: 'Super Workspace,
                                            subText: 'kb|g.super.genome '});
-*/
+*/define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-(function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseModal",
     version: "1.0.0",
     options: {
@@ -127,4 +137,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

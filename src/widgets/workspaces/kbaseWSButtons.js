@@ -1,7 +1,19 @@
-(function( $, undefined ) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseAuthenticatedWidget
+	) {
+
+    return KBWidget({
         name: "KBaseWSButtons",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         
         options: {
@@ -99,4 +111,4 @@
         }
 
     });
-})( jQuery )
+});

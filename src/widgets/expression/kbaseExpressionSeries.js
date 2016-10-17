@@ -1,11 +1,22 @@
 /**
  * Just a simple example widget to display an expression series
  * 
- */
-(function( $, undefined ) {
-    $.KBWidget({
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "kbaseExpressionSeries",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             color: "black",
@@ -43,7 +54,7 @@
                 // setup tabs
                 var pcTable = $('<table class="table table-bordered table-striped" style="width: 100%;">');
 
-                var tabs = container.kbTabs({tabs: [
+                var tabs = container.kbaseTabTableTabs({tabs: [
                                             {name: 'Overview', active: true},
                                             {name: 'ExpressionSeries', content: pcTable}]
                                           })
@@ -113,4 +124,4 @@
             return this;
         }
     });
-})( jQuery )
+});

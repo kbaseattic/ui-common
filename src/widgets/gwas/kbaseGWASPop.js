@@ -1,7 +1,19 @@
-(function( $, undefined ) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseGWASPop",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         //width: 600,
         options: {
@@ -50,4 +62,4 @@
             };
         }
     });
-})( jQuery )
+});

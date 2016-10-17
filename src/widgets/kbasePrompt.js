@@ -4,8 +4,7 @@
 
     var tab = 'Some Tab Value';
 
-    var $deleteModal = $('<div></div>').kbasePrompt(
-        {
+    var $deleteModal =  new kbasePrompt($('<div></div>'), {
             title : 'Confirm deletion',
             body : 'Really delete <strong>' + tab + '</strong>?',
             modalClass : 'fade', //Not required. jquery animation class to show/hide. Defaults to 'fade'
@@ -52,16 +51,29 @@
 
 */
 
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-    $.KBWidget({
+
+    return KBWidget({
 
 		  name: "kbasePrompt",
 
         version: "1.0.0",
         options: {
-            controls : ['closeButton'],  // Fixme: why would we want both cancel and ok?  Need 'primary' close button
+            controls : ['cancelButton', 'okayButton'],
             modalClass : 'fade',
+            keyboard : true,
         },
 
         init: function(options) {
@@ -73,7 +85,7 @@
         },
 
         openPrompt : function() {
-            this.dialogModal().modal({'keyboard' : true});
+            this.dialogModal().modal({'keyboard' : this.options.keyboard});
         },
         closePrompt : function() {
             this.dialogModal().modal('hide');
@@ -87,7 +99,6 @@
                 }
             }
         },
-
         okayButton : function() {
             return {
                 name: 'Okay',
@@ -97,17 +108,9 @@
                 }
             }
         },
-        closeButton : function() {
-            return {
-                name: 'Close',
-                type : 'primary',
-                callback : function (e, $prompt) {
-                    $prompt.closePrompt();
-                }
-            }
-        },
 
         dialogModal : function () {
+
             if (this.data('dialogModal') != undefined) {
                 return this.data('dialogModal');
             }
@@ -153,13 +156,13 @@
                                                     .addClass('form-horizontal')
                                                     .append(
                                                         $('<div></div>')
-                                                        .addClass('col-md-6')
+                                                        .addClass('col-sm-5')
                                                         .addClass('text-left')
                                                         .attr('id', 'footer')
                                                     )
                                                     .append(
                                                         $('<div></div>')
-                                                            .addClass('col-md-6')
+                                                            .addClass('col-sm-7')
                                                             .attr('id', 'controls')
                                                             .css('white-space', 'nowrap')
                                                     )
@@ -178,6 +181,7 @@
                 }
             });
 
+
             //$deleteModal.modal({'keyboard' : true});
 
             this._rewireIds($dialogModal, $dialogModal);
@@ -194,7 +198,6 @@
                 $dialogModal.data('footer').append(this.options.footer);
             }
 
-
             var $prompt = this;
 
             $.each(
@@ -210,7 +213,7 @@
 
                     var $button =
                         $('<a></a>')
-                            //.attr('href', '#')
+                            .attr('href', '#')
                             .attr('class', btnClass)
                             .append(val.name)
                             .bind('click',
@@ -268,8 +271,6 @@
                 )
             );
 
-
-
             /*$dialogModal.find('input[type=text],input[type=password]').last().keypress(
                 $.proxy(
                     function(e) {
@@ -287,62 +288,6 @@
 
         },
 
-        addAlert : function(text, type) {
-            if (this.data('dialogModal').find('.alert')) {
-                this.rmAlert();
-            }
-
-            var ele = $('<div class="alert'+(type ? ' alert-'+type : ' alert-danger')+'">'+text+'</div>');
-
-            if (text) {
-                this.data('dialogModal').find('.modal-body').prepend(ele);                
-            }            
-
-           return this;
-        },
-
-        rmAlert : function(text) {
-            this.data('dialogModal').find('.alert').remove();
-
-           return this;
-        },
-
-        addCover : function(text) {
-            if (this.data('dialogModal').find('.modal-cover')) {
-                this.rmCover();
-            }
-
-            var ele = $('<div class="modal-cover"> \
-                             <div class="modal-cover-table"> \
-                               <div class="modal-cover-cell"> \
-                                 <span class="modal-cover-box">'+
-                                 '</span> \
-                               </div> \
-                             </div> \
-                           </div>');
-            ele.hide();
-
-            if (text) {
-                ele.find('.modal-cover-box').html(text)
-                ele.show();                
-            }
-
-            $('.modal-body').append(ele);
-
-            return this;
-        },
-        
-        getCover : function() {
-            return this.data('dialogModal').find('.modal-cover-box');
-        },
-
-
-        rmCover : function(text) {
-            this.data('dialogModal').find('.modal-cover').remove();
-
-            return this;
-        },            
-
     });
 
-}( jQuery ) );
+});

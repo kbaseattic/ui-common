@@ -1,7 +1,16 @@
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
 
-(function( $, undefined ) {
 
-$.KBWidget({
+return KBWidget({
     name: "kbaseWSSelector",
     version: "1.0.0",
     options: {
@@ -1614,4 +1623,4 @@ $.KBWidget({
     } // close init
 })
 
-}( jQuery ) );
+});

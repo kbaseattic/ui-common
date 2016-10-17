@@ -1,12 +1,22 @@
 /**
  * @author Bill Riehl <wjriehl@lbl.gov>, Roman Sutormin <rsutormin@lbl.gov>
  * @public
- */
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseAuthenticatedWidget
+	) {
 
-(function($, undefined) {
-    $.KBWidget({
+    return KBWidget({
         name: 'kbaseTree',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             treeID: null,
@@ -268,4 +278,4 @@
         }
 
     });
-})( jQuery );
+});

@@ -4,11 +4,26 @@
  *
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
- */
-(function( $, undefined ) {
-    $.KBWidget({
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseTable',
+		'kbaseWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseTable,
+		kbaseWidget
+	) {
+
+    return KBWidget({
         name: "KBaseGeneStructureMatches",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         options: {
@@ -153,8 +168,7 @@
                                            else
                                            	  {
                                         	   self.$infoPara.append( "PDB Sequence matches");
-                                               self.$structTable.kbaseTable( 
-                                                                             {
+                                                new kbaseTable(self.$structTable, {
                                                                                structure : 
                                                                                    {
                                                                                     header : [
@@ -245,4 +259,4 @@
             this.$elem.append($errorDiv);
         },
     })
-})( jQuery );
+});

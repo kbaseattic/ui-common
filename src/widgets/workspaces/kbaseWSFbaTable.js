@@ -1,6 +1,16 @@
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
 
-$.KBWidget({
+
+return KBWidget({
     name: "kbaseWSFbaTable",
     version: "1.0.0",
     options: {
@@ -77,4 +87,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

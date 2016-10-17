@@ -9,11 +9,22 @@
  * username_home workspace. This might change later, dependent on input
  * from the UI and UX teams.
  *
- */
-(function( $, undefined ) {
-    $.KBWidget({
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseCardLayoutManager",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
             template: null,
@@ -2516,4 +2527,4 @@
             this.$controlBox.remove();
         },
     });
-})( jQuery );
+});

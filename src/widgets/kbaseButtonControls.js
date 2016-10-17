@@ -2,25 +2,24 @@
     control to tack on arbitrary command groups to any container element.
     This lets you mouse over and display buttons (with icons) in the upper right.
 
-    $('#some_div').kbaseButtonControls(
-        {
+     new kbaseButtonControls($('#some_div'), {
             //list of controls to populate buttons on the right end of the title bar. Give it an icon
             //and a callback function.
             onMouseover : true,
             id: some_id, //arbitrary value to associate with these controls. Each button gets a copy in .data('id')
             controls : [
                 {
-                    icon : 'icon-search',
-                    'icon-alt' : 'icon-search-alt', //optional. Toggle icon between icon and icon-alt when clicked.
+                    icon : 'fa fa-search',
+                    'icon-alt' : 'fa fa-search-o', //optional. Toggle icon between icon and icon-alt when clicked.
                     callback : function(e) {
-                        console.log("clicked on search");
+                        this.dbg("clicked on search");
                     },
                     id : 'search' //optional. Keys the button to be available via $('#some_div').controls('search')
                 },
                 {
-                    icon : 'icon-minus',
+                    icon : 'fa fa-minus',
                     callback : function(e) {
-                        console.log("clicked on delete");
+                        this.dbg("clicked on delete");
                     }
                 },
             ],
@@ -28,9 +27,28 @@
     );
 */
 
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'bootstrap',
+		'kbwidget',
+		'geometry_rectangle',
+		'geometry_point',
+		'geometry_size'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		bootstrap,
+		KBWidget,
+		geometry_rectangle,
+		geometry_point,
+		geometry_size
+	) {
 
-    $.KBWidget({
+    return KBWidget({
 
 		  name: "kbaseButtonControls",
 
@@ -38,6 +56,9 @@
         options: {
             controls : [],
             onMouseover : true,
+            position : 'top',
+            type : 'floating',
+            posOffset : '0px',
         },
 
         init: function(options) {
@@ -52,36 +73,135 @@
 
         },
 
+        bounds : function($e) {
+            var offset = $e.offset();
+
+            return new Rectangle(
+                new Point(offset.left, offset.top),
+                new Size($e.width(), $e.height())
+            );
+        },
+
+        visibleBounds : function($e) {
+
+            var rect = this.bounds($e);
+
+            var throttle = 0;
+
+            while ($e = $e.parent()) {
+
+                var parentRect = this.bounds($e);
+                rect = rect.intersectRect(parentRect);
+
+                //just being paranoid
+                if (throttle++ > 1000) {
+                    break;
+                }
+
+                if ($e.prop('tagName').toLowerCase() == 'body') {
+                    break;
+                }
+
+            }
+
+            return rect;
+
+        },
+
         appendUI : function ($elem) {
 
-            $elem
-                .css('position', 'relative')
-                .prepend(
-                    $('<div></div>')
-                        .addClass('btn-group')
-                        .attr('id', 'control-buttons')
-                        .css('right', '0px')
-                        .css('top', '0px')
-                        .css('position', 'absolute')
-                        .css('margin-right', '3px')
-                )
+            if (this.options.type == 'floating') {
+                $elem
+                    .css('position', 'relative');
+
+                //XXX godawful hack to pop the tooltips to the top.
+                $elem.append($.jqElem('style').text('.tooltip { position : fixed }'));
+            }
+
+           var $controlButtons =
+                $('<div></div>')
+                    .addClass('btn-group btn-group-xs')
+                    .attr('id', 'control-buttons')
             ;
+
+            if (this.options.type == 'floating') {
+                $controlButtons
+                    .css('right', '0px')
+                    .css(this.options.position, this.options.posOffset)
+                    .css('position', 'absolute')
+                    .css('margin-right', '3px')
+                    .attr('z-index', 10000)
+                ;
+            }
+
+            $elem.prepend($controlButtons);
 
             this._rewireIds($elem, this);
 
-            if (this.options.onMouseover) {
+            if (this.options.onMouseover && this.options.type == 'floating') {
+
+                var overControls = false;
+                var overParent = false;
+
+                var $controls = this;
+
                 $elem
                     .mouseover(
                         function(e) {
+
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            if (window._active_kbaseButtonControls != undefined) {
+                                window._active_kbaseButtonControls.hide();
+                            }
+
                             $(this).children().first().show();
+
+                            window._active_kbaseButtonControls = $controlButtons;
+                            overParent = true;
+
                         }
                     )
                     .mouseout(
                         function(e) {
-                            $(this).children().first().hide();
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            var controlBounds = $controls.bounds($controlButtons);
+                            var controlBoundsV = $controls.visibleBounds($controlButtons);
+                            var elemBounds = $controls.bounds($elem);
+
+                            var bounds = elemBounds.intersectRect(controlBounds);
+
+                            if (! controlBoundsV.containsPoint(new Point(e.pageX, e.pageY)) ) {
+                            //if (! $.contains($elem.get(0), e.target)) {
+                                window._active_kbaseButtonControls.hide();
+
+                                window._active_kbaseButtonControls = undefined;
+
+                            }
+                            overParent = false;
+
                         }
                     )
                     .children().first().hide();
+
+               /*$controlButtons
+                    .mouseover(
+                        function(e) {
+                            overControls = true;
+                        }
+                    )
+                    .mouseout(
+                        function(e) {
+                            overControls = false;
+                            if (! overParent) {
+                                $(this).hide();
+                            }
+                        }
+                    )*/
+
             };
 
             this.setControls(this.options.controls);
@@ -117,7 +237,7 @@
                         }
                     }
 
-                    var btnClass = 'btn btn-default btn-xs';
+                    var btnClass = 'btn btn-default';
                     if (val.type) {
                         btnClass = btnClass + ' btn-' + val.type;
                     }
@@ -129,7 +249,19 @@
                     }
 
                     if (tooltip != undefined && tooltip.container == undefined) {
-                        //tooltip.container = 'body';//this.$elem;//'body';
+                        tooltip.container = this.data('control-buttons');//this.$elem;//'body';//this.$elem;//'body';
+                    }
+
+                    if (tooltip != undefined && tooltip.placement == undefined) {
+                        tooltip.placement = 'top';
+                    }
+
+                    //if (tooltip != undefined) {
+                    //    tooltip.trigger = 'manual';
+                    //}
+
+                    if (tooltip != undefined) {
+                        tooltip.delay = 1;
                     }
 
                     var $button =
@@ -140,7 +272,7 @@
                             .attr('class', btnClass)
                             .append($('<i></i>').addClass(val.icon))
                             .tooltip(tooltip)//{title : val.tooltip})
-                            .bind('click',
+                            .on('click',
                                 function(e) {
                                     e.preventDefault();
                                     e.stopPropagation();
@@ -151,6 +283,18 @@
                                     val.callback.call(this, e, $buttonControls.options.context);
                                 }
                             )
+                            /*.on('mouseover',
+                                function(e) {
+                                    e.preventDefault(); e.stopPropagation();
+                                    $(this).tooltip('show');
+                                }
+                            )
+                            .on('mouseout',
+                                function(e) {
+                                    e.preventDefault(); e.stopPropagation();
+                                    $(this).tooltip('hide');
+                                }
+                            );*/
                     ;
 
                     if (val.id) {
@@ -168,4 +312,4 @@
 
     });
 
-}( jQuery ) );
+} );

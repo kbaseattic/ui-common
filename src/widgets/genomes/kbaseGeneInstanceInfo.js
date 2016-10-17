@@ -4,11 +4,22 @@
  *
  * Gene "instance" info (e.g. coordinates on a particular strain's genome)
  * is in a different widget.
- */
-(function( $, undefined ) {
-    $.KBWidget({
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseGeneInstanceInfo",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         options: {
@@ -32,7 +43,7 @@
                 return this;
             }
 
-            
+
             // always setup the cdmi clients, cause for now there is a hack to get domain/operon info if available
             // from the CDS
             this.cdmiClient = new CDMI_API(this.cdmiURL);
@@ -62,7 +73,7 @@
 
             var makeButton = function(btnName) {
                 var id = btnName;
-                btnName = btnName.replace(/\w\S*/g, 
+                btnName = btnName.replace(/\w\S*/g,
                                 function(txt) {
                                     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
                                 });
@@ -177,29 +188,29 @@
                 //    self.$infoTable.append(self.makeRow("Protein Families", "None found"));
 
                 //self.$buttonPanel.find("button#domains").click(
-                //    function(event) { 
-                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID }) 
+                //    function(event) {
+                //        self.trigger("showDomains", { event: event, featureID: self.options.featureID })
                 //    }
                 //);
                 //self.$buttonPanel.find("button#operons").click(
-                //    function(event) { 
-                //        self.trigger("showOperons", { event: event, featureID: self.options.featureID }) 
+                //    function(event) {
+                //        self.trigger("showOperons", { event: event, featureID: self.options.featureID })
                 //    }
                 //);
 
                 self.$buttonPanel.find("button#sequence").click(
-                    function(event) { 
-                        self.trigger("showSequence", { event: event, featureID: self.options.featureID }) 
+                    function(event) {
+                        self.trigger("showSequence", { event: event, featureID: self.options.featureID })
                     }
                 );
                 self.$buttonPanel.find("button#biochemistry").click(
-                    function(event) { 
-                        self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID }) 
+                    function(event) {
+                        self.trigger("showBiochemistry", { event: event, featureID: self.options.featureID })
                     }
                 );
                 self.$buttonPanel.find("button#structure").click(
-                     function(event) { 
-                         self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID }) 
+                     function(event) {
+                         self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID })
                      }
                 );
                 self.hideMessage();
@@ -243,7 +254,7 @@
 
                         // Figure out the function.
                         var func = feature['function'];
-                        if (!func) 
+                        if (!func)
                             func = "Unknown";
                         this.$infoTable.append(this.makeRow("Function", func));
 
@@ -305,7 +316,7 @@
                         }
 
                         // first add handlers that say we do not have domains or operons for this gene
-                        this.$buttonPanel.find("button#domains").click(function(event) { 
+                        this.$buttonPanel.find("button#domains").click(function(event) {
                             window.alert("No domain assignments available for this gene.  You will be able to compute domain assignments in the Narrative in the future.");
                         });
                         this.$buttonPanel.find("button#operons").click(function(event) {
@@ -313,8 +324,8 @@
                         });
                         this.$buttonPanel.find("button#structure").click(function(event) {
                             window.alert("No structure assignments available for this gene.  You will be able to compute structure assignments in the Narrative in the future.");
-                        });                        
-                        
+                        });
+
                         //determine if a feature id and its protein MD5 translation is found in the CDS- if it is,
                         //return true.  We use this as a hack to see if we have gene info for this feature for WS objects.
                         this.cdmiClient.fids_to_proteins([self.options.featureID],
@@ -322,56 +333,56 @@
                                         if (prot[self.options.featureID] == feature['md5'] ) {
                                             //ok the fid and md5 match, so go to the CDS to get domain info...  what a hack!
                                             self.$buttonPanel.find("button#domains").off("click");
-                                            self.$buttonPanel.find("button#domains").click(function(event) { 
+                                            self.$buttonPanel.find("button#domains").click(function(event) {
                                                 self.trigger("showDomains", { event: event, featureID: self.options.featureID });
                                             });
                                             self.$buttonPanel.find("button#operons").off("click");
-                                            self.$buttonPanel.find("button#operons").click(function(event) { 
+                                            self.$buttonPanel.find("button#operons").click(function(event) {
                                                 self.trigger("showOperons", { event: event, featureID: self.options.featureID });
                                             });
                                             self.$buttonPanel.find("button#structure").off("click");
-                                            self.$buttonPanel.find("button#structure").click(function(event) { 
+                                            self.$buttonPanel.find("button#structure").click(function(event) {
                                                 self.trigger("showStructureMatches", { event: event, featureID: self.options.featureID });
                                             });
                                         }
                                    } // we don't add error function- if they don't match or this fails, do nothing.
                         );
-                        
+
                         // bind button events
                         this.$buttonPanel.find("button#sequence").click(
-                            $.proxy(function(event) { 
-                                this.trigger("showSequence", { 
-                                    event: event, 
+                            $.proxy(function(event) {
+                                this.trigger("showSequence", {
+                                    event: event,
                                     featureID: this.options.featureID,
                                     genomeID: this.options.genomeID,
                                     workspaceID: this.options.workspaceID,
-                                    kbCache: this.options.kbCache 
+                                    kbCache: this.options.kbCache
                                 });
                             }, this)
                         );
                         this.$buttonPanel.find("button#biochemistry").click(
-                            $.proxy(function(event) { 
-                                this.trigger("showBiochemistry", { 
-                                    event: event, 
+                            $.proxy(function(event) {
+                                this.trigger("showBiochemistry", {
+                                    event: event,
                                     featureID: this.options.featureID,
                                     genomeID: this.options.genomeID,
                                     workspaceID: this.options.workspaceID,
-                                    kbCache: this.options.kbCache 
+                                    kbCache: this.options.kbCache
                                 });
                             }, this)
                         );
 
                     }
                     else {
-                        this.renderError({ error: "Gene '" + this.options.featureID + 
+                        this.renderError({ error: "Gene '" + this.options.featureID +
                                                   "' not found in the genome with object id: " +
                                                   this.options.workspaceID + "/" + this.options.genomeID });
                     }
 
                 }
                 else {
-                    this.renderError({ error: "No genetic features found in the genome with object id: " + 
-                                              this.options.workspaceID + "/" + 
+                    this.renderError({ error: "No genetic features found in the genome with object id: " +
+                                              this.options.workspaceID + "/" +
                                               this.options.genomeID });
                 }
 
@@ -400,10 +411,10 @@
             var $contigBtn = $("<button />")
                              .addClass("btn btn-default")
                              .append("Show Contig")
-                             .on("click", 
+                             .on("click",
                                  function(event) {
-                                    self.trigger("showContig", { 
-                                        contig: contigID, 
+                                    self.trigger("showContig", {
+                                        contig: contigID,
                                         centerFeature: self.options.featureID,
                                         genomeId: self.options.genomeID,
                                         workspaceId: self.options.workspaceID,
@@ -425,8 +436,8 @@
 
             return $("<div>")
                 .append('<a href="#/genomes/'+workspaceID+'/'+genomeID+'" target="_blank">'+workspaceID+'/<wbr>'+genomeID+'</a>');
-                
-                
+
+
             var self = this;
             var $genomeBtn = $("<button />")
                              .addClass("btn btn-default")
@@ -455,13 +466,13 @@
             s = s.toLowerCase();
             for (var i=0; i<s.length; i++) {
                 var c = s[i];
-                if (c === 'g' || c === 'c') 
+                if (c === 'g' || c === 'c')
                     gc++;
             }
-            return gc / s.length * 100;            
+            return gc / s.length * 100;
         },
-        
-        
+
+
         /**
          * parses out the location into something visible in html, adds a button to open the contig.
          * something like:
@@ -519,7 +530,7 @@
             else if (error.error && error.error.message)
                 errString = error.error.message;
 
-            
+
             var $errorDiv = $("<div>")
                             .addClass("alert alert-danger")
                             .append("<b>Error:</b>")
@@ -544,4 +555,4 @@
         },
 
     })
-})( jQuery );
+});

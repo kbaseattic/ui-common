@@ -1,6 +1,18 @@
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbasePanel'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbasePanel
+	) {
 
-$.KBWidget({
+
+return KBWidget({
     name: "kbaseWSMediaTable",      
     version: "1.0.0",
     options: {
@@ -12,7 +24,7 @@ $.KBWidget({
         var title = options.title;
         var data = options.data;
 
-        var panel = this.$elem.kbasePanel({title: 'Biochemistry Media', 
+        var panel =  new kbasePanel(this.$elem, {title: 'Biochemistry Media', 
                                            rightLabel: ws});
         panel.loading();
         var panel_body = panel.body();
@@ -80,4 +92,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

@@ -1,7 +1,21 @@
-(function ($, undefined) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseWidget
+	) {
+
+    return KBWidget({
         name: "KBaseGeneExprLinePlot",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             title: "Gene expression line plot",
@@ -313,4 +327,4 @@
             };
         },
     });
-})(jQuery);
+});

@@ -1,7 +1,17 @@
-(function( $, undefined ) { 
-    $.KBWidget({ 
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
+ 
+    return KBWidget({ 
         name: "KBaseSpecStorageCard", 
-        parent: "kbaseAuthenticatedWidget", 
+        parent : kbaseAuthenticatedWidget, 
         version: "1.0.0",
 
         options: {
@@ -66,4 +76,4 @@
             };
         }
     });
-})( jQuery );
+});

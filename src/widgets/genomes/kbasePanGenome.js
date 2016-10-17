@@ -2,12 +2,24 @@
  * Ouput widget to display a pangenome object.
  * @author Chris Henry <chrisshenry@gmail.com>, Roman Sutormin <rsutormin@lbl.gov>
  * @public
- */
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
-(function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "kbasePanGenome",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
         	ws: null,
@@ -75,7 +87,7 @@
         		container.empty();
         		var tabPane = $('<div id="'+self.pref+'tab-content">');
         		container.append(tabPane);
-        		var tabs = tabPane.kbTabs({tabs: []});
+        		var tabs = tabPane.kbaseTabTableTabs({tabs: []});
         		var showOverview = true;
         		if (self.options.withExport)
         			showOverview = false;
@@ -461,4 +473,4 @@
 
     });
 
-})( jQuery );
+});

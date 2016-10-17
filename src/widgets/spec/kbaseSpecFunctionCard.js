@@ -1,7 +1,17 @@
-(function( $, undefined ) { 
-    $.KBWidget({ 
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
+ 
+    return KBWidget({ 
         name: "KBaseSpecFunctionCard", 
-        parent: "kbaseAuthenticatedWidget", 
+        parent : kbaseAuthenticatedWidget, 
         version: "1.0.0",
         timer: null,
 
@@ -206,4 +216,4 @@
             };
         }
     });
-})( jQuery );
+});

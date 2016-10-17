@@ -1,7 +1,19 @@
-(function($, undefined) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseMastRunParametersCard",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             title: "MAST run parameters",
@@ -62,4 +74,4 @@
         }
 
     });
-})(jQuery);
+});

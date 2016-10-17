@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <!--<link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
+
+<link href="../../ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+<script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<script type = 'text/javascript'>
+    var kb_use_require = true;
+    var kb_norequire = function(deps, callback) {
+        callback(jQuery);
+    };
+    var kb_nodefine = function(module, deps, callback) {
+        callback(jQuery);
+    };
+    if (kb_use_require) {
+        kb_define = define;
+        kb_require = require;
+    }
+    else {
+        kb_define = kb_nodefine;
+        kb_require = kb_norequire;
+    }
+</script>
+
+<style>
+.bar {
+
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+</style>
+
+
+        <script type = 'text/javascript'>
+            <!--
+
+                function getParameterByName(name) {
+                  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                  var regexS = "[\\?&]" + name + "=([^&#]*)";
+                  var regex = new RegExp(regexS);
+                  var results = regex.exec(window.location.search);
+                  if(results == null)
+                    return "";
+                  else
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+
+                require(['kbpaths'], function() {
+                    require(['jquery', 'vis', 'kbasePrompt',
+                        ], function($) {
+                        $(function() {
+
+
+                            var dataset = {"data":{"column_ids":["Frequency"],"column_labels":["Frequency"],"data":[[288,785,1282,1779,2276,2773,3270,3767,4264,4761,5258,5755,6252,6749,7246,7743,8240,8737,9234,9731,10228,10725,11222,11719,12216,12713,13210,13707,14204,14701,15198,15695,16192,16689,17186,17683,18180,18677,19174,19671,20168,20665,21162,21659,22156,22653,23150,23647,24144,24641,25138],[24,63,32,29,15,7,12,8,6,2,4,1,2,0,3,0,1,2,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1]],"id":"kb|histogramdatatable.2","name":"Histogram - kb|sample.19763","row_ids":["Gene Expression Level"],"row_labels":["Gene Expression Level"]},"info":[12,"kb|histogramdatatable.2","MAK.FloatDataTable-2.1","2014-07-31T18:48:19+0000",1,"thomasoniii",811,"thomasoniii:home","ad413ce8a9e0fdb09d4aaf117a53c242",807,{}],"provenance":[],"creator":"srividya22","created":"2014-07-31T18:34:32+0000","refs":[]};
+
+                            var $hm = $('#heatmapWidget').kbaseHistogram(
+                                {
+                                    scaleAxes   : true,
+                                    //yGutter     : 80,
+                                    //xPadding    : 80,
+
+                                    //xLabel      : 'Frobnozes',
+                                    //yLabel      : 'Wingdings',
+
+                                    dataset : dataset,
+
+
+                                }
+                            );
+
+
+
+                            var $prompt = $.jqElem('div').kbasePrompt(
+                                {
+                                    title : 'Change dataset',
+                                    body : $.jqElem('form')
+                                        .append(
+                                            $.jqElem('textarea')
+                                                .kb_bind($hm, 'dataset',
+                                                    {
+                                                        transformedValue : function(v) {
+                                                            return JSON.stringify(v, undefined, 2);
+                                                        },
+                                                        reverseTransformedValue : function(v) {
+                                                            return JSON.parse(v);
+                                                        }
+                                                    }
+                                                )
+                                        ),
+                                }
+                            );
+
+                            $('#changeButton').on('click', function(e) {
+                                $prompt.openPrompt();
+                            });
+
+                        })
+                    })
+                });
+
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+        <div>
+            Simple demonstrations of visualization widgets. Mouse over the charts, they're all interactive.<br>
+            The force directed graph has draggable nodes, and they can be selected by drawing on the box.
+        </div>
+
+        <!--<div style = 'max-width : 800px; overflow : scroll'>-->
+        <button class = 'btn btn-default' id = 'changeButton'>Change data</button>
+            <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 800px; height : 1000px'></div>
+        <!--</div>-->
+        <div id = 'treeCompare'></div>
+
+        <div style = 'display : none'>
+            <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'piechartWidget' style = 'border : 1px solid green; width : 1000px; height : 500px'></div>
+            <button id = 'random-pie'>Randomize pie chart</button>
+            <div id = 'circularHeatmap' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            <button id = 'random-hm_c'>Randomize heatmap</button><button id = 'full-random-hm_c'>Fully randomize heatmap</button>
+            <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+
+
+            <div id = 'plantsNetworkNarrative' style = 'border : 1px solid green;'></div>
+        </div>
+
+
+    </body>
+
+</html>

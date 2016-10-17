@@ -1,7 +1,19 @@
-(function( $, undefined ) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseGWASTraitTable",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
             type: "KBaseGwasData.GwasPopulationTrait",
@@ -107,4 +119,4 @@
             };
         }
     });
-})( jQuery )
+});

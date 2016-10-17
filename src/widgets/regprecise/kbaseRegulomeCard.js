@@ -1,7 +1,19 @@
-(function( $, undefined ) { 
-    $.KBWidget({ 
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+ 
+    return KBWidget({ 
         name: "KBaseRegulomeCard", 
-        parent: "kbaseWidget", 
+         
         version: "1.0.0",
 
         options: {
@@ -117,4 +129,4 @@
         },
 
     });
-})( jQuery );
+});

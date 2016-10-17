@@ -5,12 +5,22 @@
  * https://gist.github.com/mbostock/1093025
  * 
  * will adapt this to work with the KBase SEED annotations
- */
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
- (function( $, undefined ) {
-    $.KBWidget({
+    return KBWidget({
         name: "KBaseSEEDFunctions",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
 
         wsUrl:"https://kbase.us/services/ws",
@@ -413,4 +423,4 @@
         }
 
     });
-})( jQuery );
+});

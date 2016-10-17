@@ -1,8 +1,22 @@
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
 
-$.KBWidget({
+
+return KBWidget({
     name: "kbaseETCDiagram",
-    parent: "kbaseAuthenticatedWidget",
+    parent : kbaseAuthenticatedWidget,
     version: "1.0.0",
     options: {
     },
@@ -271,4 +285,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

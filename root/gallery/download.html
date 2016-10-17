@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <!--<link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
+
+<link href="ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+<script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<script type = 'text/javascript'>
+    var kb_use_require = true;
+    var kb_norequire = function(deps, callback) {
+        callback(jQuery);
+    };
+    var kb_nodefine = function(module, deps, callback) {
+        callback(jQuery);
+    };
+    if (kb_use_require) {
+        kb_define = define;
+        kb_require = require;
+    }
+    else {
+        kb_define = kb_nodefine;
+        kb_require = kb_norequire;
+    }
+</script>
+
+
+        <script type = 'text/javascript'>
+            <!--
+
+                function getParameterByName(name) {
+                  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                  var regexS = "[\\?&]" + name + "=([^&#]*)";
+                  var regex = new RegExp(regexS);
+                  var results = regex.exec(window.location.search);
+                  if(results == null)
+                    return "";
+                  else
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+
+                kb_require(['kbpaths'], function() {
+                    kb_require(['jquery', 'kbaseDownload', 'kbaseFormBuilder'
+                        ], function($) {
+                        $(function() {
+
+                            var $dlbutton = $('#download').kbaseDownload(
+                                {
+                                    //"mimeType" : "text/plain",
+                                    "content" : "Something to download",
+                                }
+                            );
+
+                            var $dlForm = $('#dlForm').kbaseFormBuilder(
+                                {
+                                    rawLabels : true,
+                                    canSubmit : true,
+                                    canReset : true,
+                                    submitCallback : function(e) {
+                                        if (e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                        }
+                                        var newOptions = $dlForm.getFormValuesAsObject();
+
+                                        $('#download').removeData('kbaseDownload');
+                                        $('#download').empty();
+
+                                        if (newOptions.isJson) {
+                                            newOptions.content = JSON.parse(newOptions.content);
+                                        }
+
+                                        $dlbutton = $('#download').kbaseDownload(newOptions);
+
+                                        return false;
+                                    },
+                                    elements : [
+
+                                        {
+                                            key : 'btnClass',
+                                            type : 'string',
+                                            placeholder : $dlbutton.btnClass(),
+                                        },
+                                        {
+                                            key : 'newWindow',
+                                            type : 'checkbox',
+                                            checked : $dlbutton.options.newWindow,
+                                        },
+                                        {
+                                            key : 'isJson',
+                                            type : 'checkbox',
+                                        },
+                                        {
+                                            key : 'mimeType',
+                                            type : 'text',
+                                            placeholder : $dlbutton.mimeType()
+                                        },
+                                        {
+                                            key : 'delimiter',
+                                            type : 'text',
+                                            placeholder : $dlbutton.delimiter()
+                                        },
+                                        {
+                                            key : 'detect',
+                                            type : 'select',
+                                            values : ['auto', 'json']
+                                        },
+                                        /*{
+                                            key : 'title',
+                                            type : 'text',
+                                            placeholder : $dlbutton.title()()
+                                        },*/
+                                        {
+                                            key : 'content',
+                                            type : 'textarea',
+                                            value : $dlbutton.content(),
+                                        },
+
+                                    ]
+                                }
+                            );
+
+                        });
+                    });
+                });
+
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+        <div class = 'row'>
+            <div class = 'col-md-3'>
+                <div style = 'border : 1px solid blue; width : 250px; height : 250px; text-align : center; vertical-align : middle; display : table-cell'>
+                    <!--
+                        <button id = 'download' data-kbwidget = 'kbaseDownload' style = 'display : none'>
+                            {
+                                "mimeType" : "text/plain",
+                                "content" : [["a","b"],["c","d"],["e","f"]]
+                            }
+                        </button>
+                    -->
+                    <button id = 'download' data-kbwidget = 'kbaseDownload' style = 'display : none'></button>
+                </div>
+            </div>
+            <div class = 'col-md-9'>
+                <div style = 'border : 1px solid black' id = 'dlForm'></div>
+            </div>
+        </div>
+
+
+
+    </body>
+
+</html>

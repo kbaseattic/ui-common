@@ -1,7 +1,21 @@
-(function( $, undefined ) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
+
+    return KBWidget({
         name: "KBaseGenomeCompleteness",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         genome_id: null,
         ws_name: null,
@@ -271,4 +285,4 @@
                 });
         }
     });
-})( jQuery );
+});

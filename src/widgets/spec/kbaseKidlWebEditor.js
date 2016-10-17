@@ -1,10 +1,21 @@
 /**
  * @author Roman Sutormin <rsutormin@lbl.gov>
- */
-(function($, undefined) {
-    $.KBWidget({
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbaseAuthenticatedWidget
+	) {
+
+    return KBWidget({
         name: 'kbaseKidlWebEditor',
-        parent: 'kbaseAuthenticatedWidget',
+        parent : kbaseAuthenticatedWidget,
         version: '0.0.1',
         options: {
             type: null,
@@ -117,4 +128,4 @@
                 });
         }
     });
-})( jQuery );
+});

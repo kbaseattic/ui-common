@@ -26,7 +26,7 @@ function(    $,        Auth,           util ) {
     var self = this;
 
     // GLOBAL (to this script)
-    $('#signin-button').kbaseLogin({style: 'text', 
+kbaseLogin(    $('#signin-button'), {style: 'text', 
                 login_callback: login_cb, logout_callback: logout_cb});
     var userToken = $("#signin-button").kbaseLogin('session').token;
 
@@ -49,7 +49,7 @@ function(    $,        Auth,           util ) {
 
 	// two main objects, the workspace selector (left column) and the object table (middle column)
     objectTable = new ObjectTable();
-    wsSelector = $('#ws-container').kbaseWSSelector({userToken: userToken,
+    wsSelector = kbaseWSSelector($('#ws-container'), {userToken: userToken,
                                                                selectHandler: selectHandler});
     console.log(wsSelector)
 
@@ -642,7 +642,7 @@ function(    $,        Auth,           util ) {
             $('#main-right-content').append('<button class="btn back-button" \
                 style="float: left; margin: 0 5px 0 0;" >back</div>');
 
-            modelView = $('#main-right-content').kbaseModelView({ids: ids,
+            modelView = kbaseModelView($('#main-right-content'), {ids: ids,
                 workspaces: ws});
 
             $('.back-button').unbind('click');

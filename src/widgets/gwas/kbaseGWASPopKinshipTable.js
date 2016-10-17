@@ -1,7 +1,21 @@
-(function( $, undefined ) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseAuthenticatedWidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseAuthenticatedWidget
+	) {
+
+    return KBWidget({
         name: "KBaseGWASPopKinshipTable",
-        parent: "kbaseAuthenticatedWidget",
+        parent : kbaseAuthenticatedWidget,
         version: "1.0.0",
         options: {
             width: 500,
@@ -52,4 +66,4 @@
             };
         }
     });
-})( jQuery )
+});

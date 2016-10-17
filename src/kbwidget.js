@@ -1,27 +1,158 @@
 /**
  * @class KBWidget
  *
- * A KBase widget. Lorem ipsum dolor sit amet, consectetur adipisicing elit,
- * sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
- * ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
- * ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
- * velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
- * cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
- * est laborum.
- *
- * And here's an example:
- *
- *     @example
- *     var widget = $.KBWidget({
- *         name: "MyFancyWidget",
- *         parent: "MommyWidget",
- *         init: function () {}
- *     });
+
+kbwidget.js defines the jquery kbase widget superclass and provides some additional functionality based around it.
+
+The main thing that comes out of it is the return KBWidget() function, which is a function that creates a constructor for your widget.
+There are other things available, but we'll come back to them.
+
+It also creates the root class for the jquery widgets (kbaseWidgets), although you won't directly interact with that.
+
+And it makes available a registery of all widgets at window.KBase.
+
+But return KBWidget is the important one. This is your constructor constructor and should be used to create new jquery based widgets.
+
+Doing so is easy. It creates a classical inheritance environment. Simply call the function, name the widget, and define a parent.
+
+return KBWidget(
+    {
+        name: 'myFancyNewWidget',
+        parent : someOtherWidget,  //if parent is not provided, defaults to kbaseWidget
+        options : {
+            // key / value pairs of optional values to hand into the object. These can be used to override values set as options
+            // for the superclass. This key really should've been called defaults, but oh well.
+        }
+
+        version : "1.0.0",  //future proofing, but completely unused
+
+        _accessors : [  //optional. A list of values to automatically create setter/getters for.
+            'foo'       //you'll now be able to store something at $widget.foo('newValue') and access it via var foo = $widget.foo();
+            {name : 'bar', setter : 'setBar', getter : 'getBar'}    // the setter/getter can also be overridden If these functions are not
+                                                                    // defined in your object, you'll get default implementations. Add new methods
+                                                                    // in the object body for specific behavior. See the caveat about bindings and notifications
+                                                                    // below.
+        ],
+
+        init : function(options) {  // the initializer. Is given an options hash containing the closest value. So if you have
+            this._super(options);   // bar : 1 up in your options hash, and instantiate your widget with no args, it'll get bar : 1 in
+                                    // this options argument. If you hand in bar : 2, you'll get bar : 2. If nothing is defined in your
+                                    // class, but your parent has bar : 3, you'll get bar : 3, and so on.
+                                    //
+                                    // do whatever class initialization is necessary here. Set variables, establish network connections, layout
+                                    // your interface, etc. It may be good to lay out your UI in another method, but that's not enforced.
+                                    // $fancy.$elem contains the jquery wrapped reference to the widget you were instantiated against.
+
+            return this;            //return self when you're done. You actually can return a different object, but only do so if you know what
+                                    //you're doing
+        },
+
+        someMethod : function (args) {
+            //do something interesting
+        },
+
+        anotherMethod : function(args) {
+            //something else worthwhile
+        }
+    }
+);
+
+Instantiate as follows:
+
+var $fancy = $('some-jquery-selector').myFancyNewWidget(
+    {
+        bar : 7
+    }
+);
+
+var foo = $fancy.foo();
+var $element = $fancy.$elem; //is the same as $('some-jquery-selector');
+
+You get a lot of methods availabe by default:
+
+    callAfterInit(func) -   a semi magic function to use as a callback after the object is fully initialized. Use it to do work after callbacks may have been
+                            required during initalization. Call this from within your init, if you need it.
+    dbg(text)           -   wrapper around console.log, that checks for its existence. Thanks, IE!
+    appendUI            -   a default implementation to create the UI of the object. Used to pull in and initialize a handlebars template, if one
+                            was handed in as an option
+    templateSuccess(string) - callback if the template is successfully loaded
+    templateFailure(string) - callback if the template did not load
+    templateContent         - returns the template content
+    valueForKey(attr)   -   different way to write $fancy.attr(); Universally works regardless of what getter is named.
+    setValueForKey(attr, newValue)   -   different way to write $fancy.attr('newValue'); Universally works regardless of what setter is named.
+    setValueForKeys(obj)    - shorthand to set many values at once. key / value pairs of attribute name and new value.
+    data                - a generic block of data for you. Used by _rewireIds as a bucket to strip out IDs from HTML
+                        - my $inputField = $fancy.data('inputField'), for example
+    sortCaseInsensitively(a,b) - helper function for sorting strings insensitively
+    sortByKey(key, insensitively) - herlper to sort arrays of objects by the value of a particular key. insensitively is a boolean flag.
+    trigger('event')             - triggers an event, emitted from $fancy.$elem;
+    observe($target, attribute, callback)   - when the attribute value of $target changes, call callback on yourself.
+    unobserve($target, attribute, callback) - stop watching $target's attribute value.
+    uuid                - generate a reasonably universally unique ID.
+    _rewireIds($elem, $target) - HTML IDs are required to be unique in a document, but that's a bitch to work with.
+                                _rewireIds will strip ids from $elem, and put them into $target's data() block.
+                                So, if $elem = <div id = 'one'><span id = 'two'>Some text</span></div>
+
+                                $fancy._rewireIds($elem, $fancy) would do this:
+                                $elem becomes <div><span>Some text</span></div>
+                                $fancy.data now holds:
+                                    $fancy.data('one') === $(<div><span>Some text</span></div>)
+                                    $fancy.data('two') === $(<span>Some text</span>)
+                                        (to clarify, they're not new instances, they're the actual elements contained with $elem. Difficult to express...)
+
+
+The widgets will generate a lot of notifications from their setters/getters.
+
+$fancy.foo('new foo');  // posts events - willChangeValueForFoo, and then didChangeValueForFoo.
+
+You can listen for those events on $(document) and react as appropriately. If you create your own custom setter, be sure to call the notifications yourself.
+
+The other functions exported are:
+
+$.jqElem('name-of-html-tag')    //this is just a wrapper around $('<name-of-html-tag></name-of-html-tag>'), but it takes into account non-closing tags.
+
+$('someElement').asD3() - just a wrapper to d3.select('someElement'). Convenient for hiding d3, but not very widely used.
+
+$('someElement').kb_bind($target, attribute, ?transformers?, ?accessors?)
+    binds and synchronizes the value displayed in 'someElement' with the named attribute of the $target jQuery object.
+    Optionally hand in an object of transformers -
+        {
+            transformedValue : function(val) { return newVal }
+            reverseTransformedValue : function(val) { return newVal }
+        }
+
+        transformedValue will convert the value in someElement through some function before setting it as an attribute of the $target
+        reverseTransformedValue will convert the attribute of $target to something else before setting it as the value of someElement
+
+    Optionally hand in an object of accessors -
+        {
+            setter : "name of setter function"
+            getter : "name of getter function"
+        }
+
+        To call that setter/getter on $target instead of using a mutator named "attribute", by default.
+
+$('someElement').kb_unbind($target, attribute, callback, transformers, accessors)
+    needs the same arguments and reverses the above.
+
+
  */
-(function ($) {
-    var KBase;
+
+define (
+	[
+		'jquery',
+		'handlebars'
+	], function(
+		$,
+		Handlebars
+	) {
+
+    //'use strict';
+
     var ucfirst = function(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+        if (string !== undefined && string.length) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
     };
 
     var willChangeNoteForName = function(name) {
@@ -33,10 +164,11 @@
     }
 
     var defaultBindingAccessors = function(elem) {
+
         var tagName = $(elem).prop('tagName').toLowerCase();
 
         if (tagName.match(/^(input|select|textarea)$/)) {
-            if ($(elem).attr('type') == 'checkbox') {
+            if ($(elem).attr('type') === 'checkbox') {
                 return {
                     setter : 'checked',
                     getter : 'checked'
@@ -51,13 +183,13 @@
         }
         else {
             return {
-                    setter : 'text',
-                    getter : 'text'
+                    setter : 'html',
+                    getter : 'html'
                 }
         }
     };
 
-    makeBindingCallback = function(elem, $target, attribute, transformers, accessors) {
+    var makeBindingCallback = function(elem, $target, attribute, transformers, accessors) {
 
         return $.proxy(function (e, vals) {
             e.preventDefault();
@@ -65,11 +197,11 @@
 
             var newVal = vals.newValue;
 
-            if (transformers.transformedValue != undefined) {
+            if (transformers.transformedValue !== undefined) {
                 newVal = transformers.transformedValue(newVal);
             }
 
-            if (accessors.setter == 'checked') {
+            if (accessors.setter === 'checked') {
                 $(elem).attr(accessors.setter, newVal);
             }
             else {
@@ -79,11 +211,11 @@
         }, $(elem))
     };
 
-    makeBindingBlurCallback = function(elem, $target, attribute, transformers, accessors) {
+    var makeBindingBlurCallback = function(elem, $target, attribute, transformers, accessors) {
 
         return $.proxy(function (e, vals) {
 
-            if (e.type == 'keypress' && e.which != 13) {
+            if (e.type === 'keypress' && e.which !== 13) {
                 return;
             }
 
@@ -92,7 +224,7 @@
 
             var newVal;
 
-            if (accessors.getter == 'checked') {
+            if (accessors.getter === 'checked') {
                 newVal = this.is(':checked')
                     ? true
                     : false;
@@ -101,9 +233,9 @@
                 newVal = this[accessors.getter]();
             }
 
-            if (newVal != this.data('kbase_bindingValue')) {
+            if (newVal !== this.data('kbase_bindingValue')) {
 
-                if (transformers.validator != undefined) {
+                if (transformers.validator !== undefined) {
                     var validation = transformers.validator(newVal);
 
                     if (! validation.success) {
@@ -129,19 +261,20 @@
                     }
                 }
 
-                if (transformers.reverseTransformedValue != undefined) {
+                if (transformers.reverseTransformedValue !== undefined) {
                     newVal = transformers.reverseTransformedValue(newVal);
                 }
 
                 var setter = $target.__attributes[attribute].setter;
 
                 $target[setter](newVal);
+                this.data('kbase_bindingValue', this[accessors.getter]());
             }
 
         }, $(elem))
     };
 
-    makeBindingFocusCallback = function(elem, transformers, accessors) {
+    var makeBindingFocusCallback = function(elem, transformers, accessors) {
 
         return $.proxy( function (e) {
             e.preventDefault();
@@ -166,11 +299,11 @@
             return this;
         }
 
-        if (accessors == undefined) {
+        if (accessors === undefined) {
             accessors = defaultBindingAccessors(this);
         }
 
-        if (transformers == undefined) {
+        if (transformers === undefined) {
             transformers = {};
         }
 
@@ -197,7 +330,7 @@
                 makeBindingBlurCallback(this, $target, attribute, transformers, accessors)
             )
 
-            if ($(this).attr('type') == 'checkbox') {
+            if ($(this).attr('type') === 'checkbox') {
                 $(this).on(
                     'change.kbaseBinding',
                     makeBindingBlurCallback(this, $target, attribute, transformers, accessors)
@@ -208,11 +341,11 @@
         var target_getter = $target.__attributes[attribute].getter;
         var newVal = $target[target_getter]();
 
-        if (transformers.transformedValue != undefined) {
+        if (transformers.transformedValue !== undefined) {
             newVal = transformers.transformedValue(newVal);
         }
 
-        if (accessors.setter == 'checked') {
+        if (accessors.setter === 'checked') {
             $(this).attr(accessors.setter, newVal);
         }
         else {
@@ -235,11 +368,11 @@
             return this;
         }
 
-        if (accessors == undefined) {
+        if (accessors === undefined) {
             accessors = defaultBindingAccessors(this);
         }
 
-        if (transformers == undefined) {
+        if (transformers === undefined) {
             transformers = {};
         }
 
@@ -266,7 +399,7 @@
                 'keypress.kbaseBinding',
                 makeBindingEnterCallback(this, $target, attribute, transformers, accessors)
             )
-            if ($(this).attr('type') == 'checkbox') {
+            if ($(this).attr('type') === 'checkbox') {
                 $(this).off(
                     'change.kbaseBinding',
                     makeBindingBlurCallback(this, $target, attribute, transformers, accessors)
@@ -278,41 +411,35 @@
 
     };
 
+    var accessors = {
 
-    var widgetRegistry = {};
-    if (KBase === undefined) {
-        KBase = window.KBase = {
-            _functions : {
+        getter :
+            function getter(name) {
+                return function keyGetter() {
+                    return this.valueForKey(name);
+                }
+            },
 
-                getter :
-                    function(name) {
-                        return function() {
-                            return this.valueForKey(name);
-                        }
-                    },
+        setter :
+            function setter (name) {
+                return function (newVal) {
+                    return this.setValueForKey(name, newVal);
+                }
+            },
 
-                setter :
-                    function (name) {
-                        return function (newVal) {
-                            return this.setValueForKey(name, newVal);
-                        }
-                    },
+        getter_setter : function getter_setter (name) {
 
-                getter_setter :
-                    function (name) {
-
-                        return function(newVal) {
-                            if (arguments.length == 1) {
-                                return this.setValueForKey(name, newVal);
-                            }
-                            else {
-                                return this.valueForKey(name);
-                            }
-                        }
-                    },
-            }
-        }
+                return function(newVal) {
+                    if (arguments.length === 1) {
+                        return this.setValueForKey(name, newVal);
+                    }
+                    else {
+                        return this.valueForKey(name);
+                    }
+                }
+            },
     }
+
 
     function subclass(constructor, superConstructor) {
         function surrogateConstructor(){}
@@ -333,66 +460,66 @@
         return $(tag);
     }
 
-    $.KBWidget = function (def) {
+    var KBWidget = function (def) {
         def = (def || {});
-        var name    = def.name;
-        var parent  = def.parent;
-
-        if (parent == undefined) {
-            parent = 'kbaseWidget';
-        }
-
-        var asPlugin= def.asPlugin;
-        if (asPlugin === undefined) {
-            asPlugin = true;
-        }
 
         var Widget = function ($elem) {
-            this.$elem = $elem;
-            this.options = $.extend(true, {}, def.options, this.constructor.prototype.options);
-            return this;
-        }
 
-        if (name) {
-            var directName = name;
-            directName = directName.replace(/^kbase/, '');
-            directName = directName.charAt(0).toLowerCase() + directName.slice(1);
+          var self = this;
 
-            KBase[directName] = function (options, $elem) {
-                var $w = new Widget();
-                if ($elem == undefined) {
-                    $elem = $.jqElem('div');
-                }
-                $w.$elem = $elem;
-                $w.init(options);
-                $w._init = true;
-                $w.trigger('initialized');
-                return $w;
+          //XXX THIS IS FOR BACKWARDS COMPATIBILITY WITH JQUERY PLUGIN SYNTAX __ONLY__
+          if (! (this instanceof Widget)) {
+            var args = $elem;
+            self = new Widget(this, args);
+            $elem = this;
+            if (window.console) {console.warn("deprecated plugin style construction of", def.name, this, args, self, self.prototype);}
+          }
+          //XXX END BACKWARDS HACK
+
+            if ($elem.get(0) != undefined && $elem.get(0).kb_obj != undefined) {
+              return $elem.get(0).kb_obj;
             }
 
-            widgetRegistry[name] = Widget;
-
-            if (def == undefined) {
-                def = parent;
-                parent = 'kbaseWidget';
-                if (def == undefined) {
-                    def = {};
-                }
+            self.$elem = $elem;
+            if ($elem.get(0) != undefined) {
+              $elem.get(0).kb_obj = self;
             }
+
+            var args = Array.prototype.slice.call(arguments, 1);
+
+            $elem[def.name] = function(method) {
+            if (window.console) {console.warn("deprecated plugin style method call of", def.name, method);}
+              return self.prototype[method].apply(
+                  $self[method](
+                    args
+                  )
+              );
+            }
+
+            self.init.apply(this, args);
+
+            self._init = true;
+            self.trigger('initialized');
+
+            return self;
         }
 
-        if (parent) {
-            var pWidget = widgetRegistry[parent];
-            if (pWidget === undefined)
-                throw new Error("Parent widget is not registered");
-            subclass(Widget, pWidget);
-        }
+        Widget.options = $.extend(true, {}, def.options);
+
+        var parent = def.parent
+          ? def.parent
+          : kbaseWidget
+            ? kbaseWidget
+            : function() {};
+
+        subclass(Widget, parent);
+
 
         var defCopy = $.extend(true, {}, def);
 
         Widget.prototype.__attributes = {};
 
-        if (defCopy._accessors != undefined) {
+        if (defCopy._accessors !== undefined) {
 
             //for (var accessor in defCopy._accessors) {
             $.each(
@@ -418,18 +545,18 @@
 
                     Widget.prototype.__attributes[info.name] = info;
 
-                    if (info.setter == info.getter && info.type.match(/rw/)) {
+                    if (info.setter === info.getter && info.type.match(/rw/)) {
 
-                        Widget.prototype[info.getter] = KBase._functions.getter_setter(info.name);
+                        Widget.prototype[info.getter] = accessors.getter_setter(info.name);
 
                     }
                     else {
-                        if (info.type.match(/w/) && info.setter != undefined) {
-                            Widget.prototype[info.setter] = KBase._functions.setter(info.name);
+                        if (info.type.match(/w/) && info.setter !== undefined) {
+                            Widget.prototype[info.setter] = accessors.setter(info.name);
                         }
 
-                        if (info.type.match(/r/) && info.getter != undefined) {
-                            Widget.prototype[info.getter] = KBase._functions.getter(info.name);
+                        if (info.type.match(/r/) && info.getter !== undefined) {
+                            Widget.prototype[info.getter] = accessors.getter(info.name);
                         }
 
                     }
@@ -441,12 +568,11 @@
             defCopy._accessors = undefined;
         }
 
-        var extension = $.extend(true, {}, Widget.prototype.__attributes, widgetRegistry[parent].prototype.__attributes);
+        var extension = $.extend(true, {}, Widget.prototype.__attributes, parent.prototype.__attributes);
         Widget.prototype.__attributes = extension;
 
         for (var prop in defCopy) {
             //hella slick closure based _super method adapted from JQueryUI.
-//*
 
             if ($.isFunction(defCopy[prop])) {
 
@@ -460,15 +586,15 @@
 
                     if (parent) {
                         var _super = function() {
-                            return widgetRegistry[parent].prototype[methodName].apply(this, arguments);
+                            return parent.prototype[methodName].apply(this, arguments);
                         }
 
                         var _superMethod = function(superMethodName) {
-                            return widgetRegistry[parent].prototype[superMethodName].apply(this, Array.prototype.slice.call(arguments, 1));
+                            return parent.prototype[superMethodName].apply(this, Array.prototype.slice.call(arguments, 1));
                         }
                     }
 
-                    return function() {
+                    return function super_closure() {
                         var _oSuper = this._super;
                         var _oSuperMethod = this._superMethod;
                         this._super = _super;
@@ -485,138 +611,23 @@
 
             }
             else {
-//*/
                 Widget.prototype[prop] = defCopy[prop];
             }
         }
 
         if (parent) {
-            Widget.prototype.options = $.extend(true, {}, widgetRegistry[parent].prototype.options, Widget.prototype.options);
+            Widget.prototype.options = $.extend(true, {}, parent.prototype.options, Widget.prototype.options);
         }
 
-        if (asPlugin) {
-            var ctor = function (method, args) {
+        //XXX THIS IS FOR BACKWARDS COMPATIBILITY WITH JQUERY PLUGIN SYNTAX __ONLY__
+        $.fn[def.name] = Widget;
+        //XXX END BACKWARDS HACK
 
-                if (this.length > 1) {
-                    var methodArgs = arguments;
-                    $.each(
-                        this,
-                        function (idx, elem) {
-                            $.fn[name].apply($(elem), methodArgs);
-                        }
-                    )
-                    return this;
-                }
+        return Widget;
 
-                if (this.data(name) == undefined) {
-                    this.data(name, new Widget(this));
-                }
-
-                // Method calling logic
-                if (Widget.prototype[method]) {
-                    return Widget.prototype[method].apply(
-                        this.data(name),
-                        Array.prototype.slice.call(arguments, 1)
-                    );
-                } else if ( typeof method === 'object' || ! method ) {
-                    //return this.data(name).init( arguments );
-                    var args = arguments;
-                    $w = this.data(name);
-                    if ($w._init === undefined) {
-                        $w = Widget.prototype.init.apply($w, arguments);
-                    }
-                    $w._init = true;
-                    $w.trigger('initialized');
-                    return $w;
-                } else {
-                    $.error( 'Method ' +  method + ' does not exist on ' + name);
-                }
-
-                return this;
-
-            };
-            ctor.name = name;
-            $.fn[name] = ctor;
-            $[name]    = $.fn[name];
-        }
-
-        /**
-         * Registers events on this element.
-         * @param {String} name The event name to register
-         * @param {Function} callback The function to call when an event is
-         *        emitted.
-         */
-        this.on = function (evt, callback) {
-            this.$elem.bind(evt, callback);
-            return this;
-        };
-
-        /**
-         * Emits an event.
-         * @param {String} name The event name
-         * @param {Object} data The data to emit with the event
-         */
-        this.emit = function (evt, data) {
-            this.$elem.trigger(evt, data);
-            return this;
-        };
-
-        /**
-         * Unregisters events on this element.
-         * @param {String} name The event name to unregister from
-         */
-        this.off = function (evt) {
-            this.$elem.unbind(evt);
-            return this;
-        };
-
-        if (name !== undefined) {
-            Widget.prototype[name] = function () {
-                return $.fn[name].apply(this.$elem, arguments);
-            }
-
-            return $.fn[name];
-        } else {
-            return this;
-        }
-    }
-    
-    /**
-     * @method registry
-     * The set of globally-registered widgets.
-     * @return {Object} The registry
-     * @return {String} return.key The name of the widget
-     * @return {Object} return.value The widget
-     * @static
-     */
-    $.KBWidget.registry = function () {
-        var registry = {};
-        for (var widget in widgetRegistry) {
-            if (widget !== 'kbaseWidget') {
-                registry[widget] = widgetRegistry[widget];
-            }
-        }
-        return registry;
-    }
-    
-    /**
-     * @method resetRegistry
-     * Unregisters all global widgets.
-     * Note that this does not delete the widgets if another reference to them
-     * is maintained (e.g., by variable assignment).
-     * @static
-     * @chainable
-     */
-    $.KBWidget.resetRegistry = function () {
-        for (var widget in widgetRegistry) {
-            if (widget !== 'kbaseWidget') {
-                delete widgetRegistry[widget];
-            }
-        }
-        return this;
     }
 
-    $.KBWidget(
+    var kbaseWidget = KBWidget(
         {
             name : 'kbaseWidget',
 
@@ -624,10 +635,10 @@
              * Writes text to console.
              * @param {String} txt The text to write.
              */
-            dbg : function (txt) { if (window.console) console.log(txt); },
+            dbg : function dbg (txt) { if (window.console) console.log(txt); },
 
 
-            callAfterInit : function (func) {
+            callAfterInit : function callAfterInit (func) {
                 var $me = this;
                 var delayer = function () {
 
@@ -656,22 +667,75 @@
                 var opts = $.extend(true, {}, this.options);
                 this.options = $.extend(true, {}, opts, args);
 
-                for (attribute in this.__attributes) {
-                    if (this.options[attribute] != undefined) {
-                        this.setValueForKey(attribute, this.options[attribute]);
+                var arg;
+                for (arg in args) {
+                    if (args[arg] === undefined && this.options[arg] !== undefined) {
+                        delete this.options[arg];
                     }
                 }
 
+                var attribute;
+                for (attribute in this.__attributes) {
+                    if (this.options[attribute] !== undefined) {
+                        var setter = this.__attributes[attribute].setter;
+                        this[setter](this.options[attribute]);
+                    }
+                }
+
+                if (this.options.template) {
+                    this.callAfterInit(
+                        $.proxy(function() {
+                            this.appendUI( this.$elem);
+                        }, this)
+                    );
+                }
 
                 return this;
             },
+
+            appendUI : function($elem) {
+                if (this.options.template) {
+                    $.ajax(this.options.template)
+                    .done( $.proxy(function(res) { this.templateSuccess.apply(this, arguments) }, this) )
+                    .fail( $.proxy(function(res) { this.templateFailure.apply(this, arguments) }, this) )
+                }
+
+                return $elem;
+            },
+
+            templateSuccess : function(templateString) {
+
+                var template = Handlebars.compile(templateString);
+
+                var html = template();
+
+                var res = template( this.templateContent() );
+
+                var $res = $.jqElem('span').append(res);
+                this._rewireIds($res, this);
+
+                this.$elem.append( $res  );
+
+
+            },
+
+            templateFailure : function(res) {
+                this.dbg("Template load failure");
+                this.dbg(res);
+            },
+
+            templateContent : function() {
+                return this.options.templateContent || {};
+            },
+
+
 
             /**
              * Sets an alert to display
              * @param {String} msg The message to display
              */
             alert : function(msg) {
-                if (msg == undefined ) {
+                if (msg === undefined ) {
                     msg = this.data('msg');
                 }
                 this.data('msg', msg);
@@ -679,20 +743,19 @@
                 return this;
             },
 
-            valueForKey :
-                function (attribute) {
+            valueForKey : function valueForKey (attribute) {
                     //this.trigger('didAccessValueFor' + name + '.kbase');
                     return this._attributes[attribute];
                 },
 
             setValueForKey :
 
-                function(attribute, newVal) {
+                function setValueForKey(attribute, newVal) {
 
                     var triggerValues = undefined;
                     var oldVal = this.valueForKey(attribute);
 
-                    if (newVal != oldVal) {
+                    if (newVal !== oldVal) {
 
                         var willChangeNote = willChangeNoteForName(attribute);
 
@@ -704,7 +767,7 @@
 
                         this._attributes[attribute] = triggerValues.newValue;
 
-                        if (triggerValues.newValue != oldVal) {
+                        if (triggerValues.newValue !== oldVal) {
                             var didChangeNote  = didChangeNoteForName(attribute);
 
                             this.trigger(didChangeNote, triggerValues);
@@ -714,22 +777,38 @@
                     return this.valueForKey(attribute);
                 },
 
+            setValuesForKeys : function setValuesForKeys (obj) {
+
+                var objCopy = $.extend({}, obj);
+
+                for (attribute in this.__attributes) {
+                    if (objCopy[attribute] !== undefined) {
+                        var setter = this.__attributes[attribute].setter;
+                        this[setter](objCopy[attribute]);
+                        delete objCopy[attribute];
+                    }
+                }
+
+                this.options = $.extend(this.options, objCopy);
+
+            },
+
             /**
              * Sets data.
              * @param {Object} key The key for the data
              * @param {Object} value The data itself
              */
-            data : function (key, val) {
+            data : function data (key, val) {
 
-                if (this.options._storage == undefined) {
+                if (this.options._storage === undefined) {
                     this.options._storage = {};
                 }
 
-                if (arguments.length == 2) {
+                if (arguments.length === 2) {
                     this.options._storage[key] = val;
                 }
 
-                if (key != undefined) {
+                if (key !== undefined) {
                     return this.options._storage[key];
                 }
                 else {
@@ -739,7 +818,7 @@
 
             _rewireIds : function($elem, $target) {
 
-                if ($target == undefined) {
+                if ($target === undefined) {
                     $target = $elem;
                 }
 
@@ -752,6 +831,7 @@
                     $elem.find('[id]'),
                     function(idx) {
                         $target.data($(this).attr('id'), $(this));
+                        $(this).attr('data-id', $(this).attr('id'));
                         $(this).removeAttr('id');
                         }
                 );
@@ -759,13 +839,15 @@
                 return $elem;
             },
 
-            sortCaseInsensitively : function (a,b) {
+            sortCaseInsensitively : function sortCaseInsensitively (a,b) {
+
                      if (a.toLowerCase() < b.toLowerCase()) { return -1 }
                 else if (a.toLowerCase() > b.toLowerCase()) { return 1  }
                 else                            { return 0  }
             },
 
-            sortByKey : function (key, insensitively) {
+            sortByKey : function sortByKey (key, insensitively) {
+
                 if (insensitively) {
                     return function (a,b) {
                              if (a[key].toLowerCase() < b[key].toLowerCase()) { return -1 }
@@ -782,15 +864,15 @@
                 }
             },
 
-            trigger : function () {
+            trigger : function trigger () {
                 this.$elem.trigger.apply(this.$elem, arguments);
             },
 
-            on : function () {
+            on : function on () {
                 this.$elem.on.apply(this.$elem, arguments);
             },
 
-            off : function () {
+            off : function off () {
                 this.$elem.off.apply(this.$elem, arguments);
             },
 
@@ -821,19 +903,6 @@
                 );
             },
 
-/*
-            kb_bind : function($target, attribute, callback) {
-                var event = didChangeNoteForName(attribute);
-                $target.on(event, $target, callback);
-            },
-
-            kb_unbind : function($target, attribute, callback) {
-                var event = didChangeNoteForName(attribute);
-                $target.off(event, callback);
-            },
-*/
-
-//*
             kb_bind : function($target, attribute, callback) {
                 var event = didChangeNoteForName(attribute);
                 this.observe($target, event, callback);
@@ -845,17 +914,17 @@
                 this.unobserve($target, event, callback);
             },
 
-            uuid : function () {
+            uuid : function uuid () {
                 var result = '';
                 for (var i = 0; i < 32; i++) {
                     result += Math.floor(Math.random()*16).toString(16).toUpperCase();
                 }
 
-                return result;
+                return 'uuid-' + result;
             },
-
-//*/
 
         }
     );
-})(jQuery);
+
+    return KBWidget;
+});

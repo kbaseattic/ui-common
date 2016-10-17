@@ -1,7 +1,19 @@
-(function($, undefined) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseBambiRunResultCard",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             bambi_run_result_id: null,
@@ -119,4 +131,4 @@
         }
 
     });
-})(jQuery);
+});

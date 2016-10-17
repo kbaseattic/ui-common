@@ -1,8 +1,10 @@
 /**
+ * Shows a species description taken from Wikipedia.
+ * Also includes a picture, but that'll be under a tab or something.
  * @module widgets/genomes/kbaseWikiDescripton
  * KBase Wiki Description
  * ----------------------
- * This widget shows a description of a genome, via a given genome ID and 
+ * This widget shows a description of a genome, via a given genome ID and
  * location, either Workspace or Central Store.
  *
  * From the Genome, a taxonomy is extracted and used to look up the Genome's
@@ -10,7 +12,7 @@
  * not available, this climbs up the chain to the most detailed part that is.
  * For example, "Vibrio brasiliensis LMG 20546" isn't available, but "Vibrio"
  * is, so that is used for the description.
- * 
+ *
  * The description and a relevant picture are scraped from Wikipedia, using
  * the Wikipedia API, and rendered in the widget.
  *
@@ -18,10 +20,22 @@
  * @author Mike Sneddon [mwsneddon@lbl.gov]
  * @author Dylan Chivian [dcchivian@lbl.gov]
  */
-(function( $, undefined ) {
-    $.KBWidget({
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+ 
+    return KBWidget({
         name: "KBaseWikiDescription",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         /**
@@ -671,4 +685,4 @@
             });
         },
     })
-})( jQuery );
+});

@@ -1,6 +1,16 @@
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery'
+	], function(
+		KBWidget,
+		bootstrap,
+		$
+	) {
 
-$.KBWidget({
+
+return KBWidget({
     name: "kbaseWSModelTable",    
     version: "1.0.0",
     options: {
@@ -65,4 +75,4 @@ $.KBWidget({
 
 
 })
-}( jQuery ) );
+});

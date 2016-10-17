@@ -1,12 +1,12 @@
 /**
  * @class KBaseContigBrowser
  *
- * A KBase widget that displays an interactive view of a single contig. It 
+ * A KBase widget that displays an interactive view of a single contig. It
  * comes with hooks for navigating up and downstream, and a number of
  * different view and styling options.
  *
  * Note: this relies on kbaseContigBrowser.css in order to be pretty.
- * 
+ *
  *       @example
  *       // Setting up the browser:
  *       var browser = $("#browserDiv").KBaseContigBrowser({
@@ -34,12 +34,22 @@
  *        $("#contigStepNext").click(function()  { genomeWidget.moveRightStep(); });
  *        $("#contigZoomIn").click(function()    { genomeWidget.zoomIn(); });
  *        $("#contigZoomOut").click(function()   { genomeWidget.zoomOut(); });
- */ 
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
 
-(function( $, undefined ) {
-    $.KBWidget({
-        name: "KBaseMultiContigBrowser", 
-        parent: "kbaseWidget",
+    return KBWidget({
+        name: "KBaseMultiContigBrowser",
+        
         version: "1.0.0",
         options: {
             genomeID: null,
@@ -81,7 +91,7 @@
 	// subsystems_data, and first parent in each level of the hierarchy.
 	//
 	// seedOntology:  mapping from Role to 3 levels of parents in ontology,
-	// each level is list of parents (non-unique), with level 0 the 
+	// each level is list of parents (non-unique), with level 0 the
 	// broadest (e.g. "Carbohydrates"), level 1 whatever that's called,
 	// level 2 the "Subsystem"s, and Role is level 3 and for convenience
 	// in the code we map it to itself
@@ -102,35 +112,35 @@
         tooltip: null,
         operonFeatures: [],
         $messagePane: null,
-        
+
         noContigs: "No Contigs",
-        
+
         genome:null,
         $selectPanel:null,
         $contigViewPanel:null,
         $featureInfoPanel:null,
-        
+
 
         init: function(options) {
             this._super(options);
 
             var self = this;
-            
+
             // 1. Check that needed options are present (basically contig)
             if (this.options.contig === null) {
                 // throw an error.
             }
-            
-            
+
+
             this.$messagePane = $("<div/>")
                                 //.addClass("kbwidget-message-pane")
                                 //.addClass("kbwidget-hide-message");
             this.$elem.append(this.$messagePane);
             this.showMessage("<center><img src='" + this.options.loadingImage + "'/> loading contig details </center>");
-            
-            
+
+
             var $maindiv = $('<div class="row"/>');
-            
+
             // panel with contig selector
             this.$contigSelect = $("<select>")
                                  .addClass("form-control")
@@ -146,8 +156,8 @@
                                         var contigId = $(this).attr("id");
                                         if (contigId !== self.noContigs) {
                                             //show contig info ...
-                                             //self.trigger("showContig", 
-                                             //   { 
+                                             //self.trigger("showContig",
+                                             //   {
                                             self.contig =  $(this).attr("id");
                                             self.options.contig =  $(this).attr("id");
                                             self.render();
@@ -166,22 +176,22 @@
                               .append(this.$contigSelect)
                               .append(this.$contigButton));
             $maindiv.append(this.$selectPanel);
-            
+
             // panel where contig browser is defined
             var $contigViewPanelWrapper = $('<div class="col-md-6"/>');
             this.$contigViewPanel = $('<div id="contigmainview" align="center"/>').css({'overflow' : 'auto'});
             $contigViewPanelWrapper
                 .append(this.$contigViewPanel)
                 .append("<div>").KBaseContigBrowserButtons({ browser: self });
-            
+
             $maindiv.append($contigViewPanelWrapper);
-            
+
             // panel where feature info is displayed
             this.$featureInfoPanel = $('<div class="col-md-3"/>').html("<b>Click on a feature to view details</b>");
             $maindiv.append(this.$featureInfoPanel);
-            
-            
-            
+
+
+
             this.cdmiClient = new CDMI_API(this.cdmiURL);
             this.proteinInfoClient = new ProteinInfo(this.proteinInfoURL);
 
@@ -190,7 +200,7 @@
             $.when(prom).done($.proxy(function(genome) {
                 genome = genome[0].data;
                 self.genome = genome;
-                
+
                 var contigsToLengths = {};
                 if (genome.contig_ids && genome.contig_ids.length > 0) {
                     for (var i=0; i<genome.contig_ids.length; i++) {
@@ -218,21 +228,21 @@
 
                 self.populateContigSelector(contigsToLengths);
                 self.$elem.append($maindiv);
-                
+
                 self.hideMessage();
-                
+
                 // can't seem to get this working!  it always sizes it wrong, but I don't know why
                 if (genome.contig_ids.length>0) {
                     self.contig =  genome.contig_ids[0];
                     self.options.contig =  genome.contig_ids[0];
                     self.render();
                 }
-                
+
 
             }, this));
             $.when(prom).fail($.proxy(function(error) { this.renderError(error); }, this));
-            
-            
+
+
             var self = this;
 
             if (!this.options.onClickFunction) {
@@ -248,27 +258,27 @@
                     if (d.function) {
                         $infoTable.append(self.addInfoRow("Function", d.function));
                     }
-                    
+
                     self.$featureInfoPanel.append($infoTable);
-                    
+
                    // {"id":"kb|g.0.CDS.128390","location":[["kb|g.0.c.1",9306,"+",588]],"type":"CDS","function":"Molybdopterin biosynthesis Mog protein, molybdochelatase","protein_translation":"MNTLRIGLVSISDRASSGVYQDKGIPALEEWLTSALTTPFELETRLIPDEQAIIEQTLCELVDEMSCHLVLTTGGTGPARRDVTPDATLAVADREMPGFGEQMRQISLHFVPTAILSRQVGVIRKQALILNLPGQPKSIKETLEGVKDAEGNVVVHGIFASVPYCIQLLEGPYVETAPEVVAAFRPKSARRDVSE","aliases":[],"annotations":[["Initial gene call performed by call_genes","genome annotation service",1391812524],["Set function to\nMolybdopterin biosynthesis Mog protein, molybdochelatase\nby assign_function_to_prot with otu= score=152 nonoverlap=23 hits=152 figfam=FIG00002951","genome annotation service",1391812524]],"feature_location":[["kb|g.0.c.1",9306,"+",588]],"feature_function":"Molybdopterin biosynthesis Mog protein, molybdochelatase","feature_id":"kb|g.0.CDS.128390","range":[9306,9893],"track":0}
-                    
-                    
+
+
                 }
             }
-            
+
             return this;
         },
 
         addInfoRow: function(a, b) {
             return "<tr><th>" + a + "</th><td>" + b + "</td></tr>";
         },
-        
+
 
 
 
         /**
-         * 
+         *
          */
         render: function() {
             this.loading(false);
@@ -308,7 +318,7 @@
 	    // load SEED info
 	    this.loadSeedOntology(this.wait_for_seed_load);
 
-	    
+
 
 
             return this;
@@ -334,8 +344,8 @@
 
 	    return true;
 	},
-        
-        
+
+
         populateContigSelector: function(contigsToLengths) {
             this.$contigSelect.empty();
             if (!contigsToLengths || contigsToLengths.length == 0)
@@ -348,8 +358,8 @@
                                           .append(contig + " - " + contigsToLengths[contig] + " bp"));
             }
         },
-        
-        
+
+
 
         /**
          * An internal class used to define and calculate which features belong on which tracks.
@@ -422,7 +432,7 @@
                         //     return true;
                         // }
                     }
-                    
+
                 }
                 return false;
             };
@@ -490,7 +500,7 @@
             }
 
             // we already have the genome, so we don't have to get it again!
-            
+
             //var obj = this.buildObjectIdentity(this.options.workspaceID, this.options.genomeID);
             //var prom = this.options.kbCache.req('ws', 'get_objects', [obj]);
             //$.when(prom).fail($.proxy(function(error) {
@@ -501,7 +511,7 @@
                 // no, this isn't ideal. it should stream things.
                 // but the list of features is just that - a list. we'll need an api call, eventually, that
                 // can fetch the list of features in some range.
-                
+
                 var genome = self.genome;
 
                 this.contigLength = -1; // LOLOLOL.
@@ -697,17 +707,17 @@
             }
             else {
                 if (self.options.centerFeature && useCenter) {
-                    self.cdmiClient.fids_to_feature_data([self.options.centerFeature], 
+                    self.cdmiClient.fids_to_feature_data([self.options.centerFeature],
                         renderFromCenter
                     );
                 }
                 else {
-                    self.cdmiClient.region_to_fids([self.options.contig, self.options.start, '+', self.options.length], 
+                    self.cdmiClient.region_to_fids([self.options.contig, self.options.start, '+', self.options.length],
                         getFeatureData
                     );
                 }
             }
-            
+
         },
 
         /**
@@ -748,8 +758,8 @@
         },
 
         adjustHeight : function() {
-            var neededHeight = this.numTracks * 
-                               (this.options.trackThickness + this.options.trackMargin) + 
+            var neededHeight = this.numTracks *
+                               (this.options.trackThickness + this.options.trackMargin) +
                                this.options.topMargin + this.options.trackMargin;
 
             if (neededHeight > this.svg.attr("height")) {
@@ -776,31 +786,31 @@
                          .classed("kbcb-center", function(d) { return self.isCenterFeature(d); })
 		         .style("fill", function (d) { return self.calcFillColorByProtAnnot(d,0); })
                          .attr("id", function(d) { return d.feature_id; })
-                         .on("mouseover", 
-                                function(d) { 
-                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker()); 
+                         .on("mouseover",
+                                function(d) {
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).darker());
                                     self.tooltip = self.tooltip.text(d.feature_id + ": " + d.feature_function);
-                                    return self.tooltip.style("visibility", "visible"); 
+                                    return self.tooltip.style("visibility", "visible");
                                 }
                             )
-                         .on("mouseout", 
-                                function() { 
-                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter()); 
-                                    return self.tooltip.style("visibility", "hidden"); 
+                         .on("mouseout",
+                                function() {
+                                    d3.select(this).style("fill", d3.rgb(d3.select(this).style("fill")).brighter());
+                                    return self.tooltip.style("visibility", "hidden");
                                 }
                             )
-                         .on("mousemove", 
-                                function() { 
+                         .on("mousemove",
+                                function() {
                                     return self.tooltip.style("top", (d3.event.pageY+15) + "px").style("left", (d3.event.pageX-10)+"px");
                                 }
                             )
-                         .on("click", 
+                         .on("click",
                                 function(d) {
                                     if (self.options.onClickFunction) {
                                         self.options.onClickFunction(this, d);
                                     }
                                     else {
-                                        self.highlight(this, d); 
+                                        self.highlight(this, d);
                                     }
                                 }
                             );
@@ -812,17 +822,17 @@
 
 
 
-            
+
             self.xScale = self.xScale
                               .domain([self.options.start, self.options.start + self.options.length]);
-            
-            
+
+
 
             self.xAxis = self.xAxis
                              .scale(self.xScale);
-            
+
             self.axisSvg.call(self.xAxis);
-            
+
             self.resize();
             this.loading(true);
         },
@@ -856,7 +866,7 @@
                     return a[0] - b[0];
                 });
 
-                var mid = this.calcYCoord(feature.feature_location[0], feature.track) + 
+                var mid = this.calcYCoord(feature.feature_location[0], feature.track) +
                           this.calcHeight(feature.feature_location[0])/2;
 
                 for (var i=0; i<coords.length-1; i++) {
@@ -918,7 +928,7 @@
             if (location[2] === "-")
                 x = location[1] - location[3] + 1;
 
-            return (x - this.options.start) / this.options.length * this.options.svgWidth; // + this.options.leftMargin;    
+            return (x - this.options.start) / this.options.length * this.options.svgWidth; // + this.options.leftMargin;
         },
 
         calcYCoord : function(location, track) {
@@ -953,7 +963,7 @@
 	calcFillColorByProtAnnot : function(feature,annot_num) {
 	    if (feature.feature_type !== "CDS")    // only paint protein coding
                 return "#000";
-	    
+
 	    // SEED
 	    //
 	    // SEED has 4 levels of classification. We are defining 0 as broadest category (e.g. "Carbohydrates") and 3 as the Subsystem Role (e.g. "Beta-galactosidase (EC 3.2.1.23)")
@@ -998,17 +1008,17 @@
 		return "#CCC";
 	    var seedClassification = self.seedOntology[annot][level][alt_class_i];
 	    //}
-	    
+
 	    return self.seedColors[level][seedClassification];
 	},
 
 
 	/**
           I need to load the SEED subsystem ontology. I am going to use
-          the "subsys.txt" file I found at: 
+          the "subsys.txt" file I found at:
                 ftp.theseed.org/subsystems/subsys.txt
-          
-          Note that this file is updated weekly, but not versioned. It's 
+
+          Note that this file is updated weekly, but not versioned. It's
           possible that errors will arise because the subsystems assigned
           in the genome object are out of date relative to the current
           subsys.txt file.
@@ -1049,7 +1059,7 @@
 			    if (data[i][ROLE_INDEX] === "")
 				continue;
 			    seedRole = data[i][ROLE_INDEX];
-			    if (seedOntology[seedRole] === undefined) 
+			    if (seedOntology[seedRole] === undefined)
 				seedOntology[seedRole] = [];
 			    if (seedTermSeen[ROLE_INDEX][seedRole] === undefined) {
 				seedTermSeen[ROLE_INDEX][seedRole] = true;
@@ -1063,7 +1073,7 @@
 
 				// some node names are an empty string "".
 				// set to a modified version of their parent
-				data[i][j] = (data[i][j] === "") ? "--- " + data[i][j-1] + " ---" : data[i][j]; 
+				data[i][j] = (data[i][j] === "") ? "--- " + data[i][j-1] + " ---" : data[i][j];
 
 				seedOntology[seedRole][j].push(data[i][j]);
 
@@ -1076,7 +1086,7 @@
 
 			// wait to enforce completion of async d3 method
 			self.wait_for_seed_load();
-		}); 
+		});
 
 		// DEBUG
 		/*
@@ -1148,7 +1158,7 @@
 		}*/
 
 		//this.seedColors = seedColors;
-		
+
 		return true;
 	},
 
@@ -1156,7 +1166,7 @@
             // unhighlight others - only highlight one at a time.
             // if ours is highlighted, recenter on it.
 
-            
+
             this.recenter(feature);
             return; // skip the rest for now.
 
@@ -1181,7 +1191,7 @@
                 this.options.onClickUrl(feature.feature_id);
             else
                 this.update(true);
-        },      
+        },
 
         resize : function() {
             var newWidth = Math.min(this.$elem.parent().width(), this.options.svgWidth);
@@ -1218,7 +1228,7 @@
         },
 
         /**
-         * Moves the viewport to the right end (furthest downstream) of the contig, maintaining the 
+         * Moves the viewport to the right end (furthest downstream) of the contig, maintaining the
          * current view window size.
          * @method
          */
@@ -1233,7 +1243,7 @@
             else
                 this.showMessage("<img src='" + this.options.loadingImage + "'/>");
         },
-        
+
         showMessage: function(message) {
         // kbase panel now does this for us, should probably remove this
           var span = $("<span/>").append(message);
@@ -1247,8 +1257,8 @@
         // kbase panel now does this for us, should probably remove this
             this.$messagePane.hide();
         },
-        
-        
+
+
         getData: function() {
             return {
                 type: "Contig",
@@ -1265,7 +1275,7 @@
             else if (error.error && error.error.message)
                 errString = error.error.message;
 
-            
+
             var $errorDiv = $("<div>")
                             .addClass("alert alert-danger")
                             .append("<b>Error:</b>")
@@ -1290,4 +1300,4 @@
         },
     });
 
-})( jQuery );
+});

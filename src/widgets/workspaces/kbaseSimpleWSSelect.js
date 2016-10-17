@@ -1,6 +1,18 @@
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbasePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		kbasePrompt
+	) {
 
-$.KBWidget({
+
+return KBWidget({
     name: "kbaseSimpleWSSelect",      
     version: "1.0.0",
     options: {
@@ -18,7 +30,7 @@ $.KBWidget({
         this.show = function() {
             console.log('here2')
             $('body').append('<div id="save-to-ws-modal"></div>');
-            var prompt = $('#save-to-ws-modal').kbasePrompt({
+            var prompt =  new kbasePrompt($('#save-to-ws-modal'), {
                 title : 'Select a workspace',
                 modalClass : '',
                 controls : [
@@ -69,4 +81,4 @@ $.KBWidget({
         return this;
     }  //end init
 })
-}( jQuery ) );
+});

@@ -2,8 +2,7 @@
 
     Easy widget to serve as a tabbed container.
 
-    var $tabs = $('#tabs').kbaseTabs(
-        {
+    var $tabs =  new kbaseTabs($('#tabs'), {
             tabPosition : 'bottom', //or left or right or top. Defaults to 'top'
             canDelete : true,       //whether or not the tab can be removed. Defaults to false.
             tabs : [
@@ -32,12 +31,26 @@
 
 */
 
-(function( $, undefined ) {
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget',
+		'kbaseDeletePrompt'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget,
+		kbaseDeletePrompt
+	) {
 
 
-    $.KBWidget({
 
-		  name: "kbaseTabs",
+    return KBWidget({
+
+		   name: "kbaseTabs",
 
         version: "1.0.0",
 
@@ -69,16 +82,16 @@
             }
 
             var $block =
-                $('<div></div>')
+                $.jqElem('div')
                     .addClass('tabbable')
             ;
 
-            var $tabs = $('<div></div>')
+            var $tabs = $.jqElem('div')
                 .addClass('tab-content')
                 .attr('id', 'tabs-content')
                 .css('height', this.tabsHeight())
             ;
-            var $nav = $('<ul></ul>')
+            var $nav = $.jqElem('ul')
                 .addClass('nav nav-tabs')
                 .attr('id', 'tabs-nav')
             ;
@@ -216,7 +229,7 @@
             }
         },
 
-        closeIcon : function () { return 'icon-remove'; },
+        closeIcon : function () { return 'fa fa-times'; },
 
         deleteTabToolTip : function (tabName) {
             return 'Remove ' + tabName;
@@ -236,27 +249,28 @@
             var $tab = this.data('tabs')[tabName];
             var $nav = this.data('nav')[tabName];
 
-            if ($nav.hasClass('active')) {
-                if ($nav.next('li').length) {
-                    $nav.next().find('a').trigger('click');
+            if ($tab && $nav) {
+                if ($nav.hasClass('active')) {
+                    if ($nav.next('li').length) {
+                        $nav.next().find('a').trigger('click');
+                    }
+                    else {
+                        $nav.prev('li').find('a').trigger('click');
+                    }
                 }
-                else {
-                    $nav.prev('li').find('a').trigger('click');
-                }
+    
+                $tab.remove();
+                $nav.remove();
+    
+                this.data('tabs')[tabName] = undefined;
+                this.data('nav')[tabName] = undefined;
             }
-
-            $tab.remove();
-            $nav.remove();
-
-            this.data('tabs')[tabName] = undefined;
-            this.data('nav')[tabName] = undefined;
         },
 
         shouldShowTab : function (tab) { return 1; },
 
         deletePrompt : function(tabName) {
-            var $deleteModal = $('<div></div>').kbaseDeletePrompt(
-                {
+            var $deleteModal =  new kbaseDeletePrompt($('<div></div>'), {
                     name     : tabName,
                     callback : this.deleteTabCallback(tabName),
                 }
@@ -286,4 +300,4 @@
 
     });
 
-}( jQuery ) );
+});

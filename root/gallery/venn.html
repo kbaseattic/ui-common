@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+
+        <!--<link href="../../ext/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+        <script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>-->
+
+<link href="ext/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<link href="ext/font-awesome/4.0.3/css/font-awesome.min.css" rel="stylesheet">
+
+<script data-main = '../../src/kbpaths' src = '../../ext/requirejs/2.1.9/require.js'></script>
+
+<script type = 'text/javascript'>
+    var kb_use_require = true;
+    var kb_norequire = function(deps, callback) {
+        callback(jQuery);
+    };
+    var kb_nodefine = function(module, deps, callback) {
+        callback(jQuery);
+    };
+    if (kb_use_require) {
+        kb_define = define;
+        kb_require = require;
+    }
+    else {
+        kb_define = kb_nodefine;
+        kb_require = kb_norequire;
+    }
+</script>
+
+
+
+
+<style>
+.bar {
+
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+</style>
+
+
+        <script type = 'text/javascript'>
+            <!--
+
+                function getParameterByName(name) {
+                  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+                  var regexS = "[\\?&]" + name + "=([^&#]*)";
+                  var regex = new RegExp(regexS);
+                  var results = regex.exec(window.location.search);
+                  if(results == null)
+                    return "";
+                  else
+                    return decodeURIComponent(results[1].replace(/\+/g, " "));
+                }
+
+                kb_require(['kbpaths'], function() {
+                    kb_require(['jquery', 'd3', 'vis', 'kbaseFormBuilder',
+                        ], function($) {
+                        $(function() {
+
+                            var $venn = $('#venn').kbaseVenndiagram();
+
+                            var $vennForm = $('#vennForm').kbaseFormBuilder(
+                                {
+                                    rawLabels : true,
+                                    canSubmit : true,
+                                    canReset : true,
+                                    submitCallback : function(e) {
+                                        if (e) {
+                                            e.preventDefault(); e.stopPropagation();
+                                        }
+                                        var newOptions = $vennForm.getFormValuesAsObject();
+
+                                        $('#venn').removeData('kbaseVenndiagram');
+                                        $('#venn').empty();
+
+                                        $venn = $('#venn').kbaseVenndiagram(newOptions);
+                                        $('#vennInput').text(JSON.stringify(newOptions, undefined, 2));
+
+                                        return false;
+                                    },
+                                    elements : [
+                                        {
+                                            key : 'xGutter',
+                                            type : 'string',
+                                            placeholder : $venn.options.xGutter,
+                                        },
+                                        {
+                                            key : 'yGutter',
+                                            type : 'string',
+                                            placeholder : $venn.options.yGutter,
+                                        },
+                                        {
+                                            key : 'xPadding',
+                                            type : 'string',
+                                            placeholder : $venn.options.xPadding,
+                                        },
+                                        {
+                                            key : 'yPadding',
+                                            type : 'string',
+                                            placeholder : $venn.options.yPadding,
+                                        },
+
+                                        {
+                                            key : 'debug',
+                                            type : 'boolean',
+                                        },
+                                        {
+                                            key : 'labels',
+                                            type : 'boolean',
+                                            value : true,
+                                        },
+                                        {
+                                            key : 'xLabel',
+                                            type : 'string',
+                                            value : 'Some useful experiment',
+                                        },
+                                        {
+                                            key : 'transitionTime',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                            placeholder : $venn.options.transitionTime,
+                                        },
+                                        {
+                                            key : 'radius',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                        },
+                                        {
+                                            key : 'radiusScale',
+                                            type : 'string',
+                                            validate : {regex : new RegExp(/^\d*(\.\d+)?$/), msg : 'Must be numeric'},
+                                            placeholder : $venn.options.radiusScale,
+                                        },
+                                        {
+                                            key : 'circleFontSize',
+                                            type : 'string',
+                                            placeholder : $venn.options.circleFontSize,
+                                        },
+                                        {
+                                            key : 'intersectFontSize',
+                                            type : 'string',
+                                            placeholder : $venn.options.intersectFontSize,
+                                        },
+                                        {
+                                            key : 'dataset',
+                                            type : 'textarea',
+                                            json : true,
+                                            value :
+{
+    "c1": {
+      "label": "Molecular Function",
+      "value": 200,
+      "tooltip": "c1!",
+      "action": "alert(d.label);",
+      "fillColor": "purple"
+    },
+    "c2": {
+      "label": "Biological Process",
+      "value": 200,
+      "tooltip": "c2!",
+      "fillColor": "cyan"
+    },
+    "c3": {
+      "label": "Cellular Component",
+      "value": 200,
+      "tooltip": "c3!",
+      "fillColor": "yellow"
+    },
+    "c1c2": {
+      "value": 23,
+      "tooltip": "c1c2!"
+    },
+    "c1c3": {
+      "value": 161,
+      "tooltip": "c1c3!"
+    },
+    "c2c3": {
+      "value": 56,
+      "tooltip": "c2c3!"
+    },
+    "c1c2c3": {
+      "value": 273,
+      "tooltip": "c1c2c3!"
+    }
+  }
+                                        },
+
+                                    ]
+                                }
+                            );
+
+                            $vennForm.options.submitCallback();
+
+
+                    });
+                });});
+
+
+            //-->
+        </script>
+    </head>
+
+    <body>
+
+        <div>
+            Simple demonstrations of visualization widgets. Mouse over the charts, they're all interactive.<br>
+            The force directed graph has draggable nodes, and they can be selected by drawing on the box.
+        </div>
+
+        <!--<div style = 'max-width : 800px; overflow : scroll'>-->
+            <div class = 'row'>
+                <div class = 'col-md-6'>
+                    <div id = 'venn' style = 'border : 1px solid green; width : 800px; height : 800px; float : left'></div>
+                </div>
+                <div class = 'col-md-6'>
+                    <div style = 'border : 1px solid black' id = 'vennForm'></div>
+                </div>
+                <div class = 'col-md-6' style = 'white-space : pre'>
+                    <div id = 'vennInput'></div>
+                </div>
+            </div>
+        <!--</div>-->
+
+        <div style = 'display : none'>
+        <div id = 'treeCompare'></div>
+            <div id = 'linechartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'treechartWidget' style = 'border : 1px solid green; width : 800px; height : 800px'></div>
+            <div id = 'barchartWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'scatterplotWidget' style = 'border : 1px solid green; width : 500px; height : 300px'></div>
+            <div id = 'heatmapWidget' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+            <div id = 'forcedNetwork' style = 'border : 1px solid green; width : 500px; height : 500px'></div>
+
+            <div id = 'plantsNetworkNarrative' style = 'border : 1px solid green;'></div>
+        </div>
+
+
+    </body>
+
+</html>

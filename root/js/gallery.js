@@ -4,7 +4,7 @@ WidgetGallery.Router.map(function () {});
 
 WidgetGallery.IndexRoute = Ember.Route.extend({
     model: function () {
-        var registry = $.KBWidget.registry();
+        var registry = return KBWidget.registry();
         return Object.keys(registry);
     }
 });

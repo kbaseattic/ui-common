@@ -25,13 +25,13 @@ angular.module('lp-directives')
             if (scope.type == 'models') {
                 var ws = scope.ws ? scope.ws : "KBaseCDMModels";
 
-                var p = $(element).kbasePanel({title: 'KBase Models',
+                var p = kbasePanel($(element), {title: 'KBase Models',
                                                    rightLabel: ws});
                 p.loading();
                 var prom = kb.req('ws', 'list_workspace_objects',
                                     {type: 'Model', workspace: ws})
                 $.when(prom).done(function(d){
-                    $(p.body()).kbaseWSModelTable({ws: ws, data: d});
+kbaseWSModelTable(                    $(p.body()), {ws: ws, data: d});
                     $(document).on('modelClick', function(e, data) {
                         var url = '/models/'+ws+'/'+data.id;
                         scope.$apply( $location.path(url) );
@@ -40,33 +40,33 @@ angular.module('lp-directives')
             } else if (scope.type == 'media') {
                 var ws = scope.ws ? scope.ws : "KBaseMedia";
 
-                var p = $(element).kbasePanel({title: 'KBase Media',
+                var p = kbasePanel($(element), {title: 'KBase Media',
                                                    rightLabel: ws});
                 p.loading();
                 var prom = kb.req('ws', 'list_workspace_objects',
                                     {type: 'Media', workspace: ws});
 
                 $.when(prom).done(function(d){
-                    $(element).kbaseWSMediaTable({ws: ws, data: d});
+kbaseWSMediaTable(                    $(element), {ws: ws, data: d});
                     $(document).on('mediaClick', function(e, data) {
                         var url = '/media/'+ws+'/'+data.id;
                         scope.$apply( $location.path(url) );
                     });
                 })
             } else if (scope.type == 'rxns') {
-                var p = $(element).kbasePanel({title: 'Biochemistry Reactions'});
+                var p = kbasePanel($(element), {title: 'Biochemistry Reactions'});
                 p.loading();
 
-                var bioTable = $(p.body()).kbaseBioRxnTable();
+                var bioTable = kbaseBioRxnTable($(p.body()));
 
                 var prom = getBio('rxns', p.body(), function(data) {
                     bioTable.loadTable(data);
                 });
             } else if (scope.type == 'cpds') {
-                var p = $(element).kbasePanel({title: 'Biochemistry Compounds'});
+                var p = kbasePanel($(element), {title: 'Biochemistry Compounds'});
                 p.loading();
 
-                var bioTable = $(p.body()).kbaseBioCpdTable();
+                var bioTable = kbaseBioCpdTable($(p.body()));
 
                 var prom = getBio('cpds', p.body(), function(data) {
                     bioTable.loadTable(data);
@@ -81,7 +81,7 @@ angular.module('lp-directives')
         link: function(scope, element, attr) {
             var ws = scope.ws ? scope.ws : "AKtest";
 
-            $(element).kbaseMemeTable({ws: ws, auth: scope.USER_TOKEN, userId: scope.USER_ID});
+kbaseMemeTable(            $(element), {ws: ws, auth: scope.USER_TOKEN, userId: scope.USER_ID});
             $(document).on('memeClick', function(e, data) {
                 var url = '/meme/'+ws+'/'+data.id;
                 scope.$apply( $location.path(url) );
@@ -93,7 +93,7 @@ angular.module('lp-directives')
 .directive('modelmeta', function() {
     return {
         link: function(scope, element, attrs) {
-            var p = $(element).kbasePanel({title: 'Model Info',
+            var p = kbasePanel($(element), {title: 'Model Info',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -101,7 +101,7 @@ angular.module('lp-directives')
             var prom = kb.req('ws', 'get_objectmeta',
                         {type:'Model', id: scope.id, workspace: scope.ws});
             $.when(prom).done(function(data){
-                $(p.body()).kbaseModelMeta({data: data});
+kbaseModelMeta(                $(p.body()), {data: data});
             })
         }
     };
@@ -112,7 +112,7 @@ angular.module('lp-directives')
         link: function(scope, ele, attrs) {
             var ws = scope.ws;
             var id = scope.id;
-            /*var p = $(element).kbasePanel({title: 'Model Details',
+            /*var p = kbasePanel($(element), {title: 'Model Details',
                                            rightLabel: ws ,
                                            subText: id,
                                            type: 'FBAModel',
@@ -130,7 +130,7 @@ angular.module('lp-directives')
                 $rootScope.org_name = data[0].data.name;
                 scope.$apply();
 
-                $(ele).kbaseModelTabs({modelsData: data, api: kb.fba, ws: ws});
+kbaseModelTabs(                $(ele), {modelsData: data, api: kb.fba, ws: ws});
                 $(document).on('rxnClick', function(e, data) {
                     var url = '/rxns/'+data.ids;
                     scope.$apply( $location.path(url) );
@@ -152,7 +152,7 @@ angular.module('lp-directives')
         link: function(scope, element, attrs) {
             var ws = scope.ws;
             var id = scope.id;
-            var p = $(element).kbasePanel({title: 'Core Metabolic Pathway',
+            var p = kbasePanel($(element), {title: 'Core Metabolic Pathway',
                                            rightLabel: ws,
                                            subText: id,
                                            type: 'FBAModel',
@@ -162,7 +162,7 @@ angular.module('lp-directives')
             var prom = kb.req('fba', 'get_models',
                         {models: [id], workspaces: [ws]})
             $.when(prom).done(function(data) {
-                $(p.body()).kbaseModelCore({ids: [id],
+kbaseModelCore(                $(p.body()), {ids: [id],
                                             workspaces : [ws],
                                             modelsData: data});
                 $(document).on('coreRxnClick', function(e, data) {
@@ -176,7 +176,7 @@ angular.module('lp-directives')
 .directive('modelopts', function() {
     return {
         link: function(scope, element, attrs) {
-            $(element).kbaseModelOpts({ids: scope.id,
+kbaseModelOpts(            $(element), {ids: scope.id,
                                        workspaces : scope.ws})
         }
     };
@@ -184,14 +184,14 @@ angular.module('lp-directives')
 .directive('fbameta', function() {
     return {
         link: function(scope, element, attrs) {
-            var p = $(element).kbasePanel({title: 'FBA Info',
+            var p = kbasePanel($(element), {title: 'FBA Info',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
             var prom = kb.req('ws', 'get_objectmeta',
                         {type:'FBA', id: scope.id, workspace: scope.ws});
             $.when(prom).done(function(data){
-                $(p.body()).kbaseFbaMeta({data: data});
+kbaseFbaMeta(                $(p.body()), {data: data});
             });
         }
     };
@@ -200,14 +200,14 @@ angular.module('lp-directives')
 .directive('models', function($location, $rootScope, $stateParams) {
     return {
         link: function(scope, element, attrs) {
-            element.kbaseModelTabs({ws: $stateParams.ws, name: $stateParams.id})
+kbaseModelTabs(            element, {ws: $stateParams.ws, name: $stateParams.id})
         }
     };
 })
 .directive('fbas', function($location, $rootScope, $stateParams) {
     return {
         link: function(scope, element, attrs) {
-            element.kbaseFbaTabs({ws: $stateParams.ws, name: $stateParams.id});
+kbaseFbaTabs(            element, {ws: $stateParams.ws, name: $stateParams.id});
         }
     }
 })
@@ -283,7 +283,7 @@ angular.module('lp-directives')
                     $('.fba-container').remove();
                     var container = $('<div class="fba-container">');
                     $(element).append(container);
-                    container.kbaseFbaTabs({fbaData: data});
+kbaseFbaTabs(                    container, {fbaData: data});
 
                     $rootScope.org_name = data[0].org_name;
                     scope.$apply();
@@ -413,7 +413,7 @@ angular.module('lp-directives')
 .directive('fbacore', function($location) {
     return {
         link: function(scope, element, attrs) {
-            var p = $(element).kbasePanel({title: 'Core Metabolic Pathway',
+            var p = kbasePanel($(element), {title: 'Core Metabolic Pathway',
                                            rightLabel: scope.ws,
                                            subText: scope.id,
                                            type: 'FBA',
@@ -430,7 +430,7 @@ angular.module('lp-directives')
                 var prom2 = kb.req('fba', 'get_models',
                         {models: [objid], workspaces: [wsid]});
                 $.when(prom2).done(function(models_data){
-                    $(p.body()).kbaseModelCore({ids: [scope.id],
+kbaseModelCore(                    $(p.body()), {ids: [scope.id],
                                                 workspaces : [scope.ws],
                                                 modelsData: models_data,
                                                 fbasData: fbas_data});
@@ -449,7 +449,7 @@ angular.module('lp-directives')
     return {
         link: function(scope, element, attrs) {
             var map_ws = 'nconrad:paths';
-            var p = $(element).kbasePanel({title: 'Pathways',
+            var p = kbasePanel($(element), {title: 'Pathways',
                                            type: 'Pathway',
                                            rightLabel: map_ws,
                                            subText: scope.id});
@@ -472,7 +472,7 @@ angular.module('lp-directives')
 .directive('pathway', function() {
     return {
         link: function(scope, element, attrs) {
-            var p = $(element).kbasePanel({title: 'Metabolic Pathway',
+            var p = kbasePanel($(element), {title: 'Metabolic Pathway',
                                            type: 'Pathway',
                                            rightLabel: 'N/A',
                                            subText: scope.id});
@@ -481,7 +481,7 @@ angular.module('lp-directives')
                         [{name: scope.id, workspace: scope.ws}]);
             $.when(p1).done(function(d) {
                 var d = d[0].data;
-                $(p.body()).kbasePathway({ws: scope.ws,
+kbasePathway(                $(p.body()), {ws: scope.ws,
                                           mapID: scope.id,
                                           mapData: d,
                                           editable:true})
@@ -497,7 +497,7 @@ angular.module('lp-directives')
 .directive('mediadetail', function() {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Media Details',
+            var p = kbasePanel($(ele), {title: 'Media Details',
                                            type: 'Media',
                                            rightLabel: scope.ws,
                                            subText: scope.id,
@@ -508,7 +508,7 @@ angular.module('lp-directives')
                     {medias: [scope.id], workspaces: [scope.ws]})
             //var prom = kb.ws.get_objects([{workspace:scope.ws, name: scope.id}])
             $.when(prom).done(function(data) {
-                $(p.body()).kbaseMediaEditor({ids: [scope.id],
+kbaseMediaEditor(                $(p.body()), {ids: [scope.id],
                                               workspaces : [scope.ws],
                                               data: data});
             }).fail(function(e){
@@ -524,11 +524,11 @@ angular.module('lp-directives')
 .directive('phenotype', function() {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Phenotype Set Data',
+            var p = kbasePanel($(ele), {title: 'Phenotype Set Data',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
 
-            $(p.body()).kbasePhenotypeSet({ws: scope.ws, name: scope.id})
+kbasePhenotypeSet(            $(p.body()), {ws: scope.ws, name: scope.id})
 
         }
     }
@@ -537,11 +537,11 @@ angular.module('lp-directives')
 .directive('promconstraint', function() {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'PROM Constraint Data',
+            var p = kbasePanel($(ele), {title: 'PROM Constraint Data',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
 
-            $(p.body()).kbasePromConstraint({ws: scope.ws, name: scope.id})
+kbasePromConstraint(            $(p.body()), {ws: scope.ws, name: scope.id})
 
         }
     }
@@ -550,11 +550,11 @@ angular.module('lp-directives')
 .directive('regulome', function() {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Regulome Data',
+            var p = kbasePanel($(ele), {title: 'Regulome Data',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
 
-            $(p.body()).kbaseRegulome({ws: scope.ws, name: scope.id})
+kbaseRegulome(            $(p.body()), {ws: scope.ws, name: scope.id})
 
         }
     }
@@ -563,11 +563,11 @@ angular.module('lp-directives')
 .directive('expressionseries', function() {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Expression Series',
+            var p = kbasePanel($(ele), {title: 'Expression Series',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
 
-            $(p.body()).kbaseExpressionSeries({ws: scope.ws, name: scope.id})
+kbaseExpressionSeries(            $(p.body()), {ws: scope.ws, name: scope.id})
 
         }
     }
@@ -576,12 +576,12 @@ angular.module('lp-directives')
 .directive('pangenome', function() {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Pangenome ',
+            var p = kbasePanel($(ele), {title: 'Pangenome ',
                                        rightLabel: scope.ws,
                                        subText: scope.id});
 
             p.loading();
-            $(p.body()).kbasePanGenome({ws: scope.ws, name:scope.id});
+kbasePanGenome(            $(p.body()), {ws: scope.ws, name:scope.id});
 
 
         }
@@ -591,11 +591,11 @@ angular.module('lp-directives')
 .directive('simulation', function() {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Simulation Set Data',
+            var p = kbasePanel($(ele), {title: 'Simulation Set Data',
                                        rightLabel: scope.ws,
                                        subText: scope.id});
             p.loading();
-            $(p.body()).kbaseSimulationSet({ws: scope.ws, name: scope.id})
+kbaseSimulationSet(            $(p.body()), {ws: scope.ws, name: scope.id})
         }
     };
 })
@@ -605,12 +605,12 @@ angular.module('lp-directives')
         link: function(scope, ele, attrs) {
             var ids = scope.ids;
 
-            var tabs = $(ele).kbTabs()
+            var tabs = $(ele).kbaseTabTableTabs()
             for (var i = 0; i < ids.length; i++) {
                 var id = ids[i];
 
                 var content = $('<div>');
-                content.kbaseRxn({id: id});
+kbaseRxn(                content, {id: id});
                 tabs.addTab({name: ids[i],
                              content: content,
                              active: (i == 0 ? true : false),
@@ -625,12 +625,12 @@ angular.module('lp-directives')
         link: function(scope, ele, attrs) {
             var ids = scope.ids;
 
-            var tabs = $(ele).kbTabs()
+            var tabs = $(ele).kbaseTabTableTabs()
             for (var i = 0; i < ids.length; i++) {
                 var id = ids[i];
 
                 var content = $('<div>');
-                content.kbaseCpd({id: id});
+kbaseCpd(                content, {id: id});
                 tabs.addTab({name: ids[i],
                              content: content,
                              active: (i == 0 ? true : false),
@@ -690,7 +690,7 @@ angular.module('lp-directives')
 .directive('genomeoverview', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Genome Overview',
+            var p = kbasePanel($(ele), {title: 'Genome Overview',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -701,7 +701,7 @@ angular.module('lp-directives')
 .directive('genomewiki', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Genome Wiki',
+            var p = kbasePanel($(ele), {title: 'Genome Wiki',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -718,7 +718,7 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             if (scope.ws === "CDS") { scope.ws = "KBasePublicGenomesV3" }
-            var p = $(ele).kbasePanel({title: 'Genome Overview',
+            var p = kbasePanel($(ele), {title: 'Genome Overview',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -731,7 +731,7 @@ angular.module('lp-directives')
 .directive('sortablegenomewikidescription', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Description',
+            var p = kbasePanel($(ele), {title: 'Description',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -746,7 +746,7 @@ angular.module('lp-directives')
 .directive('sortableimport', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Copy To My Workspace',
+            var p = kbasePanel($(ele), {title: 'Copy To My Workspace',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -761,7 +761,7 @@ angular.module('lp-directives')
 .directive('sortabletaxonomyinfo', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Taxonomy',
+            var p = kbasePanel($(ele), {title: 'Taxonomy',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -776,7 +776,7 @@ angular.module('lp-directives')
 .directive('sortabletree', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Species Tree',
+            var p = kbasePanel($(ele), {title: 'Species Tree',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -798,7 +798,7 @@ angular.module('lp-directives')
                     }
             	}
             	if (treeName) {
-                    $(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});
+kbaseTree(                    $(p.body()), {treeID: treeName, workspaceID: scope.ws});
             	} else {
 
                     var createTreeNar = function() {
@@ -890,7 +890,7 @@ angular.module('lp-directives')
 .directive('sortablecontigbrowser', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Contig Browser',
+            var p = kbasePanel($(ele), {title: 'Contig Browser',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -905,7 +905,7 @@ angular.module('lp-directives')
 .directive('sortablegenetable', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene List',
+            var p = kbasePanel($(ele), {title: 'Gene List',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -920,7 +920,7 @@ angular.module('lp-directives')
 .directive('sortableseedannotations', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Functional Categories',
+            var p = kbasePanel($(ele), {title: 'Functional Categories',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -935,7 +935,7 @@ angular.module('lp-directives')
 .directive('sortablegenomecompleteness', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Genome Completeness',
+            var p = kbasePanel($(ele), {title: 'Genome Completeness',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -950,7 +950,7 @@ angular.module('lp-directives')
 .directive('sortablerelatedpublications', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Related Publications',
+            var p = kbasePanel($(ele), {title: 'Related Publications',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -981,7 +981,7 @@ angular.module('lp-directives')
 .directive('sortablenarrativereflist', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Narratives using this Genome',
+            var p = kbasePanel($(ele), {title: 'Narratives using this Genome',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -995,7 +995,7 @@ angular.module('lp-directives')
 .directive('sortableuserreflist', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'People using this Genome',
+            var p = kbasePanel($(ele), {title: 'People using this Genome',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -1009,7 +1009,7 @@ angular.module('lp-directives')
 .directive('sortablereferencelist', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'List of data objects referencing this Genome',
+            var p = kbasePanel($(ele), {title: 'List of data objects referencing this Genome',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -1023,7 +1023,7 @@ angular.module('lp-directives')
 .directive('sortableobjrefgraphview', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Object Reference and Provenance Graph',
+            var p = kbasePanel($(ele), {title: 'Object Reference and Provenance Graph',
                                            rightLabel: scope.ws,
                                            subText: scope.id});
             p.loading();
@@ -1042,7 +1042,7 @@ angular.module('lp-directives')
 .directive('sortablegeneoverview', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene Overview',
+            var p = kbasePanel($(ele), {title: 'Gene Overview',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
@@ -1056,7 +1056,7 @@ angular.module('lp-directives')
 .directive('sortablegenecontigbrowser', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Contig Location',
+            var p = kbasePanel($(ele), {title: 'Contig Location',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
@@ -1069,7 +1069,7 @@ angular.module('lp-directives')
 .directive('sortablebiochemistry', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Biochemistry',
+            var p = kbasePanel($(ele), {title: 'Biochemistry',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
@@ -1082,7 +1082,7 @@ angular.module('lp-directives')
 .directive('sortablesequence', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Sequence',
+            var p = kbasePanel($(ele), {title: 'Sequence',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
@@ -1095,7 +1095,7 @@ angular.module('lp-directives')
 .directive('sortablepdbstructure', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Structure',
+            var p = kbasePanel($(ele), {title: 'Structure',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
@@ -1108,7 +1108,7 @@ angular.module('lp-directives')
 .directive('sortableexprlineplot', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene Expression Data',
+            var p = kbasePanel($(ele), {title: 'Gene Expression Data',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
@@ -1121,7 +1121,7 @@ angular.module('lp-directives')
 .directive('sortablegenetree', function($rootScope) {
     return {
         link: function(scope, ele, attrs) {
-            var p = $(ele).kbasePanel({title: 'Gene Tree',
+            var p = kbasePanel($(ele), {title: 'Gene Tree',
                                            rightLabel: scope.ws,
                                            subText: scope.fid});
             p.loading();
@@ -1169,7 +1169,7 @@ angular.module('lp-directives')
             			}
             			if (treeName) {
             				$(p.body()).empty();
-            				$(p.body()).kbaseTree({treeID: treeName, workspaceID: scope.ws});
+kbaseTree(            				$(p.body()), {treeID: treeName, workspaceID: scope.ws});
             			} else {
             				$(p.body()).empty();
             				$(p.body()).append('<b>There are no gene trees created for this gene.</b>');
@@ -1212,7 +1212,7 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }
-            var p = $(ele).kbasePanel({title: 'Bicluster Set Overview',
+            var p = kbasePanel($(ele), {title: 'Bicluster Set Overview',
                                            rightLabel: scope.params.workspace,
                                            subText: scope.params.id});
 
@@ -1234,7 +1234,7 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }
-            var p = $(ele).kbasePanel({title: 'Bicluster Set Tiles',
+            var p = kbasePanel($(ele), {title: 'Bicluster Set Tiles',
                                            rightLabel: scope.params.workspace,
                                            subText: scope.params.id});
 
@@ -1258,7 +1258,7 @@ angular.module('lp-directives')
     return {
         link: function(scope, ele, attrs) {
             if (scope.params.workspace === "CDS") { scope.params.workspace = "KBaseBicluster" }
-            var p = $(ele).kbasePanel({title: 'Bicluster Set Enriched Terms',
+            var p = kbasePanel($(ele), {title: 'Bicluster Set Enriched Terms',
                                            rightLabel: scope.params.workspace,
                                            subText: scope.params.id});
 
@@ -1333,7 +1333,7 @@ angular.module('lp-directives')
 						}
 					)
 
-					var p = $(ele).kbasePanel({title: 'Bicluster Overview',
+					var p = kbasePanel($(ele), {title: 'Bicluster Overview',
 												rightLabel: scope.params.workspace,
 												subText: scope.params.id});
 
@@ -1366,7 +1366,7 @@ angular.module('lp-directives')
 
 					scope.params.id = bicluster.id
 
-					var p = $(ele).kbasePanel({title: 'Data Table',
+					var p = kbasePanel($(ele), {title: 'Data Table',
 												rightLabel: scope.params.workspace,
 												subText: scope.params.id});
 
@@ -1410,7 +1410,7 @@ angular.module('lp-directives')
 						function() {
 							gene_index = $(this).index()
 							if (display) {
-								p = $(ele).kbasePanel({title: 'Line Chart',
+								p = kbasePanel($(ele), {title: 'Line Chart',
 															rightLabel: scope.params.workspace,
 															subText: scope.params.id});
 
@@ -1486,7 +1486,7 @@ angular.module('lp-directives')
 								}
 							)
 
-							var p = $(ele).kbasePanel({title: 'Data Table',
+							var p = kbasePanel($(ele), {title: 'Data Table',
 														rightLabel: scope.params.workspace,
 														subText: scope.params.id});
 
@@ -1552,7 +1552,7 @@ angular.module('lp-directives')
 														var newLineChart = $("<div sortablelinechart>")
 														$("#sortable-landing").append($("<div class='col-md-12'>").append(newLineChart))
 
-														var p = newLineChart.kbasePanel({title: 'Line Chart',
+														var p = kbasePanel(newLineChart, {title: 'Line Chart',
 																				rightLabel: scope.params.workspace,
 																				subText: scope.params.id})
 														p.loading()
@@ -1589,7 +1589,7 @@ angular.module('lp-directives')
 								function() {
 									gene_index = $(this).index()
 									if (display) {
-										p = $(ele).kbasePanel({title: 'Line Chart',
+										p = kbasePanel($(ele), {title: 'Line Chart',
 																rightLabel: scope.params.workspace,
 																subText: scope.params.id});
 

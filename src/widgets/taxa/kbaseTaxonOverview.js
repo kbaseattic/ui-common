@@ -1,11 +1,22 @@
 /**
  * Shows a species description taken from Wikipedia.
  * Also includes a picture, but that'll be under a tab or something.
- */
-(function( $, undefined ) {
-    $.KBWidget({
+ */define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseTaxonOverview",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
 
         options: {
@@ -576,4 +587,4 @@
             n : "no"
         }
     })
-})( jQuery );
+});

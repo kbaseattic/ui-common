@@ -1,7 +1,19 @@
-(function($, undefined) {
-    $.KBWidget({
+define (
+	[
+		'kbwidget',
+		'bootstrap',
+		'jquery',
+		'kbwidget'
+	], function(
+		KBWidget,
+		bootstrap,
+		$,
+		KBWidget
+	) {
+
+    return KBWidget({
         name: "KBaseMastRunResultCard",
-        parent: "kbaseWidget",
+        
         version: "1.0.0",
         options: {
             id: null,
@@ -113,4 +125,4 @@
         }
 
     });
-})(jQuery);
+});
