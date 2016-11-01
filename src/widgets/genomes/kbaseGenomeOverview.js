@@ -294,21 +294,23 @@ define (
             $.when(prom).done($.proxy(function(genome) {
                 // console.log(genome);
                 genome = genome[0].data;
-				self.pubmedQuery = genome.scientific_name
-				//console.log(self.pubmedQuery)	
-                
-				var gcContent = "Unknown";
+                self.pubmedQuery = genome.scientific_name
+                //console.log(self.pubmedQuery)	
+
+                var gcContent = "Unknown";
                 var dnaLength = "Unknown";
-                if (genome.dna_size && genome.dna_size != 0) {
-                    dnaLength = genome.dna_size;
-                    if (genome.gc_content) {
-                        gcContent = Number(genome.gc_content);
-                        if (isInt(gcContent)) {
-                            if (dnaLength)
-                                gcContent = (gcContent/dnaLength*100).toFixed(2) + " %";
+
+                if (genome.gc_content) {
+                    gcContent = Number(genome.gc_content);
+                    if (gcContent < 1.0)
+                        gcContent = (gcContent * 100).toFixed(2) + " %";
+                    else if (gcContent > 100) {
+                        if (genome.dna_size && genome.dna_size !== 0) {
+                            gcContent = gcContent + Number(genome.dna_size) + " %";
                         }
-                        else
-                            gcContent = Number(gcContent.toFixed(2)) + " %";
+                    }
+                    else {
+                        gcContent = gcContent.toFixed(2) + " %";
                     }
                 }
 
